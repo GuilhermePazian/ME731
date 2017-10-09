@@ -1,0 +1,96 @@
+---
+title: "ME731"
+output: html_document
+---
+
+```{r}
+#Função para carregar os pacotes e instalar
+ipak <- function(pkg){
+    new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+    if (length(new.pkg)) 
+        install.packages(new.pkg, dependencies = TRUE)
+    sapply(pkg, require, character.only = TRUE)
+}
+# usage
+packages <- c("dplyr", "tidyverse", "MASS", "car", "xtable")
+ipak(packages)
+```
+
+
+```{r}
+source("Scripts.R")
+#data <- read.table(file = file.choose(), header = T)
+#Neste exemplo trabalharei com os dados "iris"
+
+data <- iris
+#olhando suas variaveis que são fatores ou não - usar o dplyr
+glimpse(data) 
+
+#Coluna com os nomes de cada grupo
+especie <- data[,5] 
+
+#número de linhas dos dados nrow()
+n <- nrow(data)
+#Colocar o total de variaveis do banco nesta linha
+nvar <- 4
+#Criando uma matrix com os dados da iris
+mx <- as.matrix(data[,1:4])
+inames <- c("comprimento da sépala","largura da sépala","comprimento da pétala","largura da pétala")
+
+irisd <- iris[,1:4]
+colnames(irisd)<-c("CS","LS","CP","LP")
+
+irisaux <- iris
+colnames(irisaux)<-c("CS","LS","CP","LP","Especie")
+
+
+
+#Análises descritivas - Medidas resumo
+tab_estat(mx) #Colocar sempre sem as variaveis nominais - senão ERRO
+
+
+#Covâriancia
+cov(db_tart)
+#Correlação
+cor(db_tart)
+
+par(mfrow=c(1,1))
+boxplot(db_tart,cex=1.2,cex.lab=1.2,xlab="variável")
+
+#Histograma
+
+hist(db_tart[,1],probability=TRUE,main="V1",xlab="",ylab="")
+  
+#QQplot
+
+qqPlot(scale(db_tart[,1]),dist="norm",mean=0,sd=1,col.lines=1,grid="FALSE",xlab="quantil da N(0,1)",ylab="V1",cex=1.2,id.cex=1.2)
+
+###############################
+# ACP Covariancia
+
+  p <- ncol(db_tart)
+  m.cov<-cov(db_tart)
+  aut.val <-  eigen(m.cov)$values
+  aut.vec <- -(eigen(m.cov)$vectors)
+  m.aut.val <- t(matrix(((aut.val)),p,p))
+  m.dp.var <-  (matrix(diag(sqrt(m.cov)),p,p))
+  result.cp.cov <- princomp(db_tart,cor=FALSE)
+  corr.cp.var <- aut.vec*sqrt(m.aut.val)/m.dp.var
+  sum.res <- summary(result.cp.cov)
+
+
+screeplot(sum.res,type=c("lines"),main="autovalores",cex=1.2,cex.lab=1.2,cex.main=1.2)
+
+#comp.princ <- t((t(aut.vec))%*%t(USArrests))
+cp1 <-  -cbind((sum.res$scores)[,1])
+cp2 <-  -cbind((sum.res$scores)[,2])
+
+nomes <- rownames(db_tart)
+par(mfrow=c(1,1))
+plot(cp1,cp2,cex=1.2)
+#identify(cp1,cp2,n=50,labels=estados)
+text(cp1, cp2, labels=nomes, cex= 0.7)
+
+biplot( result.cp.cov,xlim=c(-0.3,0.4))
+```
+
