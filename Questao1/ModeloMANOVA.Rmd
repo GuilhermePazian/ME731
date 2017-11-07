@@ -1,0 +1,5 @@
+---
+title: "Modelo MANOVA"
+output: pdf_document
+---
+
