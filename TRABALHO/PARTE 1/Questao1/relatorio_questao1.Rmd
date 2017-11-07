@@ -1,0 +1,126 @@
+---
+title: 
+geometry: textwidth=18cm,textheight=24cm
+header-includes:
+- \usepackage{setspace}
+- \usepackage{indentfirst}
+- \usepackage[utf8]{inputenc}
+- \usepackage{multicol}
+- \usepackage{mathptmx}
+- \usepackage{enumerate}
+output:
+  pdf_document: null
+  html_document: default
+  mainfont: Times New Roman
+  fig_caption: yes
+lang: pt-br
+setspace: doublespacing
+fontsize: 10pt
+---
+
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{center}
+\begin{center}
+\begin{minipage}[s]{1.75cm}
+\includegraphics[width=40pt,height=45pt]{logoUnicamp.png} 
+\end{minipage}\begin{minipage}[s]{11.25cm}\noindent
+{\begin{center} {\Large Universidade Estadual de Campinas}\\
+{Instituto de Matemática, Estatística e Computação Científica}\\
+{\sc Departamento de Estatística}
+\end{center}}
+\end{minipage}
+\begin{minipage}[s]{0.5cm}
+\includegraphics[width=40pt,height=45pt]{logoimecc.png}
+\end{minipage}
+\end{center}
+\end{center}
+\vspace{3cm}
+\font\fontGrande=cmcsc10 scaled 2500
+\font\pessoal=cmr9 scaled 2500
+
+\begin{center}
+\vspace*{3.5cm}
+{\rule[0 ex]{16cm}{0.05cm}}
+{\huge \sc Trabalho - Parte 1 \\[8pt]
+Relatório - Questão 1}
+{\rule[0 ex]{16cm}{0.05cm}}
+\end{center}
+
+\begin{center}
+
+\normalsize \vspace{8mm}
+
+
+\vspace{4cm}
+
+{\sc  Eliane Ramos de Siqueira  RA:155233} \\
+{\sc  Guilherme Pazian  RA:160323}\\
+{\sc  Henrique Capatto  RA:146406}\\
+{\sc  Murilo Salgado Razoli  RA:150987}
+
+\vspace{0.2cm}
+
+Disciplina: {\bf ME731 - Análise Multivariada}\\
+Professor: {\bf Caio Lucidius Naberezny Azevedo}
+\vspace{1cm}
+
+{\footnotesize{Campinas - SP \\ 18 de Novembro de 2017}}
+\end{center}
+\end{titlepage}
+
+```{r, echo=FALSE}
+#definindo opções padrões 
+
+options(OutDec= ",")
+
+knitr::opts_chunk$set(fig.width=6, fig.height=3.5, fig.path='Figs/', fig.align='center', echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r pacotes utilizados, echo=FALSE,eval=TRUE, warning=FALSE}
+#install.packages(c("ggplot2","knitr","dplyr", "xtable", "gridExtra"))
+
+#pacotes utilizados
+library(ggplot2)
+library(knitr)
+library(dplyr)
+library(xtable)
+library(gridExtra)
+```
+
+```{r}
+#leitura do banco de dados
+
+
+```
+
+```{r}
+#INSERIR TODOS OS CÓDIGOS ACIMA DO TEXTO E SÓ CHAMAR QUANDO NECESSARIO
+```
+
+
+1. Introdução
+
+\newpage
+
+2. Análise descritiva
+
+\newpage
+
+3. Análise Inferencial
+
+
+\newpage
+
+4. Conclusões 
+
+\newpage
+
+5. Bibliografia
+
+\begin{itemize}
+
+  \item Azevedo, C. L. N (2017). Notas de aula sobre análise multivariada de dados http://www.ime.unicamp.br/~cnaber/Material_AM_2S_2017.htm
+  \item Johson, R. A. and Wichern, D. W. (2007). Applied Multivariate Statistical Analysis, 7a edição, Upper Saddle River, NJ : Prentice-Hall.
+
+\end{itemize}
