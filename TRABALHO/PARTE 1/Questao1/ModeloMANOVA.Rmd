@@ -57,3 +57,22 @@ p.valor.igual.m.cov <- test.igual.matriz$p.valor
 
 ```
 
+
+```{r}
+#Teste e resuldados MANOVA
+fit.manova <- manova(as.matrix(m.dados) ~ v.especies)
+
+#Aqui é apresentado testes anova para cada variável
+anovas <-summary.aov(fit.manova)
+
+#Aqui é o resuldado das estatísticas de teste que ele passou para MANOVA
+#OBS acho que vai ter que copiar os p-valores "na mão" pq não está fácil extrai-los
+
+Wilks <- summary.manova(fit.manova,test="Wilks")
+Pillai <- summary.manova(fit.manova,test="Pillai")
+Hotelling <- summary.manova(fit.manova,test="Hotelling-Lawley")
+Roy <- summary.manova(fit.manova,test="Roy")
+
+```
+
+
