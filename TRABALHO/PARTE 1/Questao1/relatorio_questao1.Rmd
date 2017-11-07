@@ -81,18 +81,59 @@ knitr::opts_chunk$set(fig.width=6, fig.height=3.5, fig.path='Figs/', fig.align='
 #install.packages(c("ggplot2","knitr","dplyr", "xtable", "gridExtra"))
 
 #pacotes utilizados
-library(ggplot2)
-library(knitr)
-library(dplyr)
-library(xtable)
-library(gridExtra)
+
+packages <- c("ggplot2",
+              "knitr",
+              "dplyr",
+              "tidyverse",
+              "xtable",
+              "gridExtra")
+ipak(packages)
+
 ```
 
 ```{r}
 #leitura do banco de dados
+```
 
+```{r }
+##Descritivas
+
+descritivas <- 
+dadosmoscas %>% select_if(.predicate = is.numeric) %>% 
+  gather(coluna,valores) %>% 
+  group_by(coluna) %>% 
+  summarise_if(.predicate = function(x) is.numeric(x),
+                  .funs = c(Media = "mean",
+                     DP = "sd",
+                     Var. = "var",
+                     Minimo = "min",
+                     Maximo = "max",
+                     CV =  "cv",
+                     Mediana = "median",
+                     n = "length")) %>% 
+  mutate_if(.predicate = is.numeric,funs(round(.,3)))
+descritivas
+```
+
+##variavel resposta
+
+```{r}
+ggplot(dados,aes(quality)) + stat_count()
+ggplot(dados,aes(qualidade)) + stat_count()
 
 ```
+
+
+
+
+
+
+
+
+
+
+
 
 ```{r}
 #INSERIR TODOS OS CÓDIGOS ACIMA DO TEXTO E SÓ CHAMAR QUANDO NECESSARIO
