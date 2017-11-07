@@ -3,6 +3,22 @@ title: "Modelo MANOVA"
 output: pdf_document
 ---
 
+```{r}
+## Função que  carrega e instala pacotes
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg))
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+```
+
+```{r}
+##calcula coeficiente de correlacao(%)
+cv <- function(x){
+  100 * sd(x)/mean(x)
+}
+```
 
 ```{r}
 #lendo as funçoes que o caio disponibilizou para MANOVA (mudei uma coisa lá)
@@ -17,6 +33,9 @@ inames <- c("Espécie","Comprimento da Asa","Largura da Asa","Comprimento 3° pa
 #Identificação das colunas do Banco de dados
 
 dadosmoscas <- read.table(file = "dadosmoscas.txt",col.names = c("Esp","Comp_Asa","Larg_Asa","Comp_3_palpo","Larg_3_palpo", "Comp_4_palpo", "Comp_12_seg_ant", "Comp_13_seg_ant"))
+
+dadosmoscas$Esp %<>%  as.factor()#definindo o tipo da especie como fator
+glimpse(dadosmoscas) #Verificando os tipos de variaveis.
 ```
 
 
@@ -38,8 +57,6 @@ k.G <- 2
 k.P <- 7
 ```
 
-
-
 ```{r}
 #Teste de igualdade das matrizes de covariância entre os grupos
 
@@ -57,7 +74,6 @@ p.valor.igual.m.cov <- test.igual.matriz$p.valor
 
 ```
 
-
 ```{r}
 #Teste e resuldados MANOVA
 fit.manova <- manova(as.matrix(m.dados) ~ v.especies)
@@ -74,5 +90,9 @@ Hotelling <- summary.manova(fit.manova,test="Hotelling-Lawley")
 Roy <- summary.manova(fit.manova,test="Roy")
 
 ```
+
+
+
+
 
 
