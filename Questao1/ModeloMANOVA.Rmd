@@ -3,3 +3,57 @@ title: "Modelo MANOVA"
 output: pdf_document
 ---
 
+
+```{r}
+#lendo as funçoes que o caio disponibilizou para MANOVA (mudei uma coisa lá)
+source("codigoscaioMANOVA.r")
+```
+
+
+```{r}
+#nomes para usar nas tabelas
+inames <- c("Espécie","Comprimento da Asa","Largura da Asa","Comprimento 3° palpo","Largura 3° palpo", "Comprimento 4° palpo", "Comprimento 12° segmento da antena", "Compimento 13° segmento da antena")
+
+#Identificação das colunas do Banco de dados
+
+dadosmoscas <- read.table(file = "dadosmoscas.txt",col.names = c("Esp","Comp_Asa","Larg_Asa","Comp_3_palpo","Larg_3_palpo", "Comp_4_palpo", "Comp_12_seg_ant", "Comp_13_seg_ant"))
+```
+
+
+```{r}
+#tirando a primeira coluna para fazer a matriz de dados
+m.dados <- dadosmoscas[,-1]
+
+#Pegando a coluna das espécies (grupos) para fazer o vetor identificador de grupos
+#OBS somei 1 pois a função do Caio diz que o primeiro grupo é 1 (aqui esta como 0) só pra não precisar mudar a função dele
+v.especies <- cbind(as.numeric(dadosmoscas[,1])+1)
+
+#Criando um vetor com as quantidades de observações de cada grupo, constam 35 de cada grupo
+v.n_especies <- rbind(35,35)
+
+#Identificação da quantidade de grupos
+k.G <- 2
+
+#Identificação da quantidade de variáveis
+k.P <- 7
+```
+
+
+
+```{r}
+#Teste de igualdade das matrizes de covariância entre os grupos
+
+#resuldado da função
+test.igual.matriz <-Box.teste.Igual.MCov(as.matrix(m.dados),v.especies,v.n_especies,k.G)
+
+#matriz sigma P (não lembro o que é exatamente)
+m.sigma.P <- test.igual.matriz$Sigma.P
+
+#estatística do teste
+est.test.igual.m.cov <- test.igual.matriz$est.test
+
+#p-valor do teste
+p.valor.igual.m.cov <- test.igual.matriz$p.valor
+
+```
+

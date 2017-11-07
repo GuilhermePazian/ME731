@@ -37,7 +37,8 @@ Box.teste.Igual.MCov<-function(m.X.completa,v.grupos,v.n,G)
   cat("Matrizes de Covariâncias por grupo: \n")
   print(m.Sigma.completa)
   Sigma.P <-as.matrix(data.frame(Sigma.P))
-  list(Sigma.P=Sigma.P)
+  #mudei aqui para conseguir printar o pvalor e o qui-quadrado mais fácil
+  return(list(Sigma.P=Sigma.P,p.valor = e.nd.QB, est.test = Q.B))
 } # fim fa função
 
 
