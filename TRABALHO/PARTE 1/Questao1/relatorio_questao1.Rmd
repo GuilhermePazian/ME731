@@ -99,8 +99,8 @@ ipak(packages)
 ```{r }
 ##Descritivas
 
-descritivas <- 
-dadosmoscas %>% select_if(.predicate = is.numeric) %>% 
+descritivas <- function(dados){
+dados %>% select_if(.predicate = is.numeric) %>% 
   gather(coluna,valores) %>% 
   group_by(coluna) %>% 
   summarise_if(.predicate = function(x) is.numeric(x),
@@ -113,7 +113,8 @@ dadosmoscas %>% select_if(.predicate = is.numeric) %>%
                      Mediana = "median",
                      n = "length")) %>% 
   mutate_if(.predicate = is.numeric,funs(round(.,3)))
-descritivas
+return(dados)
+  }
 ```
 
 ##variavel resposta

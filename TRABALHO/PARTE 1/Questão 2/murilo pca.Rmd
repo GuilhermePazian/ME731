@@ -77,13 +77,7 @@ options(OutDec= ",")
 knitr::opts_chunk$set(fig.width=6, fig.height=3.5, fig.path='Figs/', fig.align='center', echo=FALSE, warning=FALSE, message=FALSE)
 ```
 
-```{r}
-#lendo as funções que o Murilo criou
-
-source("funcoes_murilo.r")
-```
-
-```{r}
+```{r pacotes utilizados, echo=FALSE,eval=TRUE, warning=FALSE}
 #pacotes utilizados
 
 packages <- c("ggplot2",
@@ -91,28 +85,13 @@ packages <- c("ggplot2",
               "dplyr",
               "tidyverse",
               "xtable",
-              "gridExtra",
-              "devtools",
-              "magrittr",
-              "tidyr",
-              "tidyverse")
+              "gridExtra")
 ipak(packages)
-
-#install_github("vqv/ggbiplot")
-library(ggbiplot)
 ```
 
-
 ```{r}
-#nomes para usar nas tabelas
-inames <- c("Espécie","Comprimento da Asa","Largura da Asa","Comprimento 3° palpo","Largura 3° palpo", "Comprimento 4° palpo", "Comprimento 12° segmento da antena", "Compimento 13° segmento da antena")
+#leitura do banco de dados
 
-#Identificação das colunas do Banco de dados
-
-dadosmoscas <- read.table(file = "dadosmoscas.txt",col.names = c("Esp","Comp_Asa","Larg_Asa","Comp_3_palpo","Larg_3_palpo", "Comp_4_palpo", "Comp_12_seg_ant", "Comp_13_seg_ant"))
-
-dadosmoscas$Esp %<>%  as.factor()#definindo o tipo da especie como fator
-#glimpse(dadosmoscas) #Verificando os tipos de variaveis.
 ```
 
 ```{r}
@@ -131,14 +110,13 @@ mx <- as.matrix(dadosmoscas[,-1])
 dadosmoscasd <- dadosmoscas[,-1]
 
 #Análises descritivas - Medidas resumo
-descritivas_moscas=tab_estat(mx) #Colocar sempre sem as variaveis nominais - senão ERRO
+tab_estat(mx) #Colocar sempre sem as variaveis nominais - senão ERRO
 
-boxplot_moscas=boxplot(dadosmoscas,cex=1.2,cex.lab=1.2,xlab="variável")
-```
+par(mfrow=c(1,1))
+boxplot(dadosmoscas,cex=1.2,cex.lab=1.2,xlab="variável")
 
-```{r}
 #Correlação
-correlacao_moscas=cor(dadosmoscasd)
+cor(db_tart)
 
 ###############################
 # ACP via Matriz de correlações
@@ -149,26 +127,31 @@ aut.vec <- (eigen(m.cor)$vectors)
 m.aut.val <- t(matrix(((aut.val)),p,p))
 result.cp.cor <- princomp(dadosmoscasd,cor=TRUE)
 corr.cp.cor <- aut.vec*sqrt(m.aut.val)
-componentes_moscas=summary(result.cp.cor)
-screeplot_moscas=screeplot(result.cp.cor,type=c("lines"),main="autovalores",cex=1.2,cex.lab=1.2,cex.main=1.2)
+summary(result.cp.cor)
+screeplot(result.cp.cor,type=c("lines"),main="autovalores",cex=1.2,cex.lab=1.2,cex.main=1.2)
 #
 cp1 <-  cbind((result.cp.cor$scores)[,1])
 cp2 <-  cbind((result.cp.cor$scores)[,2])
-cp3 <-  cbind((result.cp.cor$scores)[,3])
+
 
 nomes <- rownames(dadosmoscas)
-
-dispersao_moscas=plot(cp1,cp2,cex=1.2) ##fazer matriz de dispersão com 3 componentes
+par(mfrow=c(1,1))
+plot(cp1,cp2,cex=1.2)
 #identify(cp1,cp2,n=50,labels=estados)
 text(cp1, cp2, labels=nomes, cex= 0.7)
 
 wine.pca <- prcomp(dadosmoscasd, scale. = TRUE)
-biplot_moscas=ggbiplot(wine.pca, obs.scale = 1, var.scale = 1,
+ggbiplot(wine.pca, obs.scale = 1, var.scale = 1,
          groups = as.factor(dadosmoscas[,1]), ellipse = TRUE, circle = TRUE) +
   scale_color_discrete(name = '') +
   theme(legend.direction = 'horizontal', legend.position = 'top') + theme_bw()
 ```
 
+
+
+```{r}
+#INSERIR TODOS OS CÓDIGOS ACIMA DO TEXTO E SÓ CHAMAR QUANDO NECESSARIO
+```
 
 
 1. Introdução
@@ -177,36 +160,9 @@ biplot_moscas=ggbiplot(wine.pca, obs.scale = 1, var.scale = 1,
 
 2. Análise descritiva
 
-```{r}
-xtable(descritivas_moscas)
-```
-
-```{r}
-par(mfrow=c(1,1))
-boxplot_moscas
-```
-
 \newpage
 
 3. Análise Inferencial
-
-```{r}
-componentes_moscas
-
-```
-
-```{r}
-screeplot_moscas
-```
-
-```{r}
-par(mfrow=c(1,1))
-dispersao_moscas
-```
-
-```{r}
-biplot_moscas
-```
 
 
 \newpage
