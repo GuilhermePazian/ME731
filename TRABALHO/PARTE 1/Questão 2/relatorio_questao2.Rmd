@@ -133,7 +133,7 @@ dadosmoscasd <- dadosmoscas[,-1]
 #Análises descritivas - Medidas resumo
 descritivas_moscas=tab_estat(mx) #Colocar sempre sem as variaveis nominais - senão ERRO
 
-boxplot_moscas=boxplot(dadosmoscas,cex=1.2,cex.lab=1.2,xlab="variável")
+boxplot_moscas=boxplot(dadosmoscas[,2:8],cex=1.2,cex.lab=1.2,xlab="variável")
 ```
 
 ```{r}
@@ -162,8 +162,8 @@ dispersao_moscas=plot(cp1,cp2,cex=1.2) ##fazer matriz de dispersão com 3 compon
 #identify(cp1,cp2,n=50,labels=estados)
 text(cp1, cp2, labels=nomes, cex= 0.7)
 
-wine.pca <- prcomp(dadosmoscasd, scale. = TRUE)
-biplot_moscas=ggbiplot(wine.pca, obs.scale = 1, var.scale = 1,
+mosca.pca <- prcomp(dadosmoscasd, scale. = TRUE)
+biplot_moscas=ggbiplot(mosca.pca, obs.scale = 1, var.scale = 1,
          groups = as.factor(dadosmoscas[,1]), ellipse = TRUE, circle = TRUE) +
   scale_color_discrete(name = '') +
   theme(legend.direction = 'horizontal', legend.position = 'top') + theme_bw()
@@ -172,6 +172,13 @@ biplot_moscas=ggbiplot(wine.pca, obs.scale = 1, var.scale = 1,
 
 
 1. Introdução
+
+O banco de dados consiste em 70 observações vindas da medição de sete variáveis em duas espécies de moscas *Leptoconops carteri* e *Leptoconops torrens*, com 35 observações cada. A variáveis são: espécie (0 - torrens e 1- carteri), comprimento da asa, largura da asa, comprimento do terceiro palpo, largura do terceiro palpo, comprimento do quarto palpo, comprimento do décimo segundo segmento da antena e comprimento do décimo terceiro segmento da antena. Para  análises foram utilizados os softwares *R* \footnote{https://cran.r-project.org/}, versão 3.4.0 e *Rstudio* \footnote{https://www.rstudio.com/}, versão 1.0.1. 
+
+AS duas espécies foram consideradas morfologicamente similares e por prat de tempo foram consideradas como uma única espécie. O Objetivo geral desta análise é verificar possíveis distinções entre espécies. Além disso, especificamente, queremos realizar a análise de componentes principais para realizar tal tarefa. Faremos também uma análise de regressão utilizando a primeira componente. 
+
+
+
 
 \newpage
 
