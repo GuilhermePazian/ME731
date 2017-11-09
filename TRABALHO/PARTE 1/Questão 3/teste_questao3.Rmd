@@ -13,8 +13,9 @@ output:
   html_document: default
   mainfont: Times New Roman
   fig_caption: yes
+  number_sections: true
 lang: pt-br
-setspace: doublespacing
+linestretch: 2
 fontsize: 10pt
 ---
 
@@ -271,7 +272,7 @@ mental2 = as.matrix(mental)
 dimnames(mental2) <- list(rownames,colnames)
 names(dimnames(mental2)) <- c("Saúde Mental","Status Sócio-Econômico dos pais")
 
-
+prop_total = round(mental2/sum(mental3)*100,2)
 ```
 
 
@@ -300,7 +301,7 @@ rownames = c("Boa", "Presença fraca de Sintomas","Presença Moderada de Sintoma
 ```
 
 
-1. Introdução
+# Introdução
 
 Ter uma boa saúde mental é um aspecto importante na constuição da vida humana. Sem isto, pode-se pressupor que uma boa condição financeira contribui para existência de uma boa saúde mental. Com este trabalho, desejamos medir o grau de associação entre o estado da saúde mental e o status sócio-ecônomico ecõnomico do páis. o objetivo especifico deste trabalho é encontrar um padrão nos dados que indiquem quais estados de saúde mental estão mais relacionados ao status sócio- economico do país atráves de análise de correspondência simples.
 
@@ -308,14 +309,13 @@ O banco de dados que vamos analisar é constituído de `r sum(mental3)` observa�
 
 Primeiramente, realizamos um Teste Qui-Quadrado para testarmos a hipótese de independência entre as duas variáveis citadas acima. Depois, Caso indique-se a dependência,auxiliadas por uma análise descritiva dos perfis médios,procuraremos indícios de relações entre as variáveis.Depois analisaremos a estrutura deste comportamento utilizando análise correspondência (ver Azevedo(2017) e Johnson e Wichern (2007)).
 
-\newpage
 
-2. Análise descritiva
+# Análise descritiva
 
 Abaixo, Tabela 1, encontra-se os dados obtidos. O Modelo probabilistico gerador da tabela de contingência é a Multinomial, com tamanho `r sum(mental3)` e 20 categorias. 
 
 ```{r}
-kable(mental2, format = "latex", booktabs = T)
+kable(mental2, format = "latex", booktabs = T)%>%kable_styling(position = "center")
 ```
 
 Primeiramente, vamos realizar o teste Qui-quadrado para testarmos independência e hipótese que desejamos testar é:
@@ -330,12 +330,9 @@ Como discutidos anteriormente, pelo fato do teste qui-quadrado indicar dependên
 Na Tabela 2, observamos a proporção estimadas pelo total. Pode-se depreender que para `r prop_total[5,1]`% dos indíviduos vem de países com alto status sócio-ecônomico. `r prop_total[2,6]`% dos individuos têm presença fraca de sintomas. Podemos ver que `r prop_total[2,1]`% dos individuos tem presença fraca de sintomas e tem pais com alto status sócio-ecõnomico e  `r prop_total[4,1]` dos individuos é debilitados e os pais tem alto status sócio-ecõnomico. 
 
 ```{r}
-prop_total = round(mental2/sum(mental3)*100,2)
 
-kable(round(mental2/sum(mental3)*100,2), format = "latex", booktabs = T)%>%kable_styling(position = "center")
+kable(prop_total, format = "latex", booktabs = T)%>%kable_styling(position = "center")
 
 ```
-
-
 
 Na Tabela 3, há o rankeamento para cada variável. Como podemos observar que 
