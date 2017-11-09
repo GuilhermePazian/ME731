@@ -88,26 +88,297 @@ library(xtable)
 library(gridExtra)
 ```
 
-```{r}
-#leitura do banco de dados
+```{r echo=FALSE}
+#mudando o separador decimal para resultados "printados"
+options(OutDec= ",")
+```
+
+```{r, echo=FALSE}
+#definindo opções padrões dos chunks
+knitr::opts_chunk$set(fig.align='center', echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+
+```{r pacotes,cache = FALSE,echo=FALSE, warning = FALSE,eval=TRUE,message = FALSE, error = FALSE}
+#eval= FALSE faz com que o R ignore este chunk
+#echo = FALSE não permite que o chunk apareça no pdf
+
+
+packages= c("tidyverse","data.table","reshape2","captioner","gridExtra","xtable","MASS","xtable","knitr","kableExtra","quadprog","scales","ca","mice","Matrix")
+
+#caso necessário a instalação de algum pacote
+#install.packages(packages)
+
+#mostra quais pacotes foram carregados
+invisible(lapply(packages, require, character.only = TRUE))
+
+figs <- captioner(prefix="Figura")
+tbls <- captioner(prefix="Tabela")
+
+#instalacao de um pacote pra "printar" tabelas mais bonitinhas
+#install.packages('printr',type = 'source',repos = c('http://yihui.name/xran', 'http://cran.rstudio.com'))
+
+```
+
+```{r func_aux}
+# funções utilizadas
+
+#função pra calcular o TRV
+
+TRV = function(sigma_0, sigma_hat, n){
+  
+  library(Matrix)
+  
+  p = nrow(sigma_0)
+
+  lambda = n*log(det(sigma_0))-n*log(det(sigma_hat))+n*sum(diag(ginv(sigma_0)%*%sigma_hat))-n*p
+
+  p_valor = 1 - pchisq(lambda,(p*(p+1))/2, lower.tail = TRUE)
+  
+  return(lambda)
+
+}
+
+
+Box.teste.Igual.MCov<-function(m.X.completa,v.grupos,v.n,G)
+{
+  # v.grupos (1,2,3...)
+  # m.X.completa : matriz de dados com todos os grupos
+  grupo <- 1
+  p<- ncol(m.X.completa)
+  m.X.k <- m.X.completa[v.grupos==grupo,]
+  Sigma.k <- cov(m.X.k)
+  m.Sigma.completa <- cbind(grupo,Sigma.k)
+  Sigma.P <- (v.n[grupo]-1)*Sigma.k # estimativa ponderada
+  aux.k.1 <- (v.n[grupo] - 1)*log(det(Sigma.k))
+  grupo <- grupo + 1
+  for (i in 2:G)
+  {
+    m.X.k <- m.X.completa[v.grupos==grupo,] # pegar os dados referentes ao grupo i
+    Sigma.k <- cov(m.X.k)
+    m.Sigma.completa <- rbind(m.Sigma.completa,cbind(grupo,Sigma.k))
+    Sigma.P <- Sigma.P + (v.n[grupo]-1)*Sigma.k # estimativa ponderada
+    aux.k.1 <- aux.k.1 + (v.n[grupo] - 1)*log(det(Sigma.k))
+    grupo <- grupo + 1
+  }
+  Sigma.P <- Sigma.P/(sum(v.n)-G)
+  
+  # Estatística de ajuste
+  aux.u <- (sum(1/(v.n - 1)) - (1/(sum(v.n - 1))))*(2*p^2 + 3*p - 1)/(6*(p+1)*(G-1))
+  Q.B <-  (1 - aux.u)*(sum(v.n-1)*log(det(Sigma.P)) - aux.k.1)
+  aux.v <- 0.5*p*(p+1)*(G-1)
+  e.nd.QB <- 1 - pchisq(Q.B,aux.v)
+  cat("Estatística do Teste: ", Q.B, "\n")
+  cat("nível descritivo: ",e.nd.QB,"\n")
+  cat("Matrizes de Covariâncias por grupo: \n")
+  print(m.Sigma.completa)
+  Sigma.P <-as.matrix(data.frame(Sigma.P))
+  list(Sigma.P=Sigma.P)
+} # fim fa função
+
+
+TesteF.CBU.M<-function(fit.model,m.Sigma.P,p,G,m.C,m.U,m.M)
+{
+  m.B <- matrix(coef(fit.model),G,p)
+  v.beta <- matrix(t(m.B))
+  m.X <- model.matrix(fit.model)
+  m.Ca <- kronecker(m.C,t(m.U))
+  m.Ma <- matrix(t(m.M))
+  v.theta <- m.Ca%*%v.beta - m.Ma
+  m.Sigmabeta <- kronecker(solve(t(m.X)%*%m.X),m.Sigma.P)
+  estat <- t(v.theta)%*%solve(m.Ca%*%(m.Sigmabeta)%*%t(m.Ca))%*%v.theta
+  p.valor <- 1-pchisq(estat,df=nrow(m.C)*ncol(m.U))
+  cat("Estatistica Qui-quadrado = ",round(estat,2),"\n")
+  cat("pvalor = ",round(p.valor,4),"\n")
+  cat("Matriz C :","\n")
+  print(m.C)
+  cat("Matriz U :","\n")
+  print(m.U)
+  cat("Matriz M :","\n")
+  print(m.M)
+}
+
+ACaux <-function(m.X)     
+{
+n.I <- nrow(m.X)
+n.J <- ncol(m.X)
+m.X.completa <- cbind(m.X,apply(m.X,1,sum))
+m.X.completa <- rbind(m.X.completa,apply(m.X.completa,2,sum))
+
+# Matriz de proporções
+m.P <-  m.X.completa/sum(m.X)
+
+# Vetor Pr e Pc
+P.r <- cbind(m.P[,n.J+1])
+P.c <- cbind(m.P[n.I+1,])
+
+# Matrizes Dr e Dc
+D.r <- diag(c(P.r),n.I+1,n.I+1)
+D.c <- diag(c(P.c),n.J+1,n.J+1)
+
+# Perfis das linhas e colunas
+m.R <- solve(D.r)%*%m.P
+m.C <- t(solve(D.c)%*%t(m.P))
+round(m.R*100,2)
+
+#t(round(m.C*100,2))
+
+m.P.aux <- m.P[1:n.I,1:n.J]
+P.c.aux <- cbind(P.c[1:n.J,])
+P.r.aux <- cbind(P.r[1:n.I,])
+D.r.aux <- diag(sqrt(c(P.r.aux)),n.I,n.I)
+D.c.aux <- diag(sqrt(c(P.c.aux)),n.J,n.J)
+m.P.rc <- (solve(D.r.aux))%*%(m.P.aux - P.r.aux%*%t(P.c.aux))%*%(solve(D.c.aux))
+result.svd <- svd(m.P.rc)
+v.gamma <- cbind(result.svd$d)
+inercia <- (v.gamma^2)
+#round(cbind(v.gamma,inercia),4)
+ 
+# Valor singular é raiz quadrada do autovalor (positivo)
+eigen1 <- eigen(m.P.rc%*%t(m.P.rc))
+eigen2 <- eigen(t(m.P.rc)%*%(m.P.rc))
+m.Gamma <- diag(result.svd$d,min(n.I,n.J),min(n.I,n.J))
+m.U <- (result.svd$u)
+m.V <- (result.svd$v)
+ 
+# componentes
+m.PL <- (solve(D.r.aux)%*%m.U%*%(m.Gamma))
+m.PC <- (solve(D.c.aux)%*%m.V%*%(m.Gamma))
+m.FullLC <- rbind(m.PL,m.PC)
+#result.AC.inercia <- list(v.gamma=v.gamma,inercia=inercia)
+return(list(inercia=inercia,m.R=m.R,m.C=m.C))
+} # end of the function
 
 
 ```
 
+
+
+```{r dados_exer3}
+
+
+path_arq = glue::glue(getwd(),'/Saude_mental.txt')
+
+mental = read.table(path_arq) 
+
+colnames = c("A (Alto)","B","C","D","E (Baixo)","Total")
+
+rownames = c("Boa", "Presença fraca de Sintomas","Presença Moderada de Sintomas","Debilitado","Total")
+
+mental3 = mental
+
+#soma dos valores das colunas
+sum_c = colSums(mental)
+#soma dos valores das linhas
+sum_r = rowSums(mental)
+# soma dos valores
+total = sum(mental)
+
+mental = data.frame(mental,sum_r)
+mental[5,]=c(sum_c,total)
+
+mental2 = as.matrix(mental)
+
+dimnames(mental2) <- list(rownames,colnames)
+names(dimnames(mental2)) <- c("Saúde Mental","Status Sócio-Econômico do País")
+
+
+```
+
+
 ```{r}
-#INSERIR TODOS OS CÓDIGOS ACIMA DO TEXTO E SÓ CHAMAR QUANDO NECESSARIO
+quiqrad = chisq.test(mental)
+```
+
+```{r perfil_medio}
+perfis_medios = ACaux(mental2)
+
+colnames = c("A (Alto)","B","C","D","E (Baixo)","Total")
+rownames = c("Boa", "Presença fraca de Sintomas","Presença Moderada de Sintomas","Debilitado", "Total")
+
+perfil_linha = perfis_medios$m.R
+dimnames(perfil_linha) <- list(rownames,colnames)
+names(dimnames(perfil_linha)) <- c("Saúde Mental","Status Sócio-Econômico do País")
+
+
+perfil_coluna = perfis_medios$m.C
+dimnames(perfil_coluna) <- list(rownames,colnames)
+names(dimnames(perfil_coluna)) <- c("Saúde Mental","Status Sócio-Econômico do País")
+
+inercia = perfis_medios$inercia
+
+var_exp = ((inercia[1]^2)+(inercia[2]^2))/sum(inercia^2)
 ```
 
 
 1. Introdução
 
+Ter uma boa saúde mental é um aspecto importante na constuição da vida humana. Sem isto, pode-se pressupor que uma boa condição financeira contribui para existência de uma boa saúde mental. Com este trabalho, desejamos medir o grau de associação entre o estado da saúde mental e o status sócio-ecônomico ecõnomico do páis. o objetivo especifico deste trabalho é encontrar um padrão nos dados que indiquem quais estados de saúde mental estão mais relacionados ao status sócio- economico do país atráves de análise de correspondência simples.
+
+O banco de dados que vamos analisar é constituído de `r sum(mental3)` observações, com duas variáveis categorizadas que são: *Sáude Mental*, dividida em quatro categorias (Boa, Presença fraca de sintomas, Presença moderada de sintomas, Debilitado) e *Status Sócio-Ecõnomico do País*, dividido em cinco ordens (A(Boa),B,C,D e E(Baixo)). Os softwares utilizados foram: *R* \footnote{https://cran.r-project.org/}, versão 3.4.0 e *Rstudio* \footnote{https://www.rstudio.com/}, versão 1.0.1. 
+
+Primeiramente, realizamos um Teste Qui-Quadrado para testarmos a hipótese de independência entre as duas variáveis citadas acima. Depois, Caso indique-se a dependência,auxiliadas por uma análise descritiva dos perfis médios,procuraremos indícios de relações entre as variáveis.Depois analisaremos a estrutura deste comportamento utilizando análise correspondência (ver Azevedo(2017) e Johnson e Wichern (2007)).
+
 \newpage
 
 2. Análise descritiva
 
+Abaixo, Tabela 1, encontra-se os dados obtidos. O Modelo probabilistico gerador da tabela de contingência é a Multinomial, com tamanho `r sum(mental3)` e 20 categorias. 
+
+```{r}
+kable(mental2, format = "latex", booktabs = T)
+```
+
+Primeiramente, vamos realizar o teste Qui-quadrado para testarmos independência e hipótese que desejamos testar é:
+
+$H_0: p_{ij}=p_{i.}p_{.j}$ vs $H_1: p_{ij}\neq p_{i.}p_{.j}$, para pelo menos um par $(i,j)$, onde $p_{ij}$ é a proporção de indíviduos na população total para a i-ésima categoria da variável *Sáude Mental* e da j-ésima categoria da variável *Status Sócio-Ecõnomico do País*. $p_{i.}$ é a proporção de individuos na categoria "i" da variável *Sáude Mental* .$p_{.j}$ é a proporção de indivudos na categoria "j" da variável *Status Sócio-Ecõnomico do País*. 
+
+Os resultados para o teste qui-quadrado usual são: O quantil teórico de uma distribuição qui - quadrado é: $\chi^{2}_{12}=$ `r round(qchisq(0.95,12),2)`. O valor da estatística qui-quadrado é: Q = `r round(quiqrad$statistic,2)` e seu respectivo p-valor é `r round(quiqrad$p.value,4)`. Pelos resultados anteriores vemos que o teste rejeitou a hipótese de que há independência entre entre as variáveis. 
+
+Como discutidos anteriormente, pelo fato do teste qui-quadrado indicar dependência, vamos estudar essa estrutura calculando os perfis médios para cada variável, analisando-as de forma abrangente possível e, posteriormente, aplicando a Análise de Correspondência.
+
+
+
+```{r}
+prop_total = round(mental2/sum(mental3)*100,2)
+kable(round(mental2/sum(mental3)*100,2), format = "latex", booktabs = T)
+```
+
+Na Tabela 2, observamos a proporção estimadas pelo total. Pode-se depreender que para `r prop_total[5,1]`% dos indíviduos vem de países com alto status sócio-ecônomico. `r prop_total[2,6]`% dos individuos têm presença fraca de sintomas. Podemos ver que `r prop_total[2,1]`% dos individuos tem presença fraca de sintomas e tem pais com alto status sócio-ecõnomico e  `r prop_total[4,1]` dos individuos é debilitados e os pais tem alto status sócio-ecõnomico. 
+
+
+
+Na Tabela 4, de perfil das linhas, vemos que para uma boa Saúde mental temos que os perfis-medios relacionado aos maiores status socio-economicos, denominados (A,B,C), em ordem decrescente, se destacam em relação a proporção na população com respectivamente `r round(perfil_linha[1,1],4)*100`%, `r round(perfil_linha[1,2],4)*100`%, `r round(perfil_linha[1,3],4)*100`%. Ou seja, há indícios de que uma boa saúde mental pode estar relacionada a melhores condições sócio-econômicas. 
+
+Podemos observar que para quem está debilitado, os perfis-medios que se destacam são `r round(perfil_linha[4,1],4)*100`%, `r round(perfil_linha[4,4],4)*100`%, `r round(perfil_linha[4,5],4)*100`%. Ou seja, há indícios que quem está debilitado pode ter uma pior situação econômica. 
+
+O perfil das colunas é dado por:
+
+```{r}
+
+kable(perfil_coluna, format = "latex", booktabs = T)
+```
+
+Podemos ver que para quem possui o maior nível socio-economico temos que os perfis-medios relacionados aos estados de saúde mental Boa e o Debilitado  se destacam em relação a proporção na população com respectivamente `r round(perfil_linha[1,1],4)*100`%, `r round(perfil_linha[4,1],4)*100`%. Ou seja, há indícios a melhor condição sócio-econômica está relacionada com com a boa condição mental e ao estado debilitado.
+
+
 \newpage
 
 3. Análise Inferencial
+
+
+```{r}
+resultCA <- ca(mental2) # names(resultCA)
+resultFCA <- plot(resultCA,xlab="componente 1",ylab="componente 2",cex=1.2)
+#xtable(resultFCA$rows,digits=4)
+#xtable(resultFCA$cols,digits=4)
+biplot(resultFCA$rows,resultFCA$cols,var.axes=FALSE,xlab="componente 1", ylab="componente 2",cex=1.2,xlim=c(-0.9,0.5))
+abline(0,0,lty=2)
+abline(v=0,lty=2)
+
+```
+
+A proporção de variabilidade explicada é em torno de `r round(var_exp,4)*100` %. 
 
 
 \newpage
