@@ -11,6 +11,8 @@ ipak <- function(pkg){
     install.packages(new.pkg, dependencies = TRUE)
   sapply(pkg, require, character.only = TRUE)
 }
+pkg <- c("tidyverse","plyr","plotrix","car") #plotrix para "plotic" car para "qqplot"
+ipak(pkg)
 ```
 
 ```{r}
@@ -34,18 +36,22 @@ inames <- c("Espécie","Comprimento da Asa","Largura da Asa","Comprimento 3° pa
 
 dadosmoscas <- read.table(file = "dadosmoscas.txt",col.names = c("Esp","Comp_Asa","Larg_Asa","Comp_3_palpo","Larg_3_palpo", "Comp_4_palpo", "Comp_12_seg_ant", "Comp_13_seg_ant"))
 
-dadosmoscas$Esp %<>%  as.factor()#definindo o tipo da especie como fator
-glimpse(dadosmoscas) #Verificando os tipos de variaveis.
+
+
+dadosmoscas$Esp=as.factor(dadosmoscas$Esp )#definindo o tipo da especie como fator
+#glimpse(dadosmoscas) #Verificando os tipos de variaveis.
 ```
 
 
 ```{r}
+#Pegando a coluna das espécies (grupos) para fazer o vetor identificador de grupos
+
+
+v.especies <- cbind(as.numeric(dadosmoscas[,1]))
+
 #tirando a primeira coluna para fazer a matriz de dados
 m.dados <- dadosmoscas[,-1]
 
-#Pegando a coluna das espécies (grupos) para fazer o vetor identificador de grupos
-#OBS somei 1 pois a função do Caio diz que o primeiro grupo é 1 (aqui esta como 0) só pra não precisar mudar a função dele
-v.especies <- cbind(as.numeric(dadosmoscas[,1])+1)
 
 #Criando um vetor com as quantidades de observações de cada grupo, constam 35 de cada grupo
 v.n_especies <- rbind(35,35)
@@ -91,8 +97,167 @@ Roy <- summary.manova(fit.manova,test="Roy")
 
 ```
 
+```{r}
+# Parâmetros preditos pelo modelo
+m.B <- matrix(coef(fit.manova),2,7) #2 Grupos e 7 variáveis
+v.beta <- matrix(t(m.B))
+m.X <- model.matrix(fit.manova)
+m.Sigmabeta <- kronecker(solve(t(m.X)%*%m.X),m.sigma.P)
+```
 
 
+```{r}
+#Médias preditas pelo modelo com os respectivos Erro padrão e IC's
+#Lembre que algumas matrizes usadas aqui foram definidas no código anterior à isto (logo acima)
+
+
+#k.posicao_Var é o índice "k" do \mu_k que você quer prever
+MedidasPreditasModelo <- function(k.posicao_var){
+
+m.x_mu <- matrix(data = rep(0,28), nrow = 2, ncol = 14)
+m.x_mu[,k.posicao_var] <- 1
+m.x_mu[2,k.posicao_var+7] <- 1
+
+m.mu_pred <- m.x_mu%*%v.beta
+m.ep_mu_pred <- sqrt(diag(m.x_mu%*%m.Sigmabeta%*%t(m.x_mu)))
+m.IC_mu_pred <- cbind(m.mu_pred-1.96*m.ep_mu_pred,m.mu_pred+1.96*m.ep_mu_pred)
+
+return(list(mu = m.mu_pred,ep = m.ep_mu_pred, IC = m.IC_mu_pred))
+}
+```
+
+
+
+```{r teste}
+#Não coloquei o gráfico na função "MedidasPreditasModelo" pois a função plotCI não é do ggplot, ai não da pra atribuir à uma variável (acho). Então tem que chamar a função e logo embaixo a do gráfico no local que irão ser plotados os gráficos. vai ter que repetir o código abaixo para as 7 variáveis (é só mudar o valor de k.posicao_var.
+
+#lembrar de mudar o título dos gráficos.
+
+
+a <- MedidasPreditasModelo(k.posicao_var = 1)
+
+plotrix::plotCI(a$mu,ui=a$IC[,2],li=a$IC[,1],axes=FALSE,xlab="espécie",ylab="média",pch=19,cex=1.2,cex.lab=1.2,cex.axis=1.2,main="Comprimento da Asa")
+axis(2,seq(4,7,0.2),cex.axis=1.2)
+axis(1,1:2,c("Leptoconops carteri","Leptoconops torrens"),cex.axis=1.2)
+```
+
+
+
+```{r}
+#Aqui os testes CBU=M vou fazer de uma maneira geral pois depende da análise descritiva . AQUI COMPARA-SE OS ALPHAS COM ZERO
+
+#Para testar \alpha_{2i} =  \alpha_{2j} = \alpha_{2k} = \alpha_{2s} = 0  
+#OBS caso for comparaçoes de menor ordem é só ignorar os parâmetros restantes
+
+GeraMatriz_C_B_U <- function(k.ncomp,k.i,k.j,k.k,k.s) {
+  
+  #k.ncomp <- 3  #número de parâmetros \alphas a serem comparados à 0.
+
+  #k.i <- 0  #mude aqui quando definir as comparações, isto define a posição
+  #k.j <- 0  #mude aqui quando definir as comparações, isto define a posição
+  #k.k <- 0  #mude aqui quando definir as comparações, isto define a posição
+  #k.s <- 0  #mude aqui quando definir as comparações, isto define a posição
+
+  m.C1 <- cbind(0,1) # para testar os \alpha's
+
+  #Comparação de k.ncomp \alpha's com zero e são 7 variáveis
+  m.U1 <- matrix(data = c(rep(0,k.ncomp*7)), nrow = 7, ncol = k.ncomp)
+
+  m.U1[k.i,1] <- 1
+  if(k.ncomp >= 2) m.U1[k.j,2] <- 1
+  if(k.ncomp >= 3) m.U1[k.k,3] <- 1
+  if(k.ncomp >= 4) m.U1[k.s,4] <- 1
+
+
+  m.M <- rbind(rep(0,k.ncomp))
+  
+  return(list(C = m.C1, U = m.U1, M = m.M))
+}
+
+
+
+#Um exemplo abaixo de como utilizar a função, aqui está comparando simultaneamente se as espécies de moscas são iguais (na média) comparando-se em relação as duas primeiras variáveis
+
+m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 2,1,2)
+resultados_teste1 <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
+resultados_teste1$estatqui
+```
+
+
+
+
+
+
+
+
+
+```{r}
+# Resíduos univariados
+
+#Esta função é só pra não ficar copiando, da pra colocar fora do código e chamar com o source.
+
+Seteplots_Residuos <- function(mY,mresult,var,typeresid,wplot){
+  # 1 Variável
+  var<-1; gen.graf.resid(mY,mresult,var,typeresid,wplot)
+  # 2 Variável
+  var<-2; gen.graf.resid(mY,mresult,var,typeresid,wplot)
+  # 3 Variável
+  var<-3; gen.graf.resid(mY,mresult,var,typeresid,wplot)
+  # 4 Variável
+  var<-4; gen.graf.resid(mY,mresult,var,typeresid,wplot)
+  # 5 Variável
+  var<-5; gen.graf.resid(mY,mresult,var,typeresid,wplot)
+  # 6 Variável
+  var<-6; gen.graf.resid(mY,mresult,var,typeresid,wplot)
+  # 7 Variável
+  var<-7; gen.graf.resid(mY,mresult,var,typeresid,wplot)
+
+}
+
+#Os gráficos são bem parecidos com os multivariados. Mas aqui usa "Resíduo studentizado (multivariado) (RSM)"
+mY <- as.matrix(m.dados)
+mresult<- fit.manova
+typeresid <- "univariate"
+wplot <- "diagnostics"
+par(mfrow =c(4,2)) 
+Seteplots_Residuos(mY,mresult,var,typeresid,wplot)
+
+# Zoom nos envelopes
+wplot <- "envelope"
+
+par(mfrow =c(4,2))
+Seteplots_Residuos(mY,mresult,var,typeresid,wplot)
+
+```
+
+
+
+
+```{r}
+# Resíduos multivariados
+#Os gráficos são bem parecidos com os univariados. Mas aqui usa "Resíduo studentizado (multivariado) (RSM)"
+
+typeresid <- "multivariate"
+wplot <- "diagnostics"
+
+Seteplots_Residuos(mY,mresult,var,typeresid,wplot)
+
+# Zoom nos envelopes
+wplot <- "envelope"
+
+Seteplots_Residuos(mY,mresult,var,typeresid,wplot)
+
+# Resíduo baseado na distância Mahalanobis
+
+gen.graf.resid.quad.form(mY,mresult)
+```
+
+
+$$
+
+Y_{ijk} = \mu_k + \alpha_{ik} + \varepsilon_{ijk},\  \varepsilon_{ijk} \sim N_k(0,\Sigma), \\ i = 1,2 (espécie, 1 - Leptoconops torrens,2 - Leptoconops carteri) ,\ j = 1,2,...,35\ (moscas)\ e \\ k = 1,...,7 \ (variável, 1 - Comprimento da Asa, 2 - Largura da Asa, 3 - Comprimento 3° palpo, 4 - Largura 3° palpo,5 - Comprimento 4° palpo, \\ 6 - Comprimento 12° segmento da antena, 7 - Compimento 13° segmento da antena), em que \alpha_{1k} = 0, k = 1,...,7.
+
+$$
 
 
 

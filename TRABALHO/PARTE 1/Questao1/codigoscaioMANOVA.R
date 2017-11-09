@@ -61,6 +61,7 @@ TesteF.CBU.M<-function(fit.model,m.Sigma.P,p,G,m.C,m.U,m.M)
   print(m.U)
   cat("Matriz M :","\n")
   print(m.M)
+  return(list(pvalor = p.valor,M = m.M,U = m.U,C = m.C,estatqui = estat))
 }
 
 
@@ -143,7 +144,7 @@ gen.graf.resid.quad.form<-function(mY,mresult)
     Ai <- 1 - mXi%*%solve(t(mX)%*%mX)%*%t(mXi)
     vresidA[i] <- (Ai^(-2))*mYi%*%solve(mSigma)%*%t(mYi)
   }
-  par(mfrow =c(1,1))
-  qqPlot(vresidA,dist="chisq",df=nvar,col.lines=1,grid="FALSE",xlab="quantil da distribuição qui-quadrado",ylab="quantil da forma quadrática",cex=1.2,id.cex=1.2)
+  #par(mfrow =c(1,1)) #tirei para conseguir juntar os gráficos
+  car::qqPlot(vresidA,dist="chisq",df=nvar,col.lines=1,grid="FALSE",xlab="quantil da distribuição qui-quadrado",ylab="quantil da forma quadrática",cex=1.2,id.cex=1.2)
   
 }  
