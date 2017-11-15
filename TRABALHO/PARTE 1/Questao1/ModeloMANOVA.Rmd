@@ -25,6 +25,9 @@ cv <- function(x){
 ```{r}
 #lendo as funçoes que o caio disponibilizou para MANOVA (mudei uma coisa lá)
 source("codigoscaioMANOVA.r")
+
+#lendo as funções do murilo
+source("funcoes_murilo.r")
 ```
 
 
@@ -62,6 +65,10 @@ k.G <- 2
 #Identificação da quantidade de variáveis
 k.P <- 7
 ```
+
+
+
+
 
 ```{r}
 #Teste de igualdade das matrizes de covariância entre os grupos
@@ -167,6 +174,9 @@ GeraMatriz_C_B_U <- function(k.ncomp,k.i,k.j,k.k,k.s) {
   if(k.ncomp >= 2) m.U1[k.j,2] <- 1
   if(k.ncomp >= 3) m.U1[k.k,3] <- 1
   if(k.ncomp >= 4) m.U1[k.s,4] <- 1
+  if(k.ncomp >= 5) m.U1[k.s,5] <- 1
+  if(k.ncomp >= 6) m.U1[k.s,6] <- 1
+  if(k.ncomp >= 7) m.U1[k.s,7] <- 1
 
 
   m.M <- rbind(rep(0,k.ncomp))
@@ -184,22 +194,41 @@ resultados_teste1$estatqui
 ```
 
 
-
-
-
-
-
+```{r}
+#testar igualdade entre os grupos para 
+#largura da asa 
+#comprimento do 3 palpo
+# comprimento do 12º segmento da antena
+# comprimento do 13º segmento da antena
+m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 4,2,4,6)
+resultados_teste1 <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
+```
 
 
 ```{r}
-# Resíduos univariados
+legendaaux <- rep(" ",length(inames)-1)
+for (i in 2:length(inames)) {
+    aux <- "Gráficos para os resíduos referentes à variável"
+    aux2 <- as.character(inames[i])
+    legendaaux[i-1] <- paste(aux,aux2,sep = " ")}
+legenda <- legendaaux[1]
+```
+
+
+
+
+```{r eval=FALSE}
+
 
 #Esta função é só pra não ficar copiando, da pra colocar fora do código e chamar com o source.
+#Por causa da legenda, não vai adiantar essa função por causa da legenda
 
+#FUNÇÂO DESATIVADA
 Seteplots_Residuos <- function(mY,mresult,var,typeresid,wplot){
+
   # 1 Variável
   var<-1; gen.graf.resid(mY,mresult,var,typeresid,wplot)
-  # 2 Variável
+
   var<-2; gen.graf.resid(mY,mresult,var,typeresid,wplot)
   # 3 Variável
   var<-3; gen.graf.resid(mY,mresult,var,typeresid,wplot)
@@ -214,26 +243,112 @@ Seteplots_Residuos <- function(mY,mresult,var,typeresid,wplot){
 
 }
 
-#Os gráficos são bem parecidos com os multivariados. Mas aqui usa "Resíduo studentizado (multivariado) (RSM)"
+#Os gráficos são bem parecidos com os multivariados. Mas aqui usa "Resíduo studentizado (RS)"
 mY <- as.matrix(m.dados)
 mresult<- fit.manova
 typeresid <- "univariate"
 wplot <- "diagnostics"
-par(mfrow =c(4,2)) 
+#par(mfrow =c(4,2)) 
 Seteplots_Residuos(mY,mresult,var,typeresid,wplot)
+
+
+
+```
+
+```{r eval=FALSE}
+#DESATIVADA
+# Resíduos univariados
+#Os gráficos são bem parecidos com os multivariados. Mas aqui usa "Resíduo studentizado (RS)"
+
+diag_residuos <- function(){
+  var<-1; gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+  var <- var + 1
+  legenda <- legendaaux[var]
+}
+```
+
+
+```{r}
+var = 0
+var<-1+var
+legenda <- legendaaux[var]
+```
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+
+```{r}
+var<-1+var
+legenda <- legendaaux[var]
+```
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+
+```{r}
+var<-1+var
+legenda <- legendaaux[var]
+```
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+
+```{r}
+var<-1+var
+legenda <- legendaaux[var]
+```
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+
+```{r}
+var<-1+var
+legenda <- legendaaux[var]
+```
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+
+```{r}
+var<-1+var
+legenda <- legendaaux[var]
+```
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+
+```{r}
+var<-1+var
+legenda <- legendaaux[var]
+```
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+
+
+
+
+```{r eval=FALSE}
+
+#Acho que não vai precisar desses
 
 # Zoom nos envelopes
 wplot <- "envelope"
 
 par(mfrow =c(4,2))
 Seteplots_Residuos(mY,mresult,var,typeresid,wplot)
-
 ```
 
 
 
-
-```{r}
+```{r eval=FALSE}
 # Resíduos multivariados
 #Os gráficos são bem parecidos com os univariados. Mas aqui usa "Resíduo studentizado (multivariado) (RSM)"
 
@@ -247,17 +362,29 @@ wplot <- "envelope"
 
 Seteplots_Residuos(mY,mresult,var,typeresid,wplot)
 
+```
+
+```{r}
 # Resíduo baseado na distância Mahalanobis
 
-gen.graf.resid.quad.form(mY,mresult)
+gen.graf.resid.quad.form(as.matrix(m.dados),fit.manova)
 ```
 
 
+$$ Y_{ijk} = \mu_k + \alpha_{ik} + \varepsilon_{ijk},\  \varepsilon_{ijk} \sim N_k(0,\Sigma),
+$$ $$ i = 1,2 \textrm{ (espécie, 1 - Leptoconops torrens,2 - Leptoconops carteri)} ,\ j = 1,2,...,35\ \textrm{(moscas) e }
+$$ $$ k = 1,...,7 \ \textrm{(variável, 1 - Comprimento da Asa, 2 - Largura da Asa, 3 - Comprimento 3° palpo, 4 - Largura 3° palpo, } 
+$$ $$ \textrm{5 - Comprimento 4° palpo, 6 - Comprimento 12° segmento da antena, 7 - Compimento 13° segmento da antena),}
+$$ $$ \textrm{em que } \alpha_{1k} = 0, k = 1,...,7.
 $$
 
-Y_{ijk} = \mu_k + \alpha_{ik} + \varepsilon_{ijk},\  \varepsilon_{ijk} \sim N_k(0,\Sigma), \\ i = 1,2 (espécie, 1 - Leptoconops torrens,2 - Leptoconops carteri) ,\ j = 1,2,...,35\ (moscas)\ e \\ k = 1,...,7 \ (variável, 1 - Comprimento da Asa, 2 - Largura da Asa, 3 - Comprimento 3° palpo, 4 - Largura 3° palpo,5 - Comprimento 4° palpo, \\ 6 - Comprimento 12° segmento da antena, 7 - Compimento 13° segmento da antena), em que \alpha_{1k} = 0, k = 1,...,7.
+3.1 Análise dos resíduos
 
-$$
+X <- é o número do primeiro gráfico de resíduos
 
 
-
+A fim de avaliar a validade das suposições de normalidade multivariada dos dados considerando as espécies (consequentemente normalidade univariada) e homocedásticidade multivariada entre as espécies (consequentemente homocedasticidade univariada), podemos observar as figuras (X) a (X+7) que  apresentam gráficos para os resíduos studentizados para cada uma das 7 variáveis, assim como a figura (X+8) que apresenta o gráfico de envelopes baseado na distância de Mahalanobis (veja Azevedo, 2017). 
+A partir da observação destes gráficos, pode-se identificar muitos comportamentos e tendencias não esperadas, as quais podemos destacar o comportamento apresentado no gráfico 4 das figuras (X), (X+3), (X+5) e (X+6) tendo muitos pontos fora dos limites das bandas de confiança, nas figuras (X+1), (X+2) parece existira uma pequena tendência nos valores dos resíduos e na figura (X+4) apresenta muitos pontos com quantis baixos fora das bandas de confiança. Adicionalmente, identificamos comportamento assimétrico negativo no gráfico 3 das figuras (X),(X+1),(X+2) e (X+4)  e assimetrico positivo apresentando na figura (X+6). Dadas as observações referentes aos gráficos 1 e 4 das figuras (X) a (X+6) temos um forte indício de que a suposição de normalidade não é razoável para nenhuma das variáveis presentes no banco de dados.
+Observando o gráfico 2 das figuras (X) a (X+7), identificamos evidencias de presença de heterocedásticidade dos nos dados nas figuras (X), (X+2), (X+3) de maneira mais leve e nas figuras (X+4),(X+5) e (X+6) de maneira mais acentuada, já para a figura (X+1) não nota-se, a menos de um valor extremo, a presença de indicios de heterocedásticidade. Não identificamos nenhum comportamento a ser destacado referente ao gráfico 1 das figuras (X) a (X+7).
+Na figura (X+8) observamos alguns valores fora das bandas de confiança para valores menores de quantis da forma quadrática, além disso, valores maiores de quantis da forma quadrática tendem a se apresentar abaixo da linh de referência baseada no quantil da distribuição qui-quadrado, deste modo temos indicações de que a suposição de normalidade multivariada dos dados não parece ser uma suposição razoável neste caso.
+Contudo, dadas as observações destacadas, temos que a única variável do banco de dados a qual não seria irrasuável supor normalidade e homocedásticidade dos dados seria a variável "Largura da Asa", e todas as restantes apresentam ao menos um indicio evidente da fuga destas suposições portanto não seria razoável supor normalide e homocedásticidade multivariada neste caso, o que também fica evidente na figura (X+8), sendo assim, o modelo de análise de variância multivariada não apresentou um ajuste adequado aos dados aqui analisados e se é necessário procurar técnicas alternativas para realizar uma análise adequada ao banco de dados. Dado o nosso contexto acadêmico, iremos continuar com as análises dos resultados para elaborar a conclução do presente trabalho.

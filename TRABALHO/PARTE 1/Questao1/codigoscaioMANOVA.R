@@ -96,25 +96,25 @@ gen.graf.resid<-function(mY,mresult,var,typeresid,wplot)
   if (wplot == "diagnostics")
   {
     par(mfrow =c(2,2))
-    plot(mresiduo[,var],ylim=c(min(-3,min(mresiduo[,var])),max(3,max(mresiduo[,var]))),xlab="índice",ylab="resíduo studentizado")
+    plot(mresiduo[,var],ylim=c(min(-3,min(mresiduo[,var])),max(3,max(mresiduo[,var]))),xlab="índice",ylab="resíduo studentizado",main = "gráfico 1")
     abline(-2,0,lty=2)
     abline(2,0,lty=2)
     abline(0,0,lty=2)
     #
-    plot(mfit[,var],mresiduo[,var],ylim=c(min(-3,min(mresiduo[,var])),max(3,max(mresiduo[,var]))),xlab="valor ajustado",ylab="resíduo studentizado")
+    plot(mfit[,var],mresiduo[,var],ylim=c(min(-3,min(mresiduo[,var])),max(3,max(mresiduo[,var]))),xlab="valor ajustado",ylab="resíduo studentizado",main = "gráfico 2")
     abline(-2,0,lty=2)
     abline(2,0,lty=2)
     abline(0,0,lty=2)
     #
-    hist(mresiduo[,var],probability=TRUE,xlab="resíduo studentizado",main="",ylab="densidade")
+    hist(mresiduo[,var],probability=TRUE,xlab="resíduo studentizado",ylab="densidade",main = "gráfico 3")
     #
-    qqPlot((mresiduo[,var]),dist="norm",mean=0,sd=1,col.lines=1,grid="FALSE",xlab="quantil da N(0,1)",ylab=paste("quantil do resíduo studentizado"),cex=1.2,id.cex=1.2)
+    qqPlot((mresiduo[,var]),dist="norm",mean=0,sd=1,col.lines=1,grid="FALSE",xlab="quantil da N(0,1)",ylab=paste("quantil do resíduo studentizado"),cex=1.2,id.cex=1.2, main = "gráfico 4")
   }
   
   else if (wplot == "envelope")
   {
     par(mfrow =c(1,1))
-    qqPlot((mresiduo[,var]),dist="norm",mean=0,sd=1,col.lines=1,grid="FALSE",xlab="quantil da N(0,1)",ylab=paste("quantil do resíduo studentizado"),cex=1.2,id.cex=1.2)
+    qqPlot((mresiduo[,var]),dist="norm",mean=0,sd=1,col.lines=1,grid="FALSE",xlab="quantil da N(0,1)",ylab=paste("quantil do resíduo studentizado"),cex=1.2,id.cex=1.2, main = "gráfico 1")
   }
 }
 
