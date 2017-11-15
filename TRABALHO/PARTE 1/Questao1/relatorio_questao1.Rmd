@@ -5,9 +5,15 @@ header-includes:
 - \usepackage{setspace}
 - \usepackage{indentfirst}
 - \usepackage[utf8]{inputenc}
-- \usepackage{multicol}
 - \usepackage{mathptmx}
 - \usepackage{enumerate}
+- \usepackage{url}
+- \usepackage{float}
+- \usepackage{lipsum}
+- \usepackage{multirow}
+- \usepackage{booktabs}
+- \usepackage{longtable}
+- \usepackage{subcaption}
 output:
   pdf_document: null
   html_document: default
@@ -77,75 +83,218 @@ options(OutDec= ",")
 knitr::opts_chunk$set(fig.width=6, fig.height=3.5, fig.path='Figs/', fig.align='center', echo=FALSE, warning=FALSE, message=FALSE)
 ```
 
-```{r pacotes utilizados, echo=FALSE,eval=TRUE, warning=FALSE}
-#install.packages(c("ggplot2","knitr","dplyr", "xtable", "gridExtra"))
+```{r pacotes utilizados, echo=FALSE,eval=TRUE, warning=FALSE, message=FALSE}
 
+#lendo as funçoes que o caio disponibilizou para MANOVA (mudei uma coisa lá)
+source("codigoscaioMANOVA.r")
+source("funcoes_murilo.r")
+source("funcoes_eli.r")
 #pacotes utilizados
 
-packages <- c("ggplot2",
-              "knitr",
-              "dplyr",
-              "tidyverse",
-              "xtable",
-              "gridExtra")
-ipak(packages)
+packages= c("ggplot2","knitr","dplyr","tidyverse","xtable","gridExtra", "plyr", "plotrix", "car","magrittr")
+
+#caso necessário a instalação de algum pacote
+#install.packages(packages)
+
+#mostra quais pacotes foram carregados
+invisible(lapply(packages, require, character.only = TRUE))
+```
+
+
+```{r}
+#nomes para usar nas tabelas
+inames <- c("Espécie","Comprimento da Asa","Largura da Asa","Comprimento 3° palpo","Largura 3° palpo", "Comprimento 4° palpo", "Comprimento 12° segmento da antena", "Comprimento 13° segmento da antena")
+
+##leitura do banco de dados e Identificação das colunas do Banco de dados
+
+dadosmoscas <- read.table(file = "dadosmoscas.txt",col.names = c("Esp","Comp_Asa","Larg_Asa","Comp_3_palpo","Larg_3_palpo", "Comp_4_palpo", "Comp_12_seg_ant", "Comp_13_seg_ant"))
+
+dadosmoscas$Esp %<>%  as.factor()#definindo o tipo da especie como fator
+#glimpse(dadosmoscas_graf_tab) #Verificando os tipos de variaveis.
+
+dadosmoscas_graf_tab=dadosmoscas
+dadosmoscas_graf_tab$Esp=ifelse(dadosmoscas_graf_tab$Esp=='0',"Torrens", "Carteri")
+```
+
+```{r}
+upper.panel<-function(x, y){
+  points(x,y, pch=15, col=c("seagreen", "navyblue")[dadosmoscas$Esp])
+  r <- round(cor(x, y), digits=2)
+  txt <- paste0("R =", r)
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  text(0.5, 0.9, txt)
+}
+```
+
+```{r}
+#Tabelas resumo
+
+resumo_Comp_Asa=tabela.descritiva(dadosmoscas_graf_tab$Comp_Asa)
+
+resumo_Larg_Asa=tabela.descritiva(dadosmoscas_graf_tab$Larg_Asa)
+
+resumo_Comp_3_palpo=tabela.descritiva(dadosmoscas_graf_tab$Comp_3_palpo)
+
+resumo.Larg_3_palpo=tabela.descritiva(dadosmoscas_graf_tab$Larg_3_palpo)
+
+resumo.Comp_4_palpo=tabela.descritiva(dadosmoscas_graf_tab$Comp_4_palpo)
+
+resumo.Comp_12_seg_ant=tabela.descritiva(dadosmoscas_graf_tab$Comp_12_seg_ant)
+
+resumo.Comp_13_seg_ant=tabela.descritiva(dadosmoscas_graf_tab$Comp_13_seg_ant)
+
+
+
+```
+
+
+```{r}
+#boxplots
+
+g_Comp_asa=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_Asa))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "Espécie", y="Comprimento da Asa")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none", axis.text.y=element_text(size=6), axis.title.y = element_text(size=6))+theme_bw()
+
+g_Larg_asa=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Larg_Asa))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "Espécie", y="Largura da Asa")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=6))+theme_bw()
+
+g_Comp_3_palpo=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_3_palpo))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "Espécie", y="Comprimento 3° palpo")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=6), axis.title.y = element_text(size=6))+theme_bw()
+
+g_Larg_3_palpo=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Larg_3_palpo))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "Espécie", y="Largura 3° palpo")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=6), axis.title.y = element_text(size=6))+theme_bw()        
+                      
+g_Comp_4_palpo=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_4_palpo))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "Espécie", y="Comprimento 4° palpo")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=6), axis.title.y = element_text(size=6))+theme_bw()  
+
+g_Comp_12_seg_ant=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_12_seg_ant))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "Espécie", y="Comprimento 12° seg antena")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=4), axis.title.y = element_text(size=6))+theme_bw()
+                         
+g_Comp_13_seg_ant=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_13_seg_ant))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "Espécie", y="Comprimento 13° seg antena")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y = element_text(size=4), axis.title.y = element_text(size=6))+theme_bw()
 
 ```
 
 ```{r}
-#leitura do banco de dados
-```
+library(car)
+n <- nrow(dadosmoscas)
+mx<-as.matrix(subset(dadosmoscas[,2:8],dadosmoscas$Esp=='0'))
+vmu<-apply(mx,2,mean)
+s2 <- cov(mx)
+vvar<-diag(s2)
+nvar<-4
 
-```{r }
-##Descritivas
+n2 <- nrow(subset(dadosmoscas[,2:8],dadosmoscas$Esp=='1'))
+mx2<-as.matrix(dadosmoscas[,2:8])
+vmu2<-apply(mx,2,mean)
+s22 <- cov(mx)
+vvar2<-diag(s2)
+nvar2<-4
 
-descritivas <- function(dados){
-dados %>% select_if(.predicate = is.numeric) %>% 
-  gather(coluna,valores) %>% 
-  group_by(coluna) %>% 
-  summarise_if(.predicate = function(x) is.numeric(x),
-                  .funs = c(Media = "mean",
-                     DP = "sd",
-                     Var. = "var",
-                     Minimo = "min",
-                     Maximo = "max",
-                     CV =  "cv",
-                     Mediana = "median",
-                     n = "length")) %>% 
-  mutate_if(.predicate = is.numeric,funs(round(.,3)))
-return(dados)
-  }
-```
+inames <- c("Espécie","Comprimento da Asa","Largura da Asa","Comprimento 3° palpo","Largura 3° palpo", "Comprimento 4° palpo", "Comprimento 12° segmento da antena", "Comprimento 13° segmento da antena")
 
-##variavel resposta
 
-```{r}
-ggplot(dados,aes(quality)) + stat_count()
-ggplot(dados,aes(qualidade)) + stat_count()
+mmu <- t(matrix(t(vmu),nvar,n))
+mmu2 <- t(matrix(t(vmu2),nvar2,n2))
 
+vF <- apply(((mx-vmu)*(mx-vmu)%*%solve(s2)),1,sum)
+vF<- (n-nvar)*vF/((n-1)*nvar)
+
+vF2 <- apply(((mx2-vmu2)*(mx2-vmu2)%*%solve(s22)),1,sum)
+vF2<- (n2-nvar2)*vF2/((n2-1)*nvar2)
 ```
 
 
-
-
-
-
-
-
-
-
-
-
-```{r}
-#INSERIR TODOS OS CÓDIGOS ACIMA DO TEXTO E SÓ CHAMAR QUANDO NECESSARIO
-```
-
+\setlength{\parindent}{3em}
+\doublespacing
 
 1. Introdução
 
-\newpage
+O conjunto de dados utilizado neste relatório são relativos a moscas chamadas, em inglês, de "bitting fly".Neste conjunto de dados foram consideradas no total 70 moscas, sendo 35 da espécie Leptoconops carteri e 35 da Leptoconops torrens. Tais espécies serão tratadas a partir de agora por Carteri e Torrens, respectivamente. 
+
+Para cada uma das espécies, foram medidas sete variáveis referentes ao aspecto morfológico das moscas e para cada unidade amostral (mosca), foram medidas oito variáveis, sendo elas: espécie (0 – Torrens e 1 – Carteri), comprimento da asa (CA), largura da asa(LA), comprimento do 3º palpo (CP3), largura do 3º palpo (LP3), comprimento do 4º palpo (CP4), comprimento do 12º segmento da antena (SA12) e comprimento do 13º segmento da antena (SA13).
+
+Dado que as duas espécies são bastante semelhantes morfologicamente (Johson e Wichern (2007)), o objetivo desta análise é realizar a comparação  das médias de todas as variáveis consideradas entre as espécies, com o intuito de verificar se e quais variáveis diferem entre os grupos.
+
+Como abordagem inicial, será utilizada a Análise de Variância Multivariada (MANOVA) (veja mais em Johnson e Wichern (2007)), para verificar a possível existência de diferenças entre as médias. Posteriormente, caso a hipótese de igualdade entre as médias for rejeitada serão realizados testes do tipo $CBU = M$ (veja mais em Azevedo (2017)), com o intuito de descobrir onde essas diferenças se encontram.
+
+Todas as análises serão realizadas com o suporte dos softwares R versão 3.4.2 e R Studio versão 1.1.383
+
+\vspace{0.5cm}
 
 2. Análise descritiva
+
+A tabela 1 mostra algumas medidas resumo para as todas variáveis citadas anteriormente, sepadas por espécie. É possível notar que as
+médias amostrais para as variáveis comprimento da asa, comprimento do 3o palpo e do 4o palpo são relativamente diferentes entre as espécies,
+enquanto que para as demais as médias amostrais são relativamente iguais. Pode se notar também, que os desvios padrões para as variáveis largura da asa e comprimento do 4o palpo aparentemente são diferentes entre as espécies, enquanto que para as demais variáveis os desvios padrão são consideravelmente próximos.
+
+A figura 1 apresenta uma matriz de diagramas de dispersão entre as variáveis, separadas por espécie. De um modo geral, podemos notar que a espécie Torrens apresenta valores inferiores à espécie Carteri, como por exemplo, no gráfico de Largura por Comprimento do 3º Palpo, em que os pontos verser se concentram abaixo dos azuis. 
+
+Cada diagrama apresenta seu respectivo valor do coeficiente de correlação linear, então pode-se notar que aparentemente as variáveis que mais se destacaram em relação à uma possível associação linear foram as varáveis referentes ao comprimento do 12º palpo e ao comprimento do 13º palpo (0,81) e as referentes ao comprimento e largura da asa (0,6). Além disso, observam-se também possíveis associações entre as
+demais variáveis, porém com grau menor de correlação, como por exemplo entre as variáveis referentes ao comprimento da asa e comprimento do 3º palpo (0,45) e entre comprimento da asa e comprimento do 4º palpo (0,48).
+
+Na figura 2, temos os boxplots para todas as variáveis separadas por espécie. Algumas distribuições apresentam ligeiras assimetrias, observando de um modo geral. Por exemplo na variável largura da asa para a espécie Torrens, essa assimetria é um pouco mais evidente. Podemos afirmar que as distribuições quando comparadas entre as espécies são diferentes observando de um modo geral. É possível afirmar que as medianas são ligeiramente maiores para todas a variáveis na espécie Carteri, exceto para a variável referente ao comprimento do 13º segmeno da antena. Por fim, nota-se a presença de alguns pontos discrepantes, sendo que em maioria das vezes, estes pontos estão mais presentes na espécie Carteri.
+
+
+A figura 3 apresenta o gráfico de quantis-quantis com envelopes, para a distância de Mahalanobis (Azevedo(2017)), para cada espécie. Pode-se observar que a suposição de normalidade multivariada dos dados parece não ser razoável, uma vez que há grandes fugas para quantis maiores da distribuição F na parte superior dos gráficos.
+
+\vspace{0.5cm}
+
+```{r}
+tab_resumo=rbind(resumo_Comp_Asa,resumo_Larg_Asa,resumo_Comp_3_palpo,resumo.Larg_3_palpo,resumo.Comp_4_palpo,resumo.Comp_12_seg_ant,resumo.Comp_13_seg_ant)
+
+#xtable(tab_resumo)
+```
+
+\begin{center}
+\begin{table}[!h]
+\caption{Medidas Resumo das variáveis por espécie}
+\begin{tabular}{cccccccccc}
+  \toprule
+  
+ & Espécie & n & Média & Variância & Desvio Padrão & CV(\%) & Mínimo & Mediana & Máximo \\ \midrule
+  \hline
+\multirow{2}{*}{Comprimento da Asa} & Carteri & 35 & 96,457 & 40,726 & 6,382 & 6,616 & 85 & 95 & 109 \\ 
+                          & Torrens & 35 & 99,343 & 31,291 & 5,594 & 5,631 & 82 & 99 & 112 \\ \midrule
+\multirow{2}{*}{Largura da Asa} & Carteri & 35 & 42,914 & 7,492 & 2,737 & 6,378 & 38 & 44 & 49 \\ 
+                          & Torrens & 35 & 43,743 & 25,785 & 5,078 & 11,608 & 19 & 45 & 50 \\ \midrule
+\multirow{2}{*}{Comprimento 3º Palpo} & Carteri & 35 & 35,371 & 4,829 & 2,197 & 6,212 & 31 & 36 & 39 \\ 
+                          & Torrens & 35 & 39,314 & 8,045 & 2,836 & 7,215 & 33 & 39 & 44 \\  \midrule
+\multirow{2}{*}{Largura 3º Palpo} & Carteri & 35 & 14,514 & 3,375 & 1,837 & 12,657 & 11 & 14 & 18 \\ 
+                          & Torrens & 35 & 14,657 & 2,703 & 1,644 & 11,216 & 11 & 15 & 19 \\ \midrule
+\multirow{2}{*}{Comprimento 4º Palpo} & Carteri & 35 & 25,629 & 6,24 & 2,498 & 9,747 & 21 & 26 & 31 \\ 
+                          & Torrens & 35 & 30,00 & 21,294 & 4,615 & 15,382 & 20 & 31 & 38 \\ \midrule
+\multirow{2}{*}{Comprimento 12° Seg antena} & Carteri & 35 & 9,571 & 0,84 & 0,917 & 9,577 & 8 & 9 & 13 \\ 
+                          & Torrens & 35 & 9,657 & 1,585 & 1,259 & 13,036 & 6 & 10 & 12 \\ \midrule
+\multirow{2}{*}{Comprimento 13° Seg antena} & Carteri & 35 & 9,714 & 0,798 & 0,893 & 9,198 & 8 & 10 & 13 \\ 
+                          & Torrens & 35 & 9,371 & 1,182 & 1,087 & 11,599 & 7 & 9 & 11 \\  \bottomrule
+
+   \hline
+\end{tabular}
+\end{table}
+\end{center}
+
+\newpage
+
+```{r, fig.width=12, fig.height=10, fig.cap=c("Matriz de diagramas de dispersão entre as variáveis")}
+#Matriz de dispersão
+
+matriz= pairs(dadosmoscas[,2:8], lower.panel = NULL, 
+      upper.panel = upper.panel)
+par(xpd=TRUE)
+legend(0.2, 0.4, as.vector(unique(dadosmoscas_graf_tab$Esp)),  
+       fill=c("seagreen", "navyblue"))
+```
+
+```{r, fig.width=7, fig.height=8,fig.cap=c("Box-plot das variáveis por espécie")}
+grid.arrange(g_Comp_asa, g_Larg_asa, g_Comp_3_palpo, g_Larg_3_palpo, g_Comp_4_palpo, g_Comp_12_seg_ant, g_Comp_13_seg_ant, ncol=2)
+```
+
+\newpage
+```{r, fig.height=4,fig.width=8,fig.cap=c("Gráfico de quantil-quantil com envelopes para a distância de Mahalanobis; A) Torrens, B) Carteri")}
+
+par(mfrow=c(1,2))
+
+qqPlot(vF,dist="f",df1=nvar,df2=n-nvar,col.lines=1,grid="FALSE",xlab="Quantil da distribuição F",ylab="Forma quadrática",cex=1.2,id.cex=1.2)
+
+qqPlot(vF2,dist="f",df1=nvar2,df2=n2-nvar2,col.lines=1,grid="FALSE",xlab="Quantil da distribuição F",ylab="Forma quadrática",cex=1.2,id.cex=1.2)
+
+
+```
+
 
 \newpage
 
@@ -160,9 +309,3 @@ ggplot(dados,aes(qualidade)) + stat_count()
 
 5. Bibliografia
 
-\begin{itemize}
-
-  \item Azevedo, C. L. N (2017). Notas de aula sobre análise multivariada de dados http://www.ime.unicamp.br/~cnaber/Material_AM_2S_2017.htm
-  \item Johson, R. A. and Wichern, D. W. (2007). Applied Multivariate Statistical Analysis, 7a edição, Upper Saddle River, NJ : Prentice-Hall.
-
-\end{itemize}
