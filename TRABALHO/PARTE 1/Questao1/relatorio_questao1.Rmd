@@ -213,7 +213,9 @@ Dado que as duas espécies são bastante semelhantes morfologicamente (Johson e 
 
 Como abordagem inicial, será utilizada a Análise de Variância Multivariada (MANOVA) (veja mais em Johnson e Wichern (2007)), para verificar a possível existência de diferenças entre as médias. Posteriormente, caso a hipótese de igualdade entre as médias for rejeitada serão realizados testes do tipo $CBU = M$ (veja mais em Azevedo (2017)), com o intuito de descobrir onde essas diferenças se encontram.
 
-Todas as análises serão realizadas com o suporte dos softwares R versão 3.4.2 e R Studio versão 1.1.383
+Todas as análises serão realizadas com o suporte dos softwares R versão 3.4.2 e R Studio versão 1.1.383.
+
+Foi-se considerado um nível de significância de 5% para a tomar decisões quanto aos testes estatísticos aqui apresentados.
 
 \vspace{0.5cm}
 
@@ -291,20 +293,6 @@ grid.arrange(g_Comp_asa, g_Larg_asa, g_Comp_3_palpo, g_Larg_3_palpo, g_Comp_4_pa
 
 3. Análise Inferencial
 
-
-```{r, fig.height=4,fig.width=8,fig.cap=c("Gráfico de quantil-quantil com envelopes para a distância de Mahalanobis; A) Torrens, B) Carteri")}
-
-par(mfrow=c(1,2))
-
-qqPlot(vF,dist="f",df1=nvar,df2=n-nvar,col.lines=1,grid="FALSE",xlab="Quantil da distribuição F",ylab="Forma quadrática",cex=1.2,id.cex=1.2)
-
-qqPlot(vF2,dist="f",df1=nvar2,df2=n2-nvar2,col.lines=1,grid="FALSE",xlab="Quantil da distribuição F",ylab="Forma quadrática",cex=1.2,id.cex=1.2)
-
-
-```
-
-
-
 ```{r}
 #Pegando a coluna das espécies (grupos) para fazer o vetor identificador de grupos
 
@@ -326,8 +314,6 @@ k.G <- 2
 k.P <- 7
 ```
 
-Uma suposição adotada para se realizar um teste de análise de variancia multivariada é a de igualdade das matrizes de covariancia
-
 ```{r}
 #Teste de igualdade das matrizes de covariância entre os grupos
 
@@ -345,7 +331,21 @@ p.valor.igual.m.cov <- test.igual.matriz$p.valor
 
 ```
 
-Com o objetivo de identificar as diferenças entre as espécies de moscas, ajustou um modelo de regressão normal linear homocedástico multivariado ajustado via mínimos quadrados generalizados (veja Azevedo,2017):
+A figura 3 apresenta o gráfico de envelopes para a distância de Mahalanobis (veja Azevedo,2017) para os dados de ambas as espécies de moscas, note que existem muitos pontos fora das bandas de confiança para ambas as espécies de moscas, indicando que parece não ser razoável a suposição de normalidade multivariada dos dados referentes à ambas as espécies. Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados das duas espécies de moscas, ao qual resultou num p-valor de `r ifelse(p.valor.igual.m.cov < 0.001,"<0,001",round(p.valor.igual.m.cov,3))`, indicando que existe diferença estatisticamente significante entre as matrizes de covariâncias dos grupos de moscas, indicando que não parece ser razoável a suposição de igualdade das matrizes de covariâncias entre as espécies de moscas.
+
+```{r, fig.height=4,fig.width=8,fig.cap=c("Gráfico de quantil-quantil com envelopes para a distância de Mahalanobis; A) Torrens, B) Carteri")}
+
+par(mfrow=c(1,2))
+
+qqPlot(vF,dist="f",df1=nvar,df2=n-nvar,col.lines=1,grid="FALSE",xlab="Quantil da distribuição F",ylab="Forma quadrática",cex=1.2,id.cex=1.2)
+
+qqPlot(vF2,dist="f",df1=nvar2,df2=n2-nvar2,col.lines=1,grid="FALSE",xlab="Quantil da distribuição F",ylab="Forma quadrática",cex=1.2,id.cex=1.2)
+
+
+```
+
+
+Mesmo não sendo razoáveis as suposições descritas acima, dado o contexto da disciplina, ajustou-se um modelo de regressão normal linear homocedastico multivariado ajustado via mínimos quadrados generalizados (veja Azevedo,2017), tendo como objetivo identificar as diferenças entre as espécies de moscas:
 
 $$ Y_{ijk} = \mu_k + \alpha_{ik} + \varepsilon_{ijk},\  \varepsilon_{ijk} \sim N_k(0,\Sigma),
 $$ $$ i = 1,2 \textrm{ (espécie, 1 - Leptoconops torrens,2 - Leptoconops carteri)} ,\ j = 1,2,...,35\ \textrm{(moscas) e }
@@ -377,17 +377,110 @@ tbl_resultados_MANOVA <- cbind(aux,tbl_resultados_MANOVA)
 colnames(tbl_resultados_MANOVA) <- c("Estatística","Valor","Aprox. distr. F", "p-valor")
 
 tbl_resultados_MANOVA <- data.frame(tbl_resultados_MANOVA)
-
-tbl_resultados_MANOVA
 ```
 
 
-Na tabela XX(tbl_resultados_MANOVA) estão apresentadas as quatro estatísticas referentes ao teste de análise de variância multivariada:
+########
+X <- é o número do primeiro gráfico de resíduos
+########
 
+A fim de qualificar o ajuste do modelo proposto, avaliamos as das suposições de normalidade multivariada dos erros do modelo considerando as espécies (consequentemente normalidade univariada) e homocedásticidade multivariada entre as espécies (consequentemente homocedasticidade univariada) com base nas figuras (X) a (X+7), as quais apresentam gráficos para os resíduos studentizados para cada uma das 7 variáveis, e na figura (X+8) que apresenta o gráfico de envelopes baseado na distância de Mahalanobis (veja Azevedo, 2017). 
+A partir da observação destes gráficos, pode-se identificar muitos comportamentos e tendencias não esperadas, as quais podemos destacar o comportamento apresentado no gráfico 4 das figuras (X), (X+3), (X+5) e (X+6) tendo muitos pontos fora dos limites das bandas de confiança, nas figuras (X+1), (X+2) onde parece existir uma pequena tendência nos valores dos resíduos e na figura (X+4) que apresenta muitos pontos com quantis baixos fora das bandas de confiança. Adicionalmente, observa-se comportamento de distribuição com assimétria negativa no gráfico 3 das figuras (X),(X+1),(X+2) e (X+4)  e com assimetria positiva na figura (X+6). Dadas as observações referentes aos gráficos 1 e 4 das figuras (X) a (X+6) temos fortes indícios de que a suposição de normalidade não é razoável para os resíduos referentes a nenhum das variáveis presentes no banco de dados.
+Observando o gráfico 2 das figuras (X) a (X+7), identificamos evidencias de presença de heterocedásticidade entre os resíduos das espécies de moscas no gráfico 2 nas figuras (X), (X+2), (X+3) de maneira mais leve e nas figuras (X+4),(X+5) e (X+6) de maneira mais acentuada, já para a figura (X+1) não nota-se, a menos de um valor extremo, a presença de indicios de heterocedásticidade. Portanto, a suposição de igualdade das matrizes de covariância das duas espécies parece não ser razoável.
+Não identificamos nenhum comportamento a ser destacado referente ao gráfico 1 das figuras (X) a (X+7).
+Na figura (X+8) observamos alguns valores fora das bandas de confiança para valores de quantis menores da forma quadrática, além disso, valores de quantis maiores da forma quadrática tendem a se apresentar abaixo da linha de referência que é baseada no quantil da distribuição qui-quadrado, deste modo temos indicações de que a suposição de normalidade multivariada dos erros não parece ser uma suposição razoável neste caso.
+Contudo, dadas as observações destacadas, temos que a única variável do banco de dados a qual não seria irrasuável supor normalidade e homocedásticidade dos dados seria a variável "Largura da Asa", já que todas as variáveis restantes apresentam ao menos um indicio evidente da fuga das suposições. 
+Como não seria razoável supor normalide e homocedásticidade multivariada neste caso, o modelo de análise de variância multivariada não apresentou um ajuste adequado, e se é necessário procurar técnicas alternativas para realizar uma análise adequada ao banco de dados. Dado o nosso contexto acadêmico, iremos continuar com as análises dos resultados para elaborar a conclução do presente trabalho.
+
+```{r}
+################################################
+######Legendas para análises de resíduos########
+################################################
+
+legendaaux <- rep(" ",length(inames)-1)
+for (i in 2:length(inames)) {
+  aux <- "Gráficos para os resíduos referentes à variável"
+  aux2 <- as.character(inames[i])
+  legendaaux[i-1] <- paste(aux,aux2,sep = " ")
+  }
+```
+
+
+```{r}
+var = 0 #iniciando a variável
+var<-1+var; legenda <- legendaaux[var]
+```
+
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+```{r}
+var<-1+var; legenda <- legendaaux[var]
+```
+
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+```{r}
+var<-1+var; legenda <- legendaaux[var]
+```
+
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+```{r}
+var<-1+var; legenda <- legendaaux[var]
+```
+
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+```{r}
+var<-1+var; legenda <- legendaaux[var]
+```
+
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+```{r}
+var<-1+var;legenda <- legendaaux[var]
+```
+
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+```{r}
+var<-1+var; legenda <- legendaaux[var]
+```
+
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+
+```{r}
+# Resíduo baseado na distância Mahalanobis
+
+gen.graf.resid.quad.form(as.matrix(m.dados),fit.manova)
+```
+
+
+
+Na tabela XX(tbl_resultados_MANOVA) estão apresentadas as quatro estatísticas referentes ao teste de análise de variância multivariada realizado com base no modelo proposto:
+
+```{r}
+tbl_resultados_MANOVA
+```
 
 ########   TABELA tbl_resultados_MANOVA #########
 
-Note pela tabela XX(tbl_resultados_MANOVA) que todas as estatísticas apresentaram p-valor < 0,05 (Melhorar AQUI) portanto, todas os testes nos apresentam evidencias estatísticamente significativas de que as espécies difiram em ao menos uma das variáveis presentes no banco de dados.
+Note pela tabela XX(tbl_resultados_MANOVA) que todos os p-valores referentes às quatro estatísticas são menores que o nível de significância adotado, portanto, todas os testes apresentam evidencias estatísticamente significativas de que as espécies difiram em ao menos uma das variáveis presentes no banco de dados.
 
 
 ```{r}
@@ -417,6 +510,7 @@ m.IC_mu_pred <- cbind(m.mu_pred-1.96*m.ep_mu_pred,m.mu_pred+1.96*m.ep_mu_pred)
 
 return(list(mu = m.mu_pred,ep = m.ep_mu_pred, IC = m.IC_mu_pred))
 }
+
 ```
 
 ```{r}
@@ -532,99 +626,12 @@ tabela_CBU
 Note pela tabela (n XX "tabela_CBU") que os dois primeiros testes indicam a não rejeição da hipótese apresentada, portanto temos evidencias estatísticamente significantes de que as espécies tem médias conjuntamente iguais para as variáveis `r inames[2+1]`,`r inames[4+1]`,`r inames[6+1]` e `r inames[1+1]`, ou seja, as diferenças parecem residir nas variáveis `r inames[3+1]`, `r inames[5+1]` e `r inames[7+1]`.
 
 
-3.1 Análise dos resíduos
-
-X <- é o número do primeiro gráfico de resíduos
-
-
-A fim de avaliar a validade das suposições de normalidade multivariada dos dados considerando as espécies (consequentemente normalidade univariada) e homocedásticidade multivariada entre as espécies (consequentemente homocedasticidade univariada), podemos observar as figuras (X) a (X+7) que  apresentam gráficos para os resíduos studentizados para cada uma das 7 variáveis, assim como a figura (X+8) que apresenta o gráfico de envelopes baseado na distância de Mahalanobis (veja Azevedo, 2017). 
-A partir da observação destes gráficos, pode-se identificar muitos comportamentos e tendencias não esperadas, as quais podemos destacar o comportamento apresentado no gráfico 4 das figuras (X), (X+3), (X+5) e (X+6) tendo muitos pontos fora dos limites das bandas de confiança, nas figuras (X+1), (X+2) parece existira uma pequena tendência nos valores dos resíduos e na figura (X+4) apresenta muitos pontos com quantis baixos fora das bandas de confiança. Adicionalmente, identificamos comportamento assimétrico negativo no gráfico 3 das figuras (X),(X+1),(X+2) e (X+4)  e assimetrico positivo apresentando na figura (X+6). Dadas as observações referentes aos gráficos 1 e 4 das figuras (X) a (X+6) temos um forte indício de que a suposição de normalidade não é razoável para nenhuma das variáveis presentes no banco de dados.
-Observando o gráfico 2 das figuras (X) a (X+7), identificamos evidencias de presença de heterocedásticidade dos nos dados nas figuras (X), (X+2), (X+3) de maneira mais leve e nas figuras (X+4),(X+5) e (X+6) de maneira mais acentuada, já para a figura (X+1) não nota-se, a menos de um valor extremo, a presença de indicios de heterocedásticidade. Não identificamos nenhum comportamento a ser destacado referente ao gráfico 1 das figuras (X) a (X+7).
-Na figura (X+8) observamos alguns valores fora das bandas de confiança para valores menores de quantis da forma quadrática, além disso, valores maiores de quantis da forma quadrática tendem a se apresentar abaixo da linh de referência baseada no quantil da distribuição qui-quadrado, deste modo temos indicações de que a suposição de normalidade multivariada dos dados não parece ser uma suposição razoável neste caso.
-Contudo, dadas as observações destacadas, temos que a única variável do banco de dados a qual não seria irrasuável supor normalidade e homocedásticidade dos dados seria a variável "Largura da Asa", e todas as restantes apresentam ao menos um indicio evidente da fuga destas suposições portanto não seria razoável supor normalide e homocedásticidade multivariada neste caso, o que também fica evidente na figura (X+8), sendo assim, o modelo de análise de variância multivariada não apresentou um ajuste adequado aos dados aqui analisados e se é necessário procurar técnicas alternativas para realizar uma análise adequada ao banco de dados. Dado o nosso contexto acadêmico, iremos continuar com as análises dos resultados para elaborar a conclução do presente trabalho.
-
-```{r}
-################################################
-######Legendas para análises de resíduos########
-################################################
-
-legendaaux <- rep(" ",length(inames)-1)
-for (i in 2:length(inames)) {
-  aux <- "Gráficos para os resíduos referentes à variável"
-  aux2 <- as.character(inames[i])
-  legendaaux[i-1] <- paste(aux,aux2,sep = " ")
-  }
-```
-
-
-```{r}
-var = 0 #iniciando a variável
-var<-1+var; legenda <- legendaaux[var]
-```
-
-```{r fig.cap=legenda}
-gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
-```
-
-```{r}
-var<-1+var; legenda <- legendaaux[var]
-```
-
-```{r fig.cap=legenda}
-gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
-```
-
-```{r}
-var<-1+var; legenda <- legendaaux[var]
-```
-
-```{r fig.cap=legenda}
-gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
-```
-
-```{r}
-var<-1+var; legenda <- legendaaux[var]
-```
-
-```{r fig.cap=legenda}
-gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
-```
-
-```{r}
-var<-1+var; legenda <- legendaaux[var]
-```
-
-```{r fig.cap=legenda}
-gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
-```
-
-```{r}
-var<-1+var;legenda <- legendaaux[var]
-```
-
-```{r fig.cap=legenda}
-gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
-```
-
-```{r}
-var<-1+var; legenda <- legendaaux[var]
-```
-
-```{r fig.cap=legenda}
-gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
-```
-
-
-```{r}
-# Resíduo baseado na distância Mahalanobis
-
-gen.graf.resid.quad.form(as.matrix(m.dados),fit.manova)
-```
-
-
 \newpage
 
 4. Conclusões 
+
+Com base nas informações descritas neste relatório, podemos concluir que o modelo multivariado ajustado não teve um ajuste adequado, portanto os resultados apresentados referentes ao modelo proposto podem não representar o comportamento dos dados de maneira adequada, porem estes resultados parecem ser razoáveis, uma vez que concordam em boa parte com a análise descritiva realizada. Com a interpretação dos resultados obtidos, temos fortes indicações de que as espécies de moscas diferem quanto às variáveis `r inames[3+1]`, `r inames[5+1]` e `r inames[7+1]`, mas não diferem quanto às variáveis `r inames[2+1]`,`r inames[4+1]`,`r inames[6+1]` e `r inames[1+1]`.
+
 
 \newpage
 
