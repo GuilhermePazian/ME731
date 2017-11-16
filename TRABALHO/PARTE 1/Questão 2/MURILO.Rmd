@@ -1,5 +1,5 @@
 ---
-title: 
+title: 'null'
 geometry: textwidth=18cm,textheight=24cm
 header-includes:
 - \usepackage{setspace}
@@ -89,8 +89,10 @@ source("funcoes_murilo.r")
 ```
 
 ```{r}
+chooseCRANmirror(graphics=FALSE, ind=1)
 #pacotes utilizados
-
+library(formattable)
+install.packages("kableExtra")
 packages= c("ggplot2",
               "knitr",
               "dplyr",
@@ -170,9 +172,7 @@ m.aut.val <- t(matrix(((aut.val)),p,p))
 
 #matriz de componentes
 result.cp.cor <- princomp(mx.moscas,cor=TRUE)
-screeplot <- screeplot(result.cp.cor,type=c("lines"),main="autovalores",cex=1.2,cex.lab=1.2,cex.main=1.2)
 corr.cp.cor <- aut.vec*sqrt(m.aut.val)
-
 dp = sqrt(aut.val)
 
 # fiz esse código pq não consegui manipular a saída do summary #Summary(result.cp.cor)
@@ -264,6 +264,53 @@ b3  =ggbiplot(result.cp.cor,choices = c(2,3),
         labs(x = "Componente 2", y = "Componente 3")+ scale_color_manual(labels=c("Torrens", "Carteri"), values=c("blue","black")) +ggtitle("Figura C") +  theme(plot.title = element_text(lineheight=.8, face="bold"))
 ```
 
+```{r}
+library(broom)
+model_cp1 <- lm(cp1~dadosmoscas$Esp)
+par_model <- tidy(model_cp1) %>% 
+   mutate_if(.predicate = is.numeric,funs(round(.,2)))
+##estimativas Parametos
+par_model$term[2] <- sub("1","2",par_model$term[2])
+estim_medias <- par_model %>% select(term,estimate,std.error)
+names(par_model) <- c("Parâmetro","Estimativa","EP","Estatística t","p-valor")
+print(xtable(par_model),include.rownames = F,sanitize.text.function = function(x) {x})
+##intervalo de conf
+estim_medias$estimate[2] <- sum(estim_medias$estimate)
+estim_medias$term <- c("Torrens","Carteri")
+estim_medias %<>% 
+mutate(conf.low = estimate - 1.96*std.error,
+          conf.high = estimate + 1.96*std.error)
+names(estim_medias)[1:2] <- c("Espécie","Média")
+names(estim_medias) = c("Especie", "Estimativa", "EP", "IC inf", " IC sup")
+#xtable(par_model)
+#xtable(estim_medias)
+
+```
+\begin{table}[ht]
+\centering
+\begin{tabular}{rlrrrr}
+  \hline
+ & Parâmetro & Estimativa & EP & Estatística t & p-valor \\ 
+  \hline
+1 & (Intercept) & 0,51 & 0,28 & 1,84 & 0,07 \\ 
+  2 & dadosmoscas\$Esp2 & -1,03 & 0,40 & -2,60 & 0,01 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rlrrrr}
+  \hline
+ & Especie & Estimativa & EP & IC inf &  IC sup \\ 
+  \hline
+1 & Torrens & 0,51 & 0,28 & -0,04 & 1,06 \\ 
+  2 & Carteri & -0,52 & 0,40 & -1,30 & 0,26 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+
 \setlength{\parindent}{3em}
 \doublespacing
 
@@ -279,12 +326,15 @@ As duas espécies foram consideradas morfologicamente similares e por um períod
 
 2. Análise descritiva
 
-Podemos na Tabela XX, composta pelos valores do desvio padrão(DP), proporção da variabilidade(PVE) e proporção da varaibilidade acumulada(PVEA), vemos, na PVEA, que  as três componentes principais conjuntamente explicam ``r formattable::percent(var_comp_prin[3,3])` da variabilidade dos dados e portanto, considerano este número razoável, vamos utilizar apenas três componentes para analisarmos a estrutura da variabilidade dos dados. pode-se observar também que as outras variâncias, da quarta a sétima componente, não trazem muita informação acerca da variabilidade, e podemos observar pelo *screeplot*, que as três primeiras componentes explicam boa parte da variabilidade dos dados e que a partir da quarta, a explicação já não é tão significativa.  
+A partir da Figura 1. Podemos observar no scree plot que as variâncias (autovalores) associadas a cada componente nos trazem informações relevantes sobre a proporção da variância explicada (PVE). É observado que as variâncias das componentes de 1 a 3 levam uma contribuição maior no PVE do que os outros componentes de acordo com  Tabela 1.  Na mesma tabela podemos observar que a proporção da variância explicada acumulada PVEA,  indicam que é adequado o uso das três primeiras componentes,  já que explicam conjuntamente ``r formattable::percent(var_comp_prin[3,3])` da variância total.  Pelo fato das componentes 4 à  7 não estarem contribuindo significativante no PVEA e  suas variâncias estarem bem próximas,  nesta análise foram considerados apenas os três primeiros componentes.
 
+
+```{r, fig.align=1, fig.height=5, fig.width=4, fig.cap=c("Screeplot Variâncias associadas a cada componente principal")}
+screeplot=screeplot(result.cp.cor,type=c("lines"),main="autovalores",cex=1.2,cex.lab=1.2,cex.main=1.2)
+```
 
 ```{r, eval=FALSE}
 kable(var_comp_prin, format = "latex", booktabs = T)%>%kable_styling(position = "center")
-
 ```
 
 ```{r}
@@ -294,7 +344,7 @@ kable(var_comp_prin, format = "latex", booktabs = T)%>%kable_styling(position = 
 
 \begin{table}[!h]
 \centering
-\caption{LEGENDA Aqui}
+\caption{Sumário das componentes principais}
 \bgroup
 \def\arraystretch{2.5}
 \begin{tabular}{rrrrrrrr}
@@ -309,13 +359,10 @@ DP & 1,71 & 1,24 & 0,95 & 0,77 & 0,72 & 0,58 & 0,42 \\
 \egroup
 \end{table}
 
-```{r, fig.cap=c("Screeplot legenda aqui")}
-screeplot=screeplot(result.cp.cor,type=c("lines"),main="autovalores",cex=1.2,cex.lab=1.2,cex.main=1.2)
-```
-
 \vspace{0.5cm}
 
-Na Tabela XX, vemos os escores das três componentes e podemos interpretá-las de forma a termos um sentido relacionado ao problema. Vale ressaltar que os escores com valores menores que 0.10 serão descartas das análises A primeira componente pode ser vista como o escore ponderado entre cas sete componentes. A segunda, como um constraste entre os escores das variáveis  largura da asa, comprimento do terceiro palpo, largura do terceiro palpo, comprimento do quarto palpo e das variáveis comprimento do décimo segundo segmento da antena e comprimento do décimo terceiro segmento da antena. A terceira componente, pode ser interpretada como o como constraste entre as variáveis largura da asa e largura do terceiro palpo, com os comprimentos do terceiro e quarto palpo.
+Na Tabela 2, vemos os escores das três componentes e podemos interpretá-las de forma a termos um sentido relacionado ao problema. Vale ressaltar que os escores com valores menores que 0.10 serão descartas das análises. 
+A primeira componente pode ser vista como o escore ponderado entre as sete variaveis. A segunda componente observa-se  um constraste entre os escores das variáveis  CP_12ANT e CP_13ANT com as outras variaveis. A terceira componente, pode ser interpretada como o como constraste entre as variáveis LG_ASA e LG_3ASA, com os CP_3P e CP_4P. Além disso, observamos que para as componentes 1 á 3, as variaveis estão bem correlacionadas com pelo menos uma dessas componentes.
 
 ```{r}
 #xtable(loadings)
@@ -344,8 +391,10 @@ CP\_ASA & -0,49 & -0,08 & 0,09 \\
 \end{table}
 
 \vspace{0.5cm}
-Na Figura XX. vemos os gráficos de dispersão dois a dois para entre cada componente. Observa-se que nos três gráficos não temos uma separação clara entre as duas espécies, havendo uma sobreposição dos dados. No primeiro e segundo gráfico, podemos perceber que a variabilidade de Carteri parece ser maior do que a de Torrens. No Terceiro parecem ter mesma variabilidae. Na Figura XX, vemos pelos boxplot que para a espécie Torrents, as duas primeiras componentes tem maiores valores da distribuição, porém para terceira componente o contrário ocorre, com a espécie Cartieri tendo maior valor. 
 
+Na Figura 4. vemos os gráficos de dispersão dois a dois para entre cada componente. Observa-se que nos três gráficos não temos uma separação clara entre as duas espécies, havendo uma sobreposição entre dados. No primeiro e segundo gráfico, podemos perceber que a variabilidade de Carteri parece ser maior do que a de Torrens, já no terceiro parecem ter mesma variabilidade.
+
+Na Figura 5, vemos pelos Boxplot dos componentes que para a espécie Torrents, as duas primeiras componentes tem maiores valores da distribuição, porém para terceira componente o contrário ocorre, com a espécie Cartieri tendo maior valor.
 
 ```{r, fig.cap=c("colocar legenda aqui")}
 #DISPERSÃO
@@ -361,15 +410,15 @@ grid.draw(cbind(ggplotGrob(cp12),
 grid.arrange(cp1_box, cp2_box,cp3_box, nrow=1, ncol=3)
 ```
 
-A partir da Figura X, podemos observar que para o Componente 1, a distribuição estimada apresenta uma assimetria positiva para a Espécie Torrens e Carteri, também é possivel observar que para o componente 2, supostamente a distribuição apresenta uma assimetria negativa, mais visivel para a Especie Carteri, para este componente , Torrens apresenta visivelmente um ponto atipico, tanto na sua distribuição, quanto nos outros gráficos que foram apresentados. Além disso podemos observar que para a componente 3, vemos que para a Espécie torrens temos uma distribuição assimetrica negativa e para Carteri temos uma assimetria levemente positiva.
+A partir da Figura 6, podemos observar que para o Componente 1, a distribuição estimada apresenta uma assimetria positiva para a Espécie Torrens e Carteri, também é possivel observar que para o componente 2, supostamente a distribuição apresenta uma assimetria negativa, mais visivel para a Especie Carteri, para este componente , Torrens apresenta visivelmente um ponto atipico, tanto na sua distribuição, quanto nos outros gráficos que foram apresentados. Além disso podemos observar que para a componente 3, vemos que para a Espécie torrens temos uma distribuição assimetrica negativa e para Carteri temos uma assimetria levemente positiva.
 
 ```{r, fig.cap=c("colocar legenda aqui")}
 print(graf_disp)
 ```
 
-A verificação de normalidade para os componentes pode ser de suma importância da inferência estatística, podemos ver na Figura X, que para a Componenete 1 não é razoavél a suposição de normalidade, já que em ambos os gráficos de probabilidade, os pontos se comportam de forma sistematica, é notavel que para a componente 1 Carteri, mais especificamente, existem pontos fora do envelope, tendo a fuga de normalidade para ambas as especies.
+A verificação de normalidade para os componentes pode ser de suma importância da inferência estatística, podemos ver na Figura 7, que para a Componenete 1 não é razoavél a suposição de normalidade, já que em ambos os gráficos de probabilidade, os pontos se comportam de forma sistematica, é notavel que para a componente 1 Carteri, mais especificamente, existem pontos fora do envelope, tendo a fuga de normalidade para ambas as especies.
 
-Já no componenete 2, podemos ver uma forma concava em torno da linha de referencia para a especie Carteria, além para do ponto atipico, que entra em concordancia com o que foi dito anterioremente para Torrens.
+Já no componente 2, podemos ver uma forma concava em torno da linha de referencia para a especie Carteria, além para do ponto atipico, que entra em concordancia com o que foi dito anterioremente para Torrens.
 
 Para o componente 3 é notavel que existem poucos pontos fora do gráfico de envelope.
 
@@ -392,10 +441,6 @@ qqPlot(scale(cp3[especie=="Torrens"]),dist="norm",mean=0,sd=1,col.lines="red",gr
 
 Podemos observar na Figura Componente 1 vs Componente 2 que as variaveis CP_ASA, LG_ASA , CP_3P, LG_3ASA e CP_4P há uma concentração dos individuos Carteri ao redor dos scores que a especie Torrens, mostrando que a disposição das setas (Escores) estão apontando para este grupo, além dessas variaveis já citadas apresentarem mais peso na componente 1, além disso isso indica que estas variáveis apresentam valores acima da média no grupo Carteri, Já no grupo Torrens,  observando a disposição da dispersão deste grupo sobre as variaveis, supostamente essas cinco variaveis possuem valores a abaxio da média de acordo com a dispersão sobrepostas a ela.
 
-Os componentes 1 e 3 (Figura 2.6B) e entre componentes 2 e 3 (Figura 2.6C), vemos
-que as mesmas conclusões são válidas para CA, CP3 e CP4, isto é, estas variáveis parecem ter valores acima da média para
-Carteri e abaixo para Torrens. No entanto, nestes dois biplots já não é possível chegar às mesmas conclusões para LA e LP3:
-não parece haver maior concentração de indivíduos de nenhum dos dois grupos na direção das setas, ou opostos a elas.
 
 ```{r, fig.cap=c("legenda aqui")}
 grid.draw(cbind(ggplotGrob(b1),
@@ -403,8 +448,7 @@ grid.draw(cbind(ggplotGrob(b1),
                 ggplotGrob(b3),size = "first"))
 ```
 
-
-Para pobservarmos uma relação entre as espécies, vamos utilizar a regressão linear utilizando a primeira componente principal obtida. AS vantagens deste método são: A redução de dimensionalidade via PCA, evitar multicolinearidade entre preditores e mitigação do *overfitting*.  O Modelo ajustado foi:
+Observarmos uma relação entre as espécies, vamos utilizar a regressão linear utilizando a primeira componente principal obtida. AS vantagens deste método são: A redução de dimensionalidade via PCA, evitar multicolinearidade entre preditores e mitigação do *overfitting*.  O Modelo ajustado foi:
 \
 $$Y_{ij} = \mu_{1}+\alpha{i}+\epsilon_{ij}$$, onde $\alpha_{1}$=0 e i=(1=Torrens,2=Cartieri), $j=1,2,\dots,35$.
 
@@ -423,6 +467,13 @@ A Análise de resíduos mostra que o modelo proposto não está bem ajustado por
 diag2norm(fit)
 ```
 
+
+Podemos ver que toda a sumarização dos parametros se encottram na Tabela X. Foi realizado um teste do tipo $CBU = M$, para  verificar as possíveis direnças entre as médias dos grupos Carteri e Torrens.
+
+Podemos observar que o teste $CBU=M$ equivale a testar $H_0: \alpha_{2} =0$. Na tabela X, é possível notar que Torrens e Carteri são especies diferentes, além disso as estimativas para as médias estão na tabela X2 e vemos que para Carteri, o valor da média é menor que Torrens, além disso é possível notar que para os Intervalos de confiança estão sobreposto. mas como já foi dito, a estimação intervalar não é muito precisa já que os resíduos está cagado.
+
+
+
 \newpage
 
 4. Conclusões 
@@ -430,8 +481,10 @@ diag2norm(fit)
 A partir das análises realizadas, a análise de componentes principais nos trouxe a informação que algumas variaveis se comportam de forma diferente para cada grupo, mas não nos possibilitou ter uma visualização clara da separação dos dois grupos. Além diso a análise da componente 1, usando um modelo de regressão, possibilitou ver que existe diferenças enre as Especies, mas conforme a análise de resíduos, o modelo não tem um bom ajuste já que seus resíduos indicam que as suposições de homocedasticidade e normalidade não foram satisfeitas, uma das formas de contornam este problema, talvez seja ajustar um modelo que nos possibilite analisar os dados de maneira mais viavel possivel. 
 
 
+
 \newpage
 
 5. Bibliografia
+
 
 
