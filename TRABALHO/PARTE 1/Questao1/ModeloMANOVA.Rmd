@@ -3,6 +3,14 @@ title: "Modelo MANOVA"
 output: pdf_document
 ---
 
+```{r, echo=FALSE}
+#definindo opÃ§Ãµes padrÃµes 
+
+options(OutDec= ",")
+
+knitr::opts_chunk$set(fig.width=6, fig.height=3.5, fig.path='Figs/', fig.align='center', echo=FALSE, warning=FALSE, message=FALSE)
+```
+
 ```{r}
 ## Função que  carrega e instala pacotes
 ipak <- function(pkg){
@@ -11,7 +19,7 @@ ipak <- function(pkg){
     install.packages(new.pkg, dependencies = TRUE)
   sapply(pkg, require, character.only = TRUE)
 }
-pkg <- c("tidyverse","plyr","plotrix","car") #plotrix para "plotic" car para "qqplot"
+pkg <- c("tidyverse","plyr","plotrix","car","xtable") #plotrix para "plotic" car para "qqplot"
 ipak(pkg)
 ```
 
@@ -50,7 +58,8 @@ dadosmoscas$Esp=as.factor(dadosmoscas$Esp )#definindo o tipo da especie como fat
 #Pegando a coluna das espécies (grupos) para fazer o vetor identificador de grupos
 
 
-v.especies <- cbind(as.numeric(dadosmoscas[,1]))
+#v.especies <- cbind(as.numeric(dadosmoscas[,1]))
+v.especies <- dadosmoscas[,1]
 
 #tirando a primeira coluna para fazer a matriz de dados
 m.dados <- dadosmoscas[,-1]
@@ -74,7 +83,7 @@ k.P <- 7
 #Teste de igualdade das matrizes de covariância entre os grupos
 
 #resuldado da função
-test.igual.matriz <-Box.teste.Igual.MCov(as.matrix(m.dados),v.especies,v.n_especies,k.G)
+test.igual.matriz <-Box.teste.Igual.MCov(as.matrix(m.dados),as.numeric(v.especies),v.n_especies,k.G)
 
 #matriz sigma P (não lembro o que é exatamente)
 m.sigma.P <- test.igual.matriz$Sigma.P
@@ -86,6 +95,9 @@ est.test.igual.m.cov <- test.igual.matriz$est.test
 p.valor.igual.m.cov <- test.igual.matriz$p.valor
 
 ```
+
+Uma suposição adotada para se realizar um teste de análise de variancia multivariada é a de igualdade das matrizes de 
+
 
 ```{r}
 #Teste e resuldados MANOVA
@@ -102,6 +114,16 @@ Pillai <- summary.manova(fit.manova,test="Pillai")
 Hotelling <- summary.manova(fit.manova,test="Hotelling-Lawley")
 Roy <- summary.manova(fit.manova,test="Roy")
 
+tbl_resultados_MANOVA <- rbind(Wilks$stats[1,c(2,3,6)],Pillai$stats[1,c(2,3,6)],Hotelling$stats[1,c(2,3,6)],Roy$stats[1,c(2,3,6)])
+arredonda <- function(x) ifelse(x<0.001,"<0,001",round(x,digits = 3))
+tbl_resultados_MANOVA <- apply(tbl_resultados_MANOVA,2, arredonda)
+aux <- c("Wilks","Pillai","Hotelling-Lawley","Roy")
+tbl_resultados_MANOVA <- cbind(aux,tbl_resultados_MANOVA)
+colnames(tbl_resultados_MANOVA) <- c("Estatística","Valor","Aprox. distr. F", "p-valor")
+
+tbl_resultados_MANOVA <- data.frame(tbl_resultados_MANOVA)
+
+tbl_resultados_MANOVA
 ```
 
 ```{r}
@@ -135,18 +157,26 @@ return(list(mu = m.mu_pred,ep = m.ep_mu_pred, IC = m.IC_mu_pred))
 
 
 
-```{r teste}
+```{r fig.height=10, fig.width=10}
 #Não coloquei o gráfico na função "MedidasPreditasModelo" pois a função plotCI não é do ggplot, ai não da pra atribuir à uma variável (acho). Então tem que chamar a função e logo embaixo a do gráfico no local que irão ser plotados os gráficos. vai ter que repetir o código abaixo para as 7 variáveis (é só mudar o valor de k.posicao_var.
 
 #lembrar de mudar o título dos gráficos.
 
+par(mfrow =c(3,3))
 
-a <- MedidasPreditasModelo(k.posicao_var = 1)
+IC_predito <- function(i){
+a <- MedidasPreditasModelo(k.posicao_var = i)
 
-plotrix::plotCI(a$mu,ui=a$IC[,2],li=a$IC[,1],axes=FALSE,xlab="espécie",ylab="média",pch=19,cex=1.2,cex.lab=1.2,cex.axis=1.2,main="Comprimento da Asa")
+plotrix::plotCI(a$mu,ui=a$IC[,2],li=a$IC[,1],axes=FALSE,xlab="espécie",ylab="média",pch=19,cex=1.2,cex.lab=1.2,cex.axis=1.2,main= inames[i+1])
 axis(2,seq(4,7,0.2),cex.axis=1.2)
 axis(1,1:2,c("Leptoconops carteri","Leptoconops torrens"),cex.axis=1.2)
+}
+
+for (i in 1:7){IC_predito(i)}
+
+
 ```
+
 
 
 
@@ -188,21 +218,68 @@ GeraMatriz_C_B_U <- function(k.ncomp,k.i,k.j,k.k,k.s) {
 
 #Um exemplo abaixo de como utilizar a função, aqui está comparando simultaneamente se as espécies de moscas são iguais (na média) comparando-se em relação as duas primeiras variáveis
 
-m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 2,1,2)
-resultados_teste1 <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
-resultados_teste1$estatqui
+#m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 2,1,2)
+#resultados_teste1 <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
+#resultados_teste1$estatqui
 ```
 
 
 ```{r}
 #testar igualdade entre os grupos para 
 #largura da asa 
-#comprimento do 3 palpo
-# comprimento do 12º segmento da antena
-# comprimento do 13º segmento da antena
-m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 4,2,4,6)
-resultados_teste1 <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
+#Largura 3° palpo
+#comprimento do 12º segmento da antena
+#comprimento do 13º segmento da antena
+m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 3,2,4,6)
+resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
+pvalor_CBU <- rep(0,5)
+label_pvalor_CBU <- rep(" ",5)
+pvalor_CBU[1] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))
+label_pvalor_CBU[1] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = 0$"
 ```
+
+Note pelos gráficos da figura (X-1) que os Intervalos de Confiança para as médias preditas para as espécies de moscas se interceptam num intervalo grande para as variáveis `r inames[2+1]`, `r inames[4+1]` e `r inames[6+1]`, portanto é razoável conjecturar que as espécies de moscas tem médias iguais para estas variáveis. Por meio da metodologia CBU=M (veja Azevedo,2017), testou-se simultaneamente a igualdade das médias destas variáveis entre as espécies de moscas, ao qual resultou num p-valor = `r ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))`, ou seja, `r ifelse(resultados_teste$pvalor<0.05,"temos","não temos")` evidencias estatísticas suficientes para rejeitar a hipótese de igualdade simultânea das médias entre as espécies para as variáveis `r inames[2+1]`, `r inames[4+1]` e `r inames[6+1]`. A fim de identificar melhor onde residem as diferenças entre as espécies de moscas, aplicamos esta mesma metodologia acrescentando as demais variáveis na hipótese de igualdade (uma de cada vez), os resultados deste teste constam na tabela (n XX "tabela_CBU").
+
+```{r}
+#testar igualdade entre os grupos para 
+#largura da asa ,#Largura 3° palpo, #comprimento do 12º segmento da antena, #comprimento do 13º segmento da antena
+#acrescentando : Comprimento da Asa
+m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 4,1,2,4,6)
+resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
+pvalor_CBU[2] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))
+label_pvalor_CBU[2] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = \alpha_{11} = 0$"
+
+#testar igualdade entre os grupos para 
+#largura da asa ,#Largura 3° palpo, #comprimento do 12º segmento da antena, #comprimento do 13º segmento da antena
+#acrescentando : Comprimento 3° palpo
+m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 4,2,3,4,6)
+resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
+pvalor_CBU[3] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))
+label_pvalor_CBU[3] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = \alpha_{13} = 0$"
+
+#testar igualdade entre os grupos para 
+#largura da asa ,#Largura 3° palpo, #comprimento do 12º segmento da antena, #comprimento do 13º segmento da antena
+#acrescentando : Comprimento 4° palpo
+m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 4,2,4,5,6)
+resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
+pvalor_CBU[4] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))
+label_pvalor_CBU[4] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = \alpha_{15} = 0$"
+
+#testar igualdade entre os grupos para 
+#largura da asa ,#Largura 3° palpo, #comprimento do 12º segmento da antena, #comprimento do 13º segmento da antena
+#acrescentando : Comprimento 4° palpo
+m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 4,2,4,6,7)
+resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
+pvalor_CBU[5] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))
+label_pvalor_CBU[5] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = \alpha_{17} = 0$"
+
+tabela_CBU <- cbind(label_pvalor_CBU,pvalor_CBU)
+colnames(tabela_CBU) <- c("Hipótese","p-valor do teste CBU=M")
+#xtable(tabela_CBU)
+tabela_CBU
+
+```
+Note pela tabela (n XX "tabela_CBU") que os dois primeiros testes indicam a não rejeição da hipótese apresentada, portanto temos evidencias estatísticamente significantes de que as espécies tem médias conjuntamente iguais para as variáveis `r inames[2+1]`,`r inames[4+1]`,`r inames[6+1]` e `r inames[1+1]`, ou seja, as diferenças parecem residir nas variáveis `r inames[3+1]`, `r inames[5+1]` e `r inames[7+1]`.
 
 
 ```{r}
@@ -370,6 +447,7 @@ Seteplots_Residuos(mY,mresult,var,typeresid,wplot)
 gen.graf.resid.quad.form(as.matrix(m.dados),fit.manova)
 ```
 
+Com o objetivo de identificar as diferenças entre as espécies de moscas, ajustou um modelo de regressão normal linear homocedástico multivariado ajustado via mínimos quadrados generalizados (veja Azevedo,2017):
 
 $$ Y_{ijk} = \mu_k + \alpha_{ik} + \varepsilon_{ijk},\  \varepsilon_{ijk} \sim N_k(0,\Sigma),
 $$ $$ i = 1,2 \textrm{ (espécie, 1 - Leptoconops torrens,2 - Leptoconops carteri)} ,\ j = 1,2,...,35\ \textrm{(moscas) e }
@@ -377,6 +455,14 @@ $$ $$ k = 1,...,7 \ \textrm{(variável, 1 - Comprimento da Asa, 2 - Largura da A
 $$ $$ \textrm{5 - Comprimento 4° palpo, 6 - Comprimento 12° segmento da antena, 7 - Compimento 13° segmento da antena),}
 $$ $$ \textrm{em que } \alpha_{1k} = 0, k = 1,...,7.
 $$
+Na tabela XX(tbl_resultados_MANOVA) estão apresentadas as quatro estatísticas referentes ao teste de análise de variância multivariada:
+
+
+########   TABELA tbl_resultados_MANOVA #########
+
+Note pela tabela XX(tbl_resultados_MANOVA) que todas as estatísticas apresentaram p-valor < 0,05 (Melhorar AQUI) portanto, todas os testes nos apresentam evidencias estatísticamente significativas de que as espécies difiram em ao menos uma das variáveis presentes no banco de dados.
+
+
 
 3.1 Análise dos resíduos
 

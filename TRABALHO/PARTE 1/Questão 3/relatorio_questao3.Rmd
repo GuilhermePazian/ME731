@@ -1,5 +1,4 @@
 ---
-title: 
 geometry: textwidth=18cm,textheight=24cm
 header-includes:
 - \usepackage{setspace}
@@ -10,11 +9,11 @@ header-includes:
 - \usepackage{enumerate}
 output:
   pdf_document: null
-  html_document: default
   mainfont: Times New Roman
+  number_sections: yes
   fig_caption: yes
+linestretch: 1.5
 lang: pt-br
-setspace: doublespacing
 fontsize: 10pt
 ---
 
@@ -74,7 +73,7 @@ Professor: {\bf Caio Lucidius Naberezny Azevedo}
 
 options(OutDec= ",")
 
-knitr::opts_chunk$set(fig.width=6, fig.height=3.5, fig.path='Figs/', fig.align='center', echo=FALSE, warning=FALSE, message=FALSE)
+knitr::opts_chunk$set(fig.width=8, fig.height=5.5, fig.path='Figs/', fig.align='center', echo=FALSE, warning=FALSE, message=FALSE)
 ```
 
 ```{r echo=FALSE}
@@ -93,7 +92,7 @@ knitr::opts_chunk$set(fig.align='center', echo=FALSE, warning=FALSE, message=FAL
 #echo = FALSE não permite que o chunk apareça no pdf
 
 
-packages= c("tidyverse","data.table","reshape2","captioner","gridExtra","xtable","MASS","xtable","knitr","kableExtra","quadprog","scales","ca","mice","Matrix","pander")
+packages= c("tidyverse","data.table","reshape2","captioner","gridExtra","xtable","MASS","xtable","knitr","kableExtra","quadprog","scales","ca","mice","Matrix","pander", "formattable","forecast","factoextra")
 
 #caso necessário a instalação de algum pacote
 #install.packages(packages)
@@ -250,11 +249,16 @@ path_arq = glue::glue(getwd(),'/Saude_mental.txt')
 
 mental = read.table(path_arq) 
 
+
+mental2 = as.matrix(mental)
+dimnames(mental2) <- list(c("Boa", "Presença fraca de Sintomas","Presença Moderada de Sintomas","Debilitado"),c("A (Alto)","B","C","D","E (Baixo)"))
+names(dimnames(mental2)) <- c("Saúde Mental","Status Sócio-Econômico dos pais")
+
+
 colnames = c("A (Alto)","B","C","D","E (Baixo)","Total")
 
 rownames = c("Boa", "Presença fraca de Sintomas","Presença Moderada de Sintomas","Debilitado","Total")
 
-mental3 = mental
 
 #soma dos valores das colunas
 sum_c = colSums(mental)
@@ -266,123 +270,213 @@ total = sum(mental)
 mental = data.frame(mental,sum_r)
 mental[5,]=c(sum_c,total)
 
-mental2 = as.matrix(mental)
+mental = as.matrix(mental)
 
-dimnames(mental2) <- list(rownames,colnames)
-names(dimnames(mental2)) <- c("Saúde Mental","Status Sócio-Econômico do País")
+dimnames(mental) <- list(rownames,colnames)
+names(dimnames(mental)) <- c("Saúde Mental","Status Sócio-Econômico dos pais")
+
+prop_total = round(mental/sum(mental2)*100,2)
+```
+
+
+
+
+```{r legendas, echo=FALSE, cache=TRUE,warning=FALSE,message=FALSE}
+#legenda para as tabelas
+
+# legenda para a primeira tabela(estats descr) do primeiro exercício
+legenda_table1 = tbls(name="table_estat_descr1",caption = "Tabela de contingência com os dados obtidos")
+
+legenda_table2 = tbls(name="table_estat_descr2",caption = "Proporções estimadas (pelo total de observações) x 100")
+
+legenda_table3 = tbls(name="table_estat_descr3",caption = "Ranqueamento da saúde mental e do status socioeconômico dos pais")
+
+
+legenda_table4 = tbls(name="table_aic_bic",caption = "Perfil das linhas (x100)")
+
+legenda_table5 = tbls(name="table_esti_testedenulidade",caption = "Perfil das colunas (x100)")
+
+legenda_table6 = tbls(name="table_esti_testedenulidade",caption = "Inércia")
+#legendas para os gráficos
+
+#legenda para o primeiro Boxplot
+legenda_graf1 = figs(name="graf1_series",caption = "Biplot das componentes")
 
 
 ```
-
 
 ```{r}
 quiqrad = chisq.test(mental)
 ```
 
 ```{r perfil_medio}
-#perfis_medios = ACaux(mental2)
+perfis_medios = ACaux(mental2)
 
 colnames = c("A (Alto)","B","C","D","E (Baixo)","Total")
 rownames = c("Boa", "Presença fraca de Sintomas","Presença Moderada de Sintomas","Debilitado", "Total")
 
-#perfil_linha = perfis_medios$m.R
-#dimnames(perfil_linha) <- list(rownames,colnames)
-#names(dimnames(perfil_linha)) <- c("Saúde Mental","Status Sócio-Econômico do País")
+perfil_linha = round(perfis_medios$m.R,2)
+dimnames(perfil_linha) <- list(rownames,colnames)
+names(dimnames(perfil_linha)) <- c("Saúde Mental","Status Sócio-Econômico dos pais")
 
 
-#perfil_coluna = perfis_medios$m.C
-#dimnames(perfil_coluna) <- list(rownames,colnames)
-#names(dimnames(perfil_coluna)) <- c("Saúde Mental","Status Sócio-Econômico do País")
+perfil_coluna = round(perfis_medios$m.C,2)
+dimnames(perfil_coluna) <- list(rownames,colnames)
+names(dimnames(perfil_coluna)) <- c("Saúde Mental","Status Sócio-Econômico dos pais")
 
 #inercia = perfis_medios$inercia
 
 #var_exp = ((inercia[1]^2)+(inercia[2]^2))/sum(inercia^2)
 ```
 
+```{r ana_corresp}
+resultCA <- ca(mental2)
+inercia<-summary(resultCA)$scree
+result_var = cbind(round(sqrt(inercia[,2]),4),round(inercia[,2],4),round(inercia[,3],2),round(inercia[,4],2))
+colnames(result_var)=c("Valor Singular","Inércia","Porcentagem","Porcentagem Acumulada")
+rownames(result_var)=NULL
 
-1. Introdução
-
-Ter uma boa saúde mental é um aspecto importante na constuição da vida humana. Sem isto, pode-se pressupor que uma boa condição financeira contribui para existência de uma boa saúde mental. Com este trabalho, desejamos medir o grau de associação entre o estado da saúde mental e o status sócio-ecônomico ecõnomico do páis. o objetivo especifico deste trabalho é encontrar um padrão nos dados que indiquem quais estados de saúde mental estão mais relacionados ao status sócio- economico do país atráves de análise de correspondência simples.
-
-O banco de dados que vamos analisar é constituído de `r sum(mental3)` observações, com duas variáveis categorizadas que são: *Sáude Mental*, dividida em quatro categorias (Boa, Presença fraca de sintomas, Presença moderada de sintomas, Debilitado) e *Status Sócio-Ecõnomico do País*, dividido em cinco ordens (A(Boa),B,C,D e E(Baixo)). Os softwares utilizados foram: *R* \footnote{https://cran.r-project.org/}, versão 3.4.0 e *Rstudio* \footnote{https://www.rstudio.com/}, versão 1.0.1. 
-
-Primeiramente, realizamos um Teste Qui-Quadrado para testarmos a hipótese de independência entre as duas variáveis citadas acima. Depois, Caso indique-se a dependência,auxiliadas por uma análise descritiva dos perfis médios,procuraremos indícios de relações entre as variáveis.Depois analisaremos a estrutura deste comportamento utilizando análise correspondência (ver Azevedo(2017) e Johnson e Wichern (2007)).
-
-\newpage
-
-2. Análise descritiva
-
-Abaixo, Tabela 1, encontra-se os dados obtidos. O Modelo probabilistico gerador da tabela de contingência é a Multinomial, com tamanho `r sum(mental3)` e 20 categorias. 
-
-```{r}
-kable(mental2, format = "latex", booktabs = T)
 ```
 
-Primeiramente, vamos realizar o teste Qui-quadrado para testarmos independência e hipótese que desejamos testar é:
 
-$H_0: p_{ij}=p_{i.}p_{.j}$ vs $H_1: p_{ij}\neq p_{i.}p_{.j}$, para pelo menos um par $(i,j)$, onde $p_{ij}$ é a proporção de indíviduos na população total para a i-ésima categoria da variável *Sáude Mental* e da j-ésima categoria da variável *Status Sócio-Ecõnomico do País*. $p_{i.}$ é a proporção de individuos na categoria "i" da variável *Sáude Mental* .$p_{.j}$ é a proporção de indivudos na categoria "j" da variável *Status Sócio-Ecõnomico do País*. 
+# Introdução
+
+Este trabalho visa medir o grau de associação entre o estado da saúde mental dos indivíduos e o status sócio-ecônomico de seus respectivos pais. Sendo assim, pretendemos encontrar um padrão nestes dados por meio de uma análise de correspondência simples.
+
+O banco de dados que vamos analisar é constituído de `r sum(mental2)` observações, com duas variáveis categorizadas que são: *Saúde Mental*, dividida em quatro categorias (Boa, Presença fraca de sintomas, Presença moderada de sintomas, Debilitado) e *Status Sócio-Econômico dos Pais*, dividido em cinco ordens (A(Boa),B,C,D e E(Baixo)). Os softwares utilizados foram: *R* \footnote{https://cran.r-project.org/}, versão 3.4.0 e *Rstudio* \footnote{https://www.rstudio.com/}, versão 1.0.1. 
+
+Primeiramente, realizamos um Teste Qui-Quadrado para testarmos a hipótese de independência entre as duas variáveis citadas acima. Depois, caso for indicada a dependência, procuraremos indícios de relações entre as variáveis auxiliados por uma análise descritiva dos perfis médios. Por fim, analisaremos a estrutura deste comportamento utilizando a análise de correspondência simples (ver Azevedo(2017) e Johnson e Wichern (2007)).
+
+
+
+# Análise descritiva
+
+Na Tabela 1, apresentamos os dados obtidos. A Lei de Probabilidade geradora da tabela de contingência é a Multinomial, com tamanho $n=$`r sum(mental2)` e 20 categorias. 
+
+```{r}
+kable(mental2, format = "latex", booktabs = T)%>%kable_styling(position = "center")
+```
+
+\begin{center}
+ `r legenda_table1`
+\end{center}
+
+Obtidos os dados, realizamos o teste Qui-quadrado para identificarmos independência. A hipótese que desejamos testar é:
+
+$H_0: p_{ij}=p_{i.}p_{.j}$ vs $H_1: p_{ij}\neq p_{i.}p_{.j}$, para pelo menos um par $(i,j)$, onde $p_{ij}$ é a proporção de indíviduos na população total para a i-ésima categoria da variável *Saúde Mental* e da j-ésima categoria da variável *Status Sócio-Econômico dos Pais*. $p_{i.}$ é a proporção de individuos na categoria "i" da variável *Saúde Mental*  .$p_{.j}$ é a proporção de indivudos na categoria "j" da variável *Status Sócio-Econômico dos Pais*. 
 
 Os resultados para o teste qui-quadrado usual são: O quantil teórico de uma distribuição qui - quadrado é: $\chi^{2}_{12}=$ `r round(qchisq(0.95,12),2)`. O valor da estatística qui-quadrado é: Q = `r round(quiqrad$statistic,2)` e seu respectivo p-valor é `r round(quiqrad$p.value,4)`. Pelos resultados anteriores vemos que o teste rejeitou a hipótese de que há independência entre entre as variáveis. 
 
-Como discutidos anteriormente, pelo fato do teste qui-quadrado indicar dependência, vamos estudar essa estrutura calculando os perfis médios para cada variável, analisando-as de forma abrangente possível e, posteriormente, aplicando a Análise de Correspondência.
+Como discutimos anteriormente, o fato do teste qui-quadrado indicar dependência necessita de um estudo mais aprofundado dessa estrutura, calculando os perfis médios para cada variável, analisando-as de forma abrangente possível e, posteriormente, aplicando a Análise de Correspondência.
+
+
+Na Tabela 2, observamos a proporção estimada dividindo a quantidade de indivíduos em cada casela pelo total de entrevistados. Pode-se verificar que, na primeira variável, a categoria que possui maior quantidade de indivíduos, com`r prop_total[5,1]`, têm pais com alto status sócio-ecônomico e, para a segunda vaáriavel, a categoria "presença fraca de sintomas" é a que tem maior proporção de entrevistados, por volta de `r prop_total[2,6]`%. Podemos ver que `r prop_total[2,1]`% dos individuos tem presença fraca de sintomas e tem pais com alto status sócio-ecõnomico e  `r prop_total[4,1]` dos individuos é debilitados e os pais tem alto status sócio-ecõnomico. 
+
+```{r}
+
+kable(prop_total, format = "latex", booktabs = T)%>%kable_styling(position = "center")
+
+```
+
+\begin{center}
+ `r legenda_table2`
+\end{center}
+
+
+Na Tabela 3, há o rankeamento para cada variável. Como podemos observar, as análises feitas anteriormente, para Tabela 2, são observadas nesta Tabela. 
+
+```{r}
+rank = round((mental2/sum(mental2)),4)*100
+#dimnames(rank)=NULL
+rank=cbind(rank,c(4,1,3,2))
+rank= rbind(rank,c(1,3,2,4,5,''))
+
+colnames = c("A (Alto)","B","C","D","E (Baixo)","Rank")
+
+rownames = c("Boa", "Presença fraca de Sintomas","Presença Moderada de Sintomas","Debilitado","Rank")
+dimnames(rank) = list(rownames,colnames)
+
+kable(rank, format = "latex", booktabs = T)%>%kable_styling(position = "center")
+```
+
+\begin{center}
+ `r legenda_table3`
+\end{center}
+
+Na Tabela 4, de perfil das linhas, vemos que, para uma boa saúde mental,  os perfis-medios relacionados aos indivíduos cujos pais pertencem aos maiores status socio-econômicos, denominados (**A**,**B**,**C**, em ordem decrescente), se destacam em relação a proporção vista na população com respectivamente  `r round(perfil_linha[1,1],4)*100`%, `r round(perfil_linha[1,2],4)*100`%, `r round(perfil_linha[1,3],4)*100`%. Ou seja, há indícios de que uma boa saúde mental pode estar relacionada a melhores condições sócio-econômicas. Podemos observar que para quem está debilitado, os perfis-medios que se destacam em relação a proporçaõ populacional são de valores `r round(perfil_linha[4,1],4)*100`%, `r round(perfil_linha[4,4],4)*100`%, `r round(perfil_linha[4,5],4)*100`% e correspondentes aos status economicos **A**,**D** e **E**,  ou seja, há indícios que quem está debilitado pode ter uma pior situação econômica ou tem pais com o status socio-econômico mais alto.
 
 
 
 ```{r}
-prop_total = round(mental2/sum(mental3)*100,2)
-kable(round(mental2/sum(mental3)*100,2), format = "latex", booktabs = T)%>% column_spec(7, border_left = T, bold = T) %>%
-row_spec(3:5, bold = T, color = "white", background = "black")
-
+kable(perfil_linha, format = "latex", booktabs = T)%>%kable_styling(position = "center")
 ```
 
-Na Tabela 2, observamos a proporção estimadas pelo total. Pode-se depreender que para `r prop_total[5,1]`% dos indíviduos vem de países com alto status sócio-ecônomico. `r prop_total[2,6]`% dos individuos têm presença fraca de sintomas. Podemos ver que `r prop_total[2,1]`% dos individuos tem presença fraca de sintomas e tem pais com alto status sócio-ecõnomico e  `r prop_total[4,1]` dos individuos é debilitados e os pais tem alto status sócio-ecõnomico. 
+\begin{center}
+ `r legenda_table4`
+\end{center}
 
-Na Tabela 3
 
-Na Tabela 4, de perfil das linhas, vemos que para uma boa Saúde mental temos que os perfis-medios relacionado aos maiores status socio-economicos, denominados (A,B,C), em ordem decrescente, se destacam em relação a proporção na população com respectivamente `r round(perfil_linha[1,1],4)*100`%, `r round(perfil_linha[1,2],4)*100`%, `r round(perfil_linha[1,3],4)*100`%. Ou seja, há indícios de que uma boa saúde mental pode estar relacionada a melhores condições sócio-econômicas. 
+Na Tabela 5, vemos o  perfl de coluna. Podemos ver que `r percent(perfil_coluna[2,6])` dos indivíduos possuem presença fraca de sintomas, `r percent(perfil_coluna[1,6])` apresentam boa saúde mental, `r percent(perfil_coluna[3,6])` Presença moderada de sintomas e `r percent(perfil_coluna[4,6])` estavam debilitados. Outrossim, os possuintes de pais no mais baixo status socioeconômico,**E** `r percent(perfil_coluna[3,5])` apresentam presença moderada de sintomas e `r percent(perfil_coluna[4,5])` são classificados com saúde mental debilitada, destacando-se em relação as proporções encontradas na população (20,57% e 27,78%, respectivamente). Para mais, para os possuintes de pais no status **C**, `r percent(perfil_coluna[2,3])` apresentam presença fraca de sintomas, porcentagem maior do que a porcentagem encontrada na população,`r percent(perfil_coluna[2,6])` , ocorrendo o mesmo para individuos cujos pais são classificamos no status socioeconômico **D**. Vê-se concomitantemente que dos entrevistados possuintes de pais no mais alto status, `r percent(perfil_coluna[1,1])` delas apresentam boa saúde mental, número maior do que os `r percent(perfil_coluna[1,6])` da proporção populacional. Por último, dos que possuem os pais no status **B**, `r percent(perfil_coluna[1,2])`  possuem boa saúde mental e 36,59% têm presença fraca de sintomas, índices súpero as proporções encontradas na população. `r percent(perfil_coluna[1,6])` e `r percent(perfil_coluna[2,6])`, na devida ordem).
 
-Podemos observar que para quem está debilitado, os perfis-medios que se destacam são `r round(perfil_linha[4,1],4)*100`%, `r round(perfil_linha[4,4],4)*100`%, `r round(perfil_linha[4,5],4)*100`%. Ou seja, há indícios que quem está debilitado pode ter uma pior situação econômica. 
-
-O perfil das colunas é dado por:
 
 ```{r}
-
-#kable(perfil_coluna, format = "latex", booktabs = T)
+kable(perfil_coluna, format = "latex", booktabs = T)%>%kable_styling(position = "center")
 ```
 
-Podemos ver que para quem possui o maior nível socio-economico temos que os perfis-medios relacionados aos estados de saúde mental Boa e o Debilitado  se destacam em relação a proporção na população com respectivamente `r round(perfil_linha[1,1],4)*100`%, `r round(perfil_linha[4,1],4)*100`%. Ou seja, há indícios a melhor condição sócio-econômica está relacionada com com a boa condição mental e ao estado debilitado.
 
+\begin{center}
+ `r legenda_table5`
+\end{center}
 
 \newpage
 
-3. Análise Inferencial
+# Análise Inferencial
+
+Na Tabela 6, apresentamos os resultados obtidos via Análise de Correspondência Simples. Observamos que  `r result_var[2,4]` % da variablidade é explicada pelas duas prmeiras componentes, uma quantdade razoável que nos leva a considerarmos apenas elas para as próxmas análises.
 
 
 ```{r}
-resultCA <- ca(mental2) # names(resultCA)
-resultFCA <- plot(resultCA,xlab="componente 1",ylab="componente 2",cex=1.2)
+
+kable(result_var,format = "latex", booktabs = T)%>%kable_styling(position = "center")
+
+```
+
+\begin{center}
+ `r legenda_table6`
+\end{center}
+
+
+Na Figura 1, vemos o biplot. Por meio dele, observamos que os status socio-economico dos pais **B**e **C** estão relacionados à presença fraca de sintomas, ou seja, pessoas que possuem esse sintoma possuem pais naquele status econômico. Podemos ver também que quem apresenta uma presença moderada de sintomas dispõe de pais com status econômico mais baixo, nas classes  **D** e **E**. Para o status econômico mais alto, nível  **A**, vemos que temos dois comportamentos interessantes devido à distinção dos nívels de sintomas: o primeiro é a relação do mais alto status, **A** com o nível de saúde mental Debilitado, uma relação mais forte do que a segunda, a de  **A** com Boa saúde mental.  
+
+
+```{r}
 #xtable(resultFCA$rows,digits=4)
 #xtable(resultFCA$cols,digits=4)
-biplot(resultFCA$rows,resultFCA$cols,var.axes=FALSE,xlab="componente 1", ylab="componente 2",cex=1.2,xlim=c(-0.9,0.5))
-abline(0,0,lty=2)
-abline(v=0,lty=2)
 
+#resultFCA <- invisible(plot(resultCA,xlab="componente 1",ylab="componente 2"))
+
+fviz_ca_biplot(resultCA, repel = TRUE)
 ```
 
-A proporção de variabilidade explicada é em torno de `r round(var_exp,4)*100` %. 
+\begin{center}
+`r legenda_graf1`
+\end{center}
 
 
-\newpage
+# Conclusão
 
-4. Conclusões 
+Podemos ver que primeramente há uma relação de dependência entre as duas variáveis analisadas, *Saúde Mental* e *Status Sócio-Econômico dos Pais*, verificadas atráves do Teste Qu-Quadrado. Com o perfl das lnhas e colunas, conjecturamos alguns padrões que poderiam ser identificadas atráves da Análise de Correspondênca. 
 
-\newpage
+Depois, ao ajustarmos um modelo de Análise de Correspondênca Simples,  `r result_var[2,4]`%  da variabilidade dos dados é explicada pelas duas primeiras componentes deste modelo, o que nos levou a considerarmos apenas estas duas para o restante das análises. 
 
-5. Bibliografia
+Vemos, atráves do Biplot, que os status **B** e **C** estão mais relacionadas à presença fraca de sintomas, **D** e **E**  mais relacionadas a presença moderada e **A**, alusiva tanto ao status Debilitado, quanto ao Bom, porém a primeira relação é mais forte que a segunda. De modo geral, as relaççoes não são contundentes, dificultando a identificação de padrões definidos. 
+
+
+# Bibliografia
 
 \begin{itemize}
 
-  \item Azevedo, C. L. N (2017). Notas de aula sobre análise multivariada de dados http://www.ime.unicamp.br/~cnaber/Material_AM_2S_2017.htm
+  \item Azevedo, C. L. N (2017). Notas de aula sobre análise multivariada de dados 
   \item Johson, R. A. and Wichern, D. W. (2007). Applied Multivariate Statistical Analysis, 7a edição, Upper Saddle River, NJ : Prentice-Hall.
 
 \end{itemize}
