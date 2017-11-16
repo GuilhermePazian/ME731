@@ -338,28 +338,50 @@ rownames(result_var)=NULL
 
 ```
 
+\setlength{\parindent}{3em}
 
-# Introdução
 
+1. Introdução
+
+\doublespacing
 Este trabalho visa medir o grau de associação entre o estado da saúde mental dos indivíduos e o status sócio-ecônomico de seus respectivos pais. Sendo assim, pretendemos encontrar um padrão nestes dados por meio de uma análise de correspondência simples.
 
 O banco de dados que vamos analisar é constituído de `r sum(mental2)` observações, com duas variáveis categorizadas que são: *Saúde Mental*, dividida em quatro categorias (Boa, Presença fraca de sintomas, Presença moderada de sintomas, Debilitado) e *Status Sócio-Econômico dos Pais*, dividido em cinco ordens (A(Boa),B,C,D e E(Baixo)). Os softwares utilizados foram: *R* \footnote{https://cran.r-project.org/}, versão 3.4.0 e *Rstudio* \footnote{https://www.rstudio.com/}, versão 1.0.1. 
 
 Primeiramente, realizamos um Teste Qui-Quadrado para testarmos a hipótese de independência entre as duas variáveis citadas acima. Depois, caso for indicada a dependência, procuraremos indícios de relações entre as variáveis auxiliados por uma análise descritiva dos perfis médios. Por fim, analisaremos a estrutura deste comportamento utilizando a análise de correspondência simples (ver Azevedo(2017) e Johnson e Wichern (2007)).
 
+\vspace{0.5cm}
 
-
-# Análise descritiva
+2. Análise descritiva
 
 Na Tabela 1, apresentamos os dados obtidos. A Lei de Probabilidade geradora da tabela de contingência é a Multinomial, com tamanho $n=$`r sum(mental2)` e 20 categorias. 
 
-```{r}
-kable(mental2, format = "latex", booktabs = T)%>%kable_styling(position = "center")
+```{r, fig.cap=c("Tabela de contingência com os dados obtidos")}
+#kable(mental2, format = "latex", booktabs = T)%>%kable_styling(position = "center")
 ```
 
-\begin{center}
- `r legenda_table1`
-\end{center}
+```{r}
+#xtable(mental2)
+```
+
+\begin{table}[!h]
+\centering
+\caption{Tabela de contingência com os dados obtidos}
+\bgroup
+\def\arraystretch{2.0}
+\begin{tabular}{lccccc}
+  \toprule
+ & A (Alto) & B & C & D & E (Baixo) \\ 
+  \hline
+Boa & 121 &  57 &  72 &  36 &  21 \\ 
+  Presença fraca de Sintomas & 188 & 105 & 141 &  97 &  71 \\ 
+  Presença Moderada de Sintomas & 112 &  65 &  77 &  54 &  54 \\ 
+  Debilitado & 186 &  60 &  94 &  78 &  71 \\ 
+   \hline
+\end{tabular}
+\egroup
+\end{table}
+
 
 Obtidos os dados, realizamos o teste Qui-quadrado para identificarmos independência. A hipótese que desejamos testar é:
 
@@ -372,20 +394,39 @@ Como discutimos anteriormente, o fato do teste qui-quadrado indicar dependência
 
 Na Tabela 2, observamos a proporção estimada dividindo a quantidade de indivíduos em cada casela pelo total de entrevistados. Pode-se verificar que, na primeira variável, a categoria que possui maior quantidade de indivíduos, com`r prop_total[5,1]`, têm pais com alto status sócio-ecônomico e, para a segunda vaáriavel, a categoria "presença fraca de sintomas" é a que tem maior proporção de entrevistados, por volta de `r prop_total[2,6]`%. Podemos ver que `r prop_total[2,1]`% dos individuos tem presença fraca de sintomas e tem pais com alto status sócio-ecõnomico e  `r prop_total[4,1]` dos individuos é debilitados e os pais tem alto status sócio-ecõnomico. 
 
-```{r}
+```{r, fig.cap=c("Proporções estimadas (pelo total de observações) x 100")}
 
-kable(prop_total, format = "latex", booktabs = T)%>%kable_styling(position = "center")
-
+#kable(prop_total, format = "latex", booktabs = T)%>%kable_styling(position = "center")
 ```
 
-\begin{center}
- `r legenda_table2`
-\end{center}
+```{r}
+#xtable(prop_total)
+```
 
+\begin{table}[!h]
+\centering
+\caption{Proporções estimadas (pelo total de observações) x 100}
+\bgroup
+\def\arraystretch{2.0}
+\begin{tabular}{lrrrrrr}
+  \toprule
+ & A (Alto) & B & C & D & E (Baixo) & Total \\ 
+  \hline
+Boa & 6,88 & 3,24 & 4,09 & 2,05 & 1,19 & 17,44 \\ 
+  Presença fraca de Sintomas & 10,68 & 5,97 & 8,01 & 5,51 & 4,03 & 34,20 \\ 
+  Presença Moderada de Sintomas & 6,36 & 3,69 & 4,38 & 3,07 & 3,07 & 20,57 \\ 
+  Debilitado & 10,57 & 3,41 & 5,34 & 4,43 & 4,03 & 27,78 \\ 
+  Total & 34,49 & 16,31 & 21,82 & 15,06 & 12,33 & 100,00 \\ 
+   \hline
+\end{tabular}
+\egroup
+\end{table}
+
+\vspace{0.5cm}
 
 Na Tabela 3, há o rankeamento para cada variável. Como podemos observar, as análises feitas anteriormente, para Tabela 2, são observadas nesta Tabela. 
 
-```{r}
+```{r, fig.cap =c("Ranqueamento da saúde mental e do status socioeconômico dos pais")}
 rank = round((mental2/sum(mental2)),4)*100
 #dimnames(rank)=NULL
 rank=cbind(rank,c(4,1,3,2))
@@ -396,12 +437,34 @@ colnames = c("A (Alto)","B","C","D","E (Baixo)","Rank")
 rownames = c("Boa", "Presença fraca de Sintomas","Presença Moderada de Sintomas","Debilitado","Rank")
 dimnames(rank) = list(rownames,colnames)
 
-kable(rank, format = "latex", booktabs = T)%>%kable_styling(position = "center")
+#kable(rank, format = "latex", booktabs = T)%>%kable_styling(position = "center")
 ```
 
-\begin{center}
- `r legenda_table3`
-\end{center}
+```{r}
+#xtable(rank)
+```
+\vspace{0.5cm}
+
+\begin{table}[!h]
+\centering
+\caption{Ranqueamento da saúde mental e do status socioeconômico dos pais}
+\bgroup
+\def\arraystretch{2.0}
+\begin{tabular}{lcccccc}
+  \toprule
+ & A (Alto) & B & C & D & E (Baixo) & Rank \\ 
+  \hline
+Boa & 6,88 & 3,24 & 4,09 & 2,05 & 1,19 & 4 \\ 
+  Presença fraca de Sintomas & 10,68 & 5,97 & 8,01 & 5,51 & 4,03 & 1 \\ 
+  Presença Moderada de Sintomas & 6,36 & 3,69 & 4,38 & 3,07 & 3,07 & 3 \\ 
+  Debilitado & 10,57 & 3,41 & 5,34 & 4,43 & 4,03 & 2 \\ 
+  Rank & 1 & 3 & 2 & 4 & 5 &  \\ 
+   \hline
+\end{tabular}
+\egroup
+\end{table}
+
+\vspace{0.5cm}
 
 Na Tabela 4, de perfil das linhas, vemos que, para uma boa saúde mental,  os perfis-medios relacionados aos indivíduos cujos pais pertencem aos maiores status socio-econômicos, denominados (**A**,**B**,**C**, em ordem decrescente), se destacam em relação a proporção vista na população com respectivamente  `r round(perfil_linha[1,1],4)*100`%, `r round(perfil_linha[1,2],4)*100`%, `r round(perfil_linha[1,3],4)*100`%. Ou seja, há indícios de que uma boa saúde mental pode estar relacionada a melhores condições sócio-econômicas. Podemos observar que para quem está debilitado, os perfis-medios que se destacam em relação a proporçaõ populacional são de valores `r round(perfil_linha[4,1],4)*100`%, `r round(perfil_linha[4,4],4)*100`%, `r round(perfil_linha[4,5],4)*100`% e correspondentes aos status economicos **A**,**D** e **E**,  ou seja, há indícios que quem está debilitado pode ter uma pior situação econômica ou tem pais com o status socio-econômico mais alto.
 
@@ -444,11 +507,16 @@ paste0('{\\emph{ ', x, '}}')
 #autoformat(x)
 
 ```
+\vspace{0.5cm}
 
-\begin{table}[ht]
+
+\begin{table}[!h]
 \centering
+\caption{Perfil das linhas (x100)}
+\bgroup
+\def\arraystretch{2.0}
 \begin{tabular}{lrrrrrr}
-  \hline
+  \toprule
  & A (Alto) & B & C & D & E (Baixo) & Total \\ 
   \hline
   Boa                               & \textbf{39,41} & \textbf{18,57} & \textbf{23,45} & 11,73          & 6,84 & 1 \\ 
@@ -458,20 +526,15 @@ paste0('{\\emph{ ', x, '}}')
   Total                             & 34,49          & 16,31          & 21,82          & 15,06          & 12,33 & 1 \\ 
    \hline
 \end{tabular}
+\egroup
 \end{table}
 
-
-
-
-
-\begin{center}
- `r legenda_table4`
-\end{center}
+\vspace{0.5cm}
 
 
 Na Tabela 5, vemos o  perfl de coluna. Podemos ver que `r percent(perfil_coluna[2,6])` dos indivíduos possuem presença fraca de sintomas, `r percent(perfil_coluna[1,6])` apresentam boa saúde mental, `r percent(perfil_coluna[3,6])` Presença moderada de sintomas e `r percent(perfil_coluna[4,6])` estavam debilitados. Outrossim, os possuintes de pais no mais baixo status socioeconômico,**E**, `r percent(perfil_coluna[3,5])` apresentam presença moderada de sintomas e `r percent(perfil_coluna[4,5])` são classificados com saúde mental debilitada, destacando-se em relação as proporções encontradas na população (20,57% e 27,78%, respectivamente). Para mais, para os possuintes de pais no status **C**, `r percent(perfil_coluna[2,3])` apresentam presença fraca de sintomas, porcentagem maior do que a porcentagem encontrada na população,`r percent(perfil_coluna[2,6])` , ocorrendo o mesmo para individuos cujos pais são classificamos no status socioeconômico **D**. Vê-se concomitantemente que dos entrevistados possuintes de pais no mais alto status,**A**, `r percent(perfil_coluna[1,1])` delas apresentam boa saúde mental, número maior do que os `r percent(perfil_coluna[1,6])` da proporção populacional e podemos ver que `r percent(perfil_coluna[4,1])` dos indivíduos  que tem pais no status **A** estão debilitados. Por último, dos que possuem os pais no status **B**, `r percent(perfil_coluna[1,2])`  possuem boa saúde mental e 36,59% têm presença fraca de sintomas, índices súpero as proporções encontradas na população. `r percent(perfil_coluna[1,6])` e `r percent(perfil_coluna[2,6])`, na devida ordem).
 
-
+\vspace{0.5cm}
 ```{r}
 #kable(perfil_coluna, format = "latex", booktabs = T)%>%kable_styling(position = "center")
 
@@ -479,10 +542,13 @@ Na Tabela 5, vemos o  perfl de coluna. Podemos ver que `r percent(perfil_coluna[
 #autoformat(x)
 ```
 
-\begin{table}[ht]
+\begin{table}[!h]
 \centering
+\caption{Perfil das colunas (x100)}
+\bgroup
+\def\arraystretch{2.0}
 \begin{tabular}{lrrrrrr}
-  \hline
+  \toprule
                                 & A (Alto) & B & C & D & E (Baixo) & Total \\ 
   \hline
   Boa                           & \textbf{19,93} & \textbf{19,86} & \textbf{18,75} & 13,58 & 9,68 & 17,44 \\ 
@@ -492,34 +558,53 @@ Na Tabela 5, vemos o  perfl de coluna. Podemos ver que `r percent(perfil_coluna[
                                 & 100,00 & 100,00 & 100,00 & 100,00 & 100,00 & 100,00 \\ 
    \hline
 \end{tabular}
+\egroup
 \end{table}
-
-\begin{center}
- `r legenda_table5`
-\end{center}
 
 \newpage
 
-# Análise Inferencial
+\vspace{0.5cm}
+
+
+3. Análise Inferencial
 
 Na Tabela 6, apresentamos os resultados obtidos via Análise de Correspondência Simples. Observamos que  `r result_var[2,4]` % da variablidade é explicada pelas duas prmeiras componentes, uma quantidade razoável que nos leva a considerarmos apenas elas para as próxmas análises.
 
+\vspace{0.5cm}
 
-```{r}
+```{r, fig.cap=("Inércia")}
 
-kable(result_var,format = "latex", booktabs = T)%>%kable_styling(position = "center")
+#kable(result_var,format = "latex", booktabs = T)%>%kable_styling(position = "center")
 
 ```
 
-\begin{center}
- `r legenda_table6`
-\end{center}
+```{r}
+#xtable(result_var)
+```
 
+\begin{table}[!h]
+\centering
+\caption{Inércia}
+\bgroup
+\def\arraystretch{2.0}
+\begin{tabular}{rrrrr}
+  \toprule
+ & Valor Singular & Inércia & Porcentagem & Porcentagem Acumulada \\ 
+  \hline
+1 & 0,10 & 0,01 & 59,09 & 59,09 \\ 
+  2 & 0,08 & 0,01 & 35,88 & 94,96 \\ 
+  3 & 0,03 & 0,00 & 5,04 & 100,00 \\ 
+   \hline
+\end{tabular}
+\egroup
+\end{table}
+
+\vspace{0.5cm}
 
 Na Figura 1, vemos o biplot. Por meio dele, observamos que os status socio-economico dos pais **B**e **C** estão relacionados à presença fraca de sintomas, ou seja, pessoas que possuem esse sintoma possuem pais naquele status econômico. Podemos ver também que quem apresenta uma presença moderada de sintomas dispõe de pais com status econômico mais baixo, nas classes  **D** e **E**. Para o status econômico mais alto, nível  **A**, vemos que temos dois comportamentos interessantes devido à distinção dos nívels de sintomas: o primeiro é a relação do mais alto status, **A** com o nível de saúde mental Debilitado, uma relação mais forte do que a segunda, a de  **A** com Boa saúde mental.  
 
 
-```{r}
+```{r, fig.cap=c("Biplot das componentes"), fig.height=4, fig.width=7}
 #xtable(resultFCA$rows,digits=4)
 #xtable(resultFCA$cols,digits=4)
 
@@ -528,12 +613,11 @@ Na Figura 1, vemos o biplot. Por meio dele, observamos que os status socio-econo
 fviz_ca_biplot(resultCA, repel = TRUE)
 ```
 
-\begin{center}
-`r legenda_graf1`
-\end{center}
+\vspace{0.5cm}
 
+\newpage
 
-# Conclusão
+4. Conclusão
 
 Podemos ver que primeramente há uma relação de dependência entre as duas variáveis analisadas, *Saúde Mental* e *Status Sócio-Econômico dos Pais*, verificadas atráves do Teste Qu-Quadrado. Com o perfl das lnhas e colunas, conjecturamos alguns padrões que poderiam ser identificadas atráves da Análise de Correspondênca, podemos ver pelo perfil das colunas que para o status sócio-econômico **A** os indivíduos estão mais relacionados ou a uma boa saúde ou a está debilitado. Podemos ver nese perfil que tem menor status sócio-econômico está mais relacionado a presença moderada de sintomas ou está debilitado. Os indivíduos cujos pais estão nos status sócio-econômicos **C** e **D** estão mais relacionados a presença fraca de sintomas. Para entrevistados que cujos pais tem status sócio_econômicos mais baixo, **E**, ou possuem presença moderada de sintomas ou está debilitado. Para indivíduos no qual os pais tem status **B**, ou possuem uma boa saúde mental ou presença fraca de sintomas. 
 
@@ -543,7 +627,9 @@ Vemos, atráves do Biplot, que os status **B** e **C** estão mais relacionadas 
 
 Portanto, podemos ver que tanto a análise dos perfis médios e quanto a do biplot concordam nas conclusões obtidas.
 
-# Bibliografia
+\vspace{0.5cm}
+
+5. Bibliografia
 
 \begin{itemize}
 
