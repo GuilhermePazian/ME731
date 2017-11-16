@@ -92,7 +92,7 @@ knitr::opts_chunk$set(fig.align='center', echo=FALSE, warning=FALSE, message=FAL
 #echo = FALSE não permite que o chunk apareça no pdf
 
 
-packages= c("tidyverse","data.table","reshape2","captioner","gridExtra","xtable","MASS","xtable","knitr","kableExtra","quadprog","scales","ca","mice","Matrix","pander", "formattable","forecast","factoextra")
+packages= c("tidyverse","data.table","reshape2","captioner","gridExtra","xtable","MASS","xtable","knitr","kableExtra","quadprog","scales","ca","mice","Matrix","pander", "formattable","forecast","factoextra","huxtable")
 
 #caso necessário a instalação de algum pacote
 #install.packages(packages)
@@ -315,12 +315,12 @@ perfis_medios = ACaux(mental2)
 colnames = c("A (Alto)","B","C","D","E (Baixo)","Total")
 rownames = c("Boa", "Presença fraca de Sintomas","Presença Moderada de Sintomas","Debilitado", "Total")
 
-perfil_linha = round(perfis_medios$m.R,2)
+perfil_linha = round(perfis_medios$m.R,4)
 dimnames(perfil_linha) <- list(rownames,colnames)
 names(dimnames(perfil_linha)) <- c("Saúde Mental","Status Sócio-Econômico dos pais")
 
 
-perfil_coluna = round(perfis_medios$m.C,2)
+perfil_coluna = round(perfis_medios$m.C,4)
 dimnames(perfil_coluna) <- list(rownames,colnames)
 names(dimnames(perfil_coluna)) <- c("Saúde Mental","Status Sócio-Econômico dos pais")
 
@@ -408,21 +408,91 @@ Na Tabela 4, de perfil das linhas, vemos que, para uma boa saúde mental,  os pe
 
 
 ```{r}
-kable(perfil_linha, format = "latex", booktabs = T)%>%kable_styling(position = "center")
+perfil_linha1 = data.frame(perfil_linha)
+colnames(perfil_linha1) = c("A","B","C","D","E","Total")
+
+large <- function(x){
+paste0('{\\Large{\\bfseries ', x, '}}')
+}
+italic <- function(x){
+paste0('{\\emph{ ', x, '}}')
+}
+
+
+#perfil_linha1 %>%
+#mutate(
+#    pl = row.names(.),
+  # You don't need format = "latex" if you have ever defined o     ptions(knitr.table.format)
+#    A = cell_spec(A, "latex", bold = T)
+    #B = cell_spec(B, "latex", bold = if(A > 0.16)).
+    #C = cell_spec(C, "latex", bold = if(C > 0.22)),
+    #D = cell_spec(D, "latex", bold = if(D > 0.15)).
+    #E = cell_spec(E, "latex", bold = if(E > 0.12)))
+#)%>%
+#select(pl, A) %>%
+#kable("latex", escape = F, booktabs = T, linesep = "")
+
+
+
+
+
+#kable(perfil_linha, format = "latex", booktabs = T)%>%kable_styling(position = "center")
+
+
+
+#x <- xtable(perfil_linha*100,latex.environments = "center")
+#autoformat(x)
+
 ```
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrrrrrr}
+  \hline
+ & A (Alto) & B & C & D & E (Baixo) & Total \\ 
+  \hline
+  Boa                               & \textbf{39,41} & \textbf{18,57} & \textbf{23,45} & 11,73          & 6,84 & 1 \\ 
+  Presença fraca de Sintomas        & 31,23          & \textbf{17,44} & \textbf{23,42} & \textbf{16,11} & 11,79 & 1 \\ 
+  Presença Moderada de Sintomas     & 30,94          & \textbf{17,96} & 21,27          & 14,92          & \textbf{14,92} & 1 \\ 
+  Debilitado                        & \textbf{38,04} & 12,27          & 19,22          & \textbf{15,95} & \textbf{14,52} & 1 \\ 
+  Total                             & 34,49          & 16,31          & 21,82          & 15,06          & 12,33 & 1 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+
+
+
 
 \begin{center}
  `r legenda_table4`
 \end{center}
 
 
-Na Tabela 5, vemos o  perfl de coluna. Podemos ver que `r percent(perfil_coluna[2,6])` dos indivíduos possuem presença fraca de sintomas, `r percent(perfil_coluna[1,6])` apresentam boa saúde mental, `r percent(perfil_coluna[3,6])` Presença moderada de sintomas e `r percent(perfil_coluna[4,6])` estavam debilitados. Outrossim, os possuintes de pais no mais baixo status socioeconômico,**E** `r percent(perfil_coluna[3,5])` apresentam presença moderada de sintomas e `r percent(perfil_coluna[4,5])` são classificados com saúde mental debilitada, destacando-se em relação as proporções encontradas na população (20,57% e 27,78%, respectivamente). Para mais, para os possuintes de pais no status **C**, `r percent(perfil_coluna[2,3])` apresentam presença fraca de sintomas, porcentagem maior do que a porcentagem encontrada na população,`r percent(perfil_coluna[2,6])` , ocorrendo o mesmo para individuos cujos pais são classificamos no status socioeconômico **D**. Vê-se concomitantemente que dos entrevistados possuintes de pais no mais alto status, `r percent(perfil_coluna[1,1])` delas apresentam boa saúde mental, número maior do que os `r percent(perfil_coluna[1,6])` da proporção populacional. Por último, dos que possuem os pais no status **B**, `r percent(perfil_coluna[1,2])`  possuem boa saúde mental e 36,59% têm presença fraca de sintomas, índices súpero as proporções encontradas na população. `r percent(perfil_coluna[1,6])` e `r percent(perfil_coluna[2,6])`, na devida ordem).
+Na Tabela 5, vemos o  perfl de coluna. Podemos ver que `r percent(perfil_coluna[2,6])` dos indivíduos possuem presença fraca de sintomas, `r percent(perfil_coluna[1,6])` apresentam boa saúde mental, `r percent(perfil_coluna[3,6])` Presença moderada de sintomas e `r percent(perfil_coluna[4,6])` estavam debilitados. Outrossim, os possuintes de pais no mais baixo status socioeconômico,**E**, `r percent(perfil_coluna[3,5])` apresentam presença moderada de sintomas e `r percent(perfil_coluna[4,5])` são classificados com saúde mental debilitada, destacando-se em relação as proporções encontradas na população (20,57% e 27,78%, respectivamente). Para mais, para os possuintes de pais no status **C**, `r percent(perfil_coluna[2,3])` apresentam presença fraca de sintomas, porcentagem maior do que a porcentagem encontrada na população,`r percent(perfil_coluna[2,6])` , ocorrendo o mesmo para individuos cujos pais são classificamos no status socioeconômico **D**. Vê-se concomitantemente que dos entrevistados possuintes de pais no mais alto status,**A**, `r percent(perfil_coluna[1,1])` delas apresentam boa saúde mental, número maior do que os `r percent(perfil_coluna[1,6])` da proporção populacional e podemos ver que `r percent(perfil_coluna[4,1])` dos indivíduos  que tem pais no status **A** estão debilitados. Por último, dos que possuem os pais no status **B**, `r percent(perfil_coluna[1,2])`  possuem boa saúde mental e 36,59% têm presença fraca de sintomas, índices súpero as proporções encontradas na população. `r percent(perfil_coluna[1,6])` e `r percent(perfil_coluna[2,6])`, na devida ordem).
 
 
 ```{r}
-kable(perfil_coluna, format = "latex", booktabs = T)%>%kable_styling(position = "center")
+#kable(perfil_coluna, format = "latex", booktabs = T)%>%kable_styling(position = "center")
+
+#x <- xtable(perfil_coluna*100,latex.environments = "center")
+#autoformat(x)
 ```
 
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrrrrrr}
+  \hline
+                                & A (Alto) & B & C & D & E (Baixo) & Total \\ 
+  \hline
+  Boa                           & \textbf{19,93} & \textbf{19,86} & \textbf{18,75} & 13,58 & 9,68 & 17,44 \\ 
+  Presença fraca de Sintomas    & 30,97 & \textbf{36,59} & \textbf{36,72} & \textbf{36,60} & 32,72 & 34,20 \\ 
+  Presença Moderada de Sintomas & 18,45 & \textbf{22,65} & 20,05 & 20,38 & \textbf{24,88} & 20,57 \\ 
+  Debilitado                    & \textbf{30,64} & 20,91 & 24,48 & \textbf{29,43} & \textbf{32,72} & 27,78 \\ 
+                                & 100,00 & 100,00 & 100,00 & 100,00 & 100,00 & 100,00 \\ 
+   \hline
+\end{tabular}
+\end{table}
 
 \begin{center}
  `r legenda_table5`
@@ -432,7 +502,7 @@ kable(perfil_coluna, format = "latex", booktabs = T)%>%kable_styling(position = 
 
 # Análise Inferencial
 
-Na Tabela 6, apresentamos os resultados obtidos via Análise de Correspondência Simples. Observamos que  `r result_var[2,4]` % da variablidade é explicada pelas duas prmeiras componentes, uma quantdade razoável que nos leva a considerarmos apenas elas para as próxmas análises.
+Na Tabela 6, apresentamos os resultados obtidos via Análise de Correspondência Simples. Observamos que  `r result_var[2,4]` % da variablidade é explicada pelas duas prmeiras componentes, uma quantidade razoável que nos leva a considerarmos apenas elas para as próxmas análises.
 
 
 ```{r}
@@ -465,12 +535,13 @@ fviz_ca_biplot(resultCA, repel = TRUE)
 
 # Conclusão
 
-Podemos ver que primeramente há uma relação de dependência entre as duas variáveis analisadas, *Saúde Mental* e *Status Sócio-Econômico dos Pais*, verificadas atráves do Teste Qu-Quadrado. Com o perfl das lnhas e colunas, conjecturamos alguns padrões que poderiam ser identificadas atráves da Análise de Correspondênca. 
+Podemos ver que primeramente há uma relação de dependência entre as duas variáveis analisadas, *Saúde Mental* e *Status Sócio-Econômico dos Pais*, verificadas atráves do Teste Qu-Quadrado. Com o perfl das lnhas e colunas, conjecturamos alguns padrões que poderiam ser identificadas atráves da Análise de Correspondênca, podemos ver pelo perfil das colunas que para o status sócio-econômico **A** os indivíduos estão mais relacionados ou a uma boa saúde ou a está debilitado. Podemos ver nese perfil que tem menor status sócio-econômico está mais relacionado a presença moderada de sintomas ou está debilitado. Os indivíduos cujos pais estão nos status sócio-econômicos **C** e **D** estão mais relacionados a presença fraca de sintomas. Para entrevistados que cujos pais tem status sócio_econômicos mais baixo, **E**, ou possuem presença moderada de sintomas ou está debilitado. Para indivíduos no qual os pais tem status **B**, ou possuem uma boa saúde mental ou presença fraca de sintomas. 
 
 Depois, ao ajustarmos um modelo de Análise de Correspondênca Simples,  `r result_var[2,4]`%  da variabilidade dos dados é explicada pelas duas primeiras componentes deste modelo, o que nos levou a considerarmos apenas estas duas para o restante das análises. 
 
 Vemos, atráves do Biplot, que os status **B** e **C** estão mais relacionadas à presença fraca de sintomas, **D** e **E**  mais relacionadas a presença moderada e **A**, alusiva tanto ao status Debilitado, quanto ao Bom, porém a primeira relação é mais forte que a segunda. De modo geral, as relaççoes não são contundentes, dificultando a identificação de padrões definidos. 
 
+Portanto, podemos ver que tanto a análise dos perfis médios e quanto a do biplot concordam nas conclusões obtidas.
 
 # Bibliografia
 
