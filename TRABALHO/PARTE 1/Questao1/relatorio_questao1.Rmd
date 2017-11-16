@@ -76,6 +76,7 @@ Professor: {\bf Caio Lucidius Naberezny Azevedo}
 \end{titlepage}
 
 ```{r, echo=FALSE}
+
 #definindo opções padrões 
 
 options(OutDec= ",")
@@ -89,6 +90,7 @@ knitr::opts_chunk$set(fig.width=6, fig.height=3.5, fig.path='Figs/', fig.align='
 source("codigoscaioMANOVA.r")
 source("funcoes_murilo.r")
 source("funcoes_eli.r")
+
 #pacotes utilizados
 
 packages= c("ggplot2","knitr","dplyr","tidyverse","xtable","gridExtra", "plyr", "plotrix", "car","magrittr")
@@ -184,7 +186,7 @@ s22 <- cov(mx)
 vvar2<-diag(s2)
 nvar2<-4
 
-inames <- c("Espécie","Comprimento da Asa","Largura da Asa","Comprimento 3° palpo","Largura 3° palpo", "Comprimento 4° palpo", "Comprimento 12° segmento da antena", "Comprimento 13° segmento da antena")
+#inames <- c("Espécie","Comprimento da Asa","Largura da Asa","Comprimento 3° palpo","Largura 3° palpo", "Comprimento 4° palpo", "Comprimento 12° segmento da antena", "Comprimento 13° segmento da antena") #já está definido acima
 
 
 mmu <- t(matrix(t(vmu),nvar,n))
@@ -279,11 +281,17 @@ legend(0.2, 0.4, as.vector(unique(dadosmoscas_graf_tab$Esp)),
        fill=c("seagreen", "navyblue"))
 ```
 
+\newpage
+
 ```{r, fig.width=7, fig.height=8,fig.cap=c("Box-plot das variáveis por espécie")}
 grid.arrange(g_Comp_asa, g_Larg_asa, g_Comp_3_palpo, g_Larg_3_palpo, g_Comp_4_palpo, g_Comp_12_seg_ant, g_Comp_13_seg_ant, ncol=2)
 ```
 
 \newpage
+
+3. Análise Inferencial
+
+
 ```{r, fig.height=4,fig.width=8,fig.cap=c("Gráfico de quantil-quantil com envelopes para a distância de Mahalanobis; A) Torrens, B) Carteri")}
 
 par(mfrow=c(1,2))
@@ -296,9 +304,322 @@ qqPlot(vF2,dist="f",df1=nvar2,df2=n2-nvar2,col.lines=1,grid="FALSE",xlab="Quanti
 ```
 
 
-\newpage
 
-3. Análise Inferencial
+```{r}
+#Pegando a coluna das espécies (grupos) para fazer o vetor identificador de grupos
+
+
+#v.especies <- cbind(as.numeric(dadosmoscas[,1]))
+v.especies <- dadosmoscas[,1]
+
+#tirando a primeira coluna para fazer a matriz de dados
+m.dados <- dadosmoscas[,-1]
+
+
+#Criando um vetor com as quantidades de observações de cada grupo, constam 35 de cada grupo
+v.n_especies <- rbind(35,35)
+
+#Identificação da quantidade de grupos
+k.G <- 2
+
+#Identificação da quantidade de variáveis
+k.P <- 7
+```
+
+Uma suposição adotada para se realizar um teste de análise de variancia multivariada é a de igualdade das matrizes de covariancia
+
+```{r}
+#Teste de igualdade das matrizes de covariância entre os grupos
+
+#resuldado da função
+test.igual.matriz <-Box.teste.Igual.MCov(as.matrix(m.dados),as.numeric(v.especies),v.n_especies,k.G)
+
+#matriz sigma P (não lembro o que é exatamente)
+m.sigma.P <- test.igual.matriz$Sigma.P
+
+#estatística do teste
+est.test.igual.m.cov <- test.igual.matriz$est.test
+
+#p-valor do teste
+p.valor.igual.m.cov <- test.igual.matriz$p.valor
+
+```
+
+Com o objetivo de identificar as diferenças entre as espécies de moscas, ajustou um modelo de regressão normal linear homocedástico multivariado ajustado via mínimos quadrados generalizados (veja Azevedo,2017):
+
+$$ Y_{ijk} = \mu_k + \alpha_{ik} + \varepsilon_{ijk},\  \varepsilon_{ijk} \sim N_k(0,\Sigma),
+$$ $$ i = 1,2 \textrm{ (espécie, 1 - Leptoconops torrens,2 - Leptoconops carteri)} ,\ j = 1,2,...,35\ \textrm{(moscas) e }
+$$ $$ k = 1,...,7 \ \textrm{(variável, 1 - Comprimento da Asa, 2 - Largura da Asa, 3 - Comprimento 3° palpo, 4 - Largura 3° palpo, } 
+$$ $$ \textrm{5 - Comprimento 4° palpo, 6 - Comprimento 12° segmento da antena, 7 - Compimento 13° segmento da antena),}
+$$ $$ \textrm{em que } \alpha_{1k} = 0, k = 1,...,7. $$
+
+
+```{r}
+#Teste e resuldados MANOVA
+fit.manova <- manova(as.matrix(m.dados) ~ v.especies)
+
+#Aqui é apresentado testes anova para cada variável
+anovas <-summary.aov(fit.manova)
+
+#Aqui é o resuldado das estatísticas de teste que ele passou para MANOVA
+#OBS acho que vai ter que copiar os p-valores "na mão" pq não está fácil extrai-los
+
+Wilks <- summary.manova(fit.manova,test="Wilks")
+Pillai <- summary.manova(fit.manova,test="Pillai")
+Hotelling <- summary.manova(fit.manova,test="Hotelling-Lawley")
+Roy <- summary.manova(fit.manova,test="Roy")
+
+tbl_resultados_MANOVA <- rbind(Wilks$stats[1,c(2,3,6)],Pillai$stats[1,c(2,3,6)],Hotelling$stats[1,c(2,3,6)],Roy$stats[1,c(2,3,6)])
+arredonda <- function(x) ifelse(x<0.001,"<0,001",round(x,digits = 3))
+tbl_resultados_MANOVA <- apply(tbl_resultados_MANOVA,2, arredonda)
+aux <- c("Wilks","Pillai","Hotelling-Lawley","Roy")
+tbl_resultados_MANOVA <- cbind(aux,tbl_resultados_MANOVA)
+colnames(tbl_resultados_MANOVA) <- c("Estatística","Valor","Aprox. distr. F", "p-valor")
+
+tbl_resultados_MANOVA <- data.frame(tbl_resultados_MANOVA)
+
+tbl_resultados_MANOVA
+```
+
+
+Na tabela XX(tbl_resultados_MANOVA) estão apresentadas as quatro estatísticas referentes ao teste de análise de variância multivariada:
+
+
+########   TABELA tbl_resultados_MANOVA #########
+
+Note pela tabela XX(tbl_resultados_MANOVA) que todas as estatísticas apresentaram p-valor < 0,05 (Melhorar AQUI) portanto, todas os testes nos apresentam evidencias estatísticamente significativas de que as espécies difiram em ao menos uma das variáveis presentes no banco de dados.
+
+
+```{r}
+# Parâmetros preditos pelo modelo
+m.B <- matrix(coef(fit.manova),2,7) #2 Grupos e 7 variáveis
+v.beta <- matrix(t(m.B))
+m.X <- model.matrix(fit.manova)
+m.Sigmabeta <- kronecker(solve(t(m.X)%*%m.X),m.sigma.P)
+```
+
+
+```{r}
+#Médias preditas pelo modelo com os respectivos Erro padrão e IC's
+#Lembre que algumas matrizes usadas aqui foram definidas no código anterior à isto (logo acima)
+
+
+#k.posicao_Var é o índice "k" do \mu_k que você quer prever
+MedidasPreditasModelo <- function(k.posicao_var){
+
+m.x_mu <- matrix(data = rep(0,28), nrow = 2, ncol = 14)
+m.x_mu[,k.posicao_var] <- 1
+m.x_mu[2,k.posicao_var+7] <- 1
+
+m.mu_pred <- m.x_mu%*%v.beta
+m.ep_mu_pred <- sqrt(diag(m.x_mu%*%m.Sigmabeta%*%t(m.x_mu)))
+m.IC_mu_pred <- cbind(m.mu_pred-1.96*m.ep_mu_pred,m.mu_pred+1.96*m.ep_mu_pred)
+
+return(list(mu = m.mu_pred,ep = m.ep_mu_pred, IC = m.IC_mu_pred))
+}
+```
+
+```{r}
+#função para gerar as matrizes CBU só para facilitar
+GeraMatriz_C_B_U <- function(k.ncomp,k.i,k.j,k.k,k.s) {
+  
+  #k.ncomp  #número de parâmetros \alphas a serem comparados à 0.
+
+  m.C1 <- cbind(0,1) # para testar os \alpha's
+
+  #Comparação de k.ncomp \alpha's com zero e são 7 variáveis
+  m.U1 <- matrix(data = c(rep(0,k.ncomp*7)), nrow = 7, ncol = k.ncomp)
+
+  m.U1[k.i,1] <- 1
+  if(k.ncomp >= 2) m.U1[k.j,2] <- 1
+  if(k.ncomp >= 3) m.U1[k.k,3] <- 1
+  if(k.ncomp >= 4) m.U1[k.s,4] <- 1
+  if(k.ncomp >= 5) m.U1[k.s,5] <- 1
+  if(k.ncomp >= 6) m.U1[k.s,6] <- 1
+  if(k.ncomp >= 7) m.U1[k.s,7] <- 1
+
+
+  m.M <- rbind(rep(0,k.ncomp))
+  
+  return(list(C = m.C1, U = m.U1, M = m.M))
+}
+```
+
+```{r}
+#testar igualdade entre os grupos para 
+#largura da asa 
+#Largura 3° palpo
+#comprimento do 12º segmento da antena
+#comprimento do 13º segmento da antena
+m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 3,2,4,6)
+
+resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
+
+pvalor_CBU <- rep(0,5)
+
+label_pvalor_CBU <- rep(" ",5)
+
+pvalor_CBU[1] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))
+
+label_pvalor_CBU[1] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = 0$"
+```
+
+```{r fig.height=10, fig.width=10}
+#IC para as médias preditas para variáveis para cada espécie
+
+IC_predito <- function(i){
+a <- MedidasPreditasModelo(k.posicao_var = i)
+
+plotrix::plotCI(a$mu,ui=a$IC[,2],li=a$IC[,1],axes=FALSE,xlab="espécie",ylab="média",pch=19,cex=1.2,cex.lab=1.2,cex.axis=1.2,main= inames[i+1])
+axis(2,seq(4,7,0.2),cex.axis=1.2)
+axis(1,1:2,c("Leptoconops carteri","Leptoconops torrens"),cex.axis=1.2)
+}
+
+par(mfrow =c(3,3))
+for (i in 1:7){IC_predito(i)}
+
+
+```
+
+
+Note pelos gráficos da figura (X-1) que os Intervalos de Confiança para as médias preditas para as espécies de moscas se interceptam num intervalo grande para as variáveis `r inames[2+1]`, `r inames[4+1]` e `r inames[6+1]`, portanto é razoável conjecturar que as espécies de moscas tem médias iguais para estas variáveis. Por meio da metodologia CBU=M (veja Azevedo,2017), testou-se simultaneamente a igualdade das médias destas variáveis entre as espécies de moscas, ao qual resultou num p-valor = `r ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))`, ou seja, `r ifelse(resultados_teste$pvalor<0.05,"temos","não temos")` evidencias estatísticas suficientes para rejeitar a hipótese de igualdade simultânea das médias entre as espécies para as variáveis `r inames[2+1]`, `r inames[4+1]` e `r inames[6+1]`. A fim de identificar melhor onde residem as diferenças entre as espécies de moscas, aplicamos esta mesma metodologia acrescentando as demais variáveis na hipótese de igualdade (uma de cada vez), os resultados deste teste constam na tabela (n XX "tabela_CBU").
+
+
+
+```{r}
+#testar igualdade entre os grupos para 
+#largura da asa ,#Largura 3° palpo, #comprimento do 12º segmento da antena, #comprimento do 13º segmento da antena
+#acrescentando : Comprimento da Asa
+m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 4,1,2,4,6)
+resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
+pvalor_CBU[2] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))
+label_pvalor_CBU[2] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = \alpha_{11} = 0$"
+
+#testar igualdade entre os grupos para 
+#largura da asa ,#Largura 3° palpo, #comprimento do 12º segmento da antena, #comprimento do 13º segmento da antena
+#acrescentando : Comprimento 3° palpo
+m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 4,2,3,4,6)
+resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
+pvalor_CBU[3] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))
+label_pvalor_CBU[3] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = \alpha_{13} = 0$"
+
+#testar igualdade entre os grupos para 
+#largura da asa ,#Largura 3° palpo, #comprimento do 12º segmento da antena, #comprimento do 13º segmento da antena
+#acrescentando : Comprimento 4° palpo
+m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 4,2,4,5,6)
+resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
+pvalor_CBU[4] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))
+label_pvalor_CBU[4] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = \alpha_{15} = 0$"
+
+#testar igualdade entre os grupos para 
+#largura da asa ,#Largura 3° palpo, #comprimento do 12º segmento da antena, #comprimento do 13º segmento da antena
+#acrescentando : Comprimento 4° palpo
+m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 4,2,4,6,7)
+resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
+pvalor_CBU[5] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))
+label_pvalor_CBU[5] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = \alpha_{17} = 0$"
+
+tabela_CBU <- cbind(label_pvalor_CBU,pvalor_CBU)
+colnames(tabela_CBU) <- c("Hipótese","p-valor do teste CBU=M")
+#xtable(tabela_CBU)
+tabela_CBU
+
+```
+
+
+########## Colocar aqui a tabela CBU###########################
+
+Note pela tabela (n XX "tabela_CBU") que os dois primeiros testes indicam a não rejeição da hipótese apresentada, portanto temos evidencias estatísticamente significantes de que as espécies tem médias conjuntamente iguais para as variáveis `r inames[2+1]`,`r inames[4+1]`,`r inames[6+1]` e `r inames[1+1]`, ou seja, as diferenças parecem residir nas variáveis `r inames[3+1]`, `r inames[5+1]` e `r inames[7+1]`.
+
+
+3.1 Análise dos resíduos
+
+X <- é o número do primeiro gráfico de resíduos
+
+
+A fim de avaliar a validade das suposições de normalidade multivariada dos dados considerando as espécies (consequentemente normalidade univariada) e homocedásticidade multivariada entre as espécies (consequentemente homocedasticidade univariada), podemos observar as figuras (X) a (X+7) que  apresentam gráficos para os resíduos studentizados para cada uma das 7 variáveis, assim como a figura (X+8) que apresenta o gráfico de envelopes baseado na distância de Mahalanobis (veja Azevedo, 2017). 
+A partir da observação destes gráficos, pode-se identificar muitos comportamentos e tendencias não esperadas, as quais podemos destacar o comportamento apresentado no gráfico 4 das figuras (X), (X+3), (X+5) e (X+6) tendo muitos pontos fora dos limites das bandas de confiança, nas figuras (X+1), (X+2) parece existira uma pequena tendência nos valores dos resíduos e na figura (X+4) apresenta muitos pontos com quantis baixos fora das bandas de confiança. Adicionalmente, identificamos comportamento assimétrico negativo no gráfico 3 das figuras (X),(X+1),(X+2) e (X+4)  e assimetrico positivo apresentando na figura (X+6). Dadas as observações referentes aos gráficos 1 e 4 das figuras (X) a (X+6) temos um forte indício de que a suposição de normalidade não é razoável para nenhuma das variáveis presentes no banco de dados.
+Observando o gráfico 2 das figuras (X) a (X+7), identificamos evidencias de presença de heterocedásticidade dos nos dados nas figuras (X), (X+2), (X+3) de maneira mais leve e nas figuras (X+4),(X+5) e (X+6) de maneira mais acentuada, já para a figura (X+1) não nota-se, a menos de um valor extremo, a presença de indicios de heterocedásticidade. Não identificamos nenhum comportamento a ser destacado referente ao gráfico 1 das figuras (X) a (X+7).
+Na figura (X+8) observamos alguns valores fora das bandas de confiança para valores menores de quantis da forma quadrática, além disso, valores maiores de quantis da forma quadrática tendem a se apresentar abaixo da linh de referência baseada no quantil da distribuição qui-quadrado, deste modo temos indicações de que a suposição de normalidade multivariada dos dados não parece ser uma suposição razoável neste caso.
+Contudo, dadas as observações destacadas, temos que a única variável do banco de dados a qual não seria irrasuável supor normalidade e homocedásticidade dos dados seria a variável "Largura da Asa", e todas as restantes apresentam ao menos um indicio evidente da fuga destas suposições portanto não seria razoável supor normalide e homocedásticidade multivariada neste caso, o que também fica evidente na figura (X+8), sendo assim, o modelo de análise de variância multivariada não apresentou um ajuste adequado aos dados aqui analisados e se é necessário procurar técnicas alternativas para realizar uma análise adequada ao banco de dados. Dado o nosso contexto acadêmico, iremos continuar com as análises dos resultados para elaborar a conclução do presente trabalho.
+
+```{r}
+################################################
+######Legendas para análises de resíduos########
+################################################
+
+legendaaux <- rep(" ",length(inames)-1)
+for (i in 2:length(inames)) {
+  aux <- "Gráficos para os resíduos referentes à variável"
+  aux2 <- as.character(inames[i])
+  legendaaux[i-1] <- paste(aux,aux2,sep = " ")
+  }
+```
+
+
+```{r}
+var = 0 #iniciando a variável
+var<-1+var; legenda <- legendaaux[var]
+```
+
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+```{r}
+var<-1+var; legenda <- legendaaux[var]
+```
+
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+```{r}
+var<-1+var; legenda <- legendaaux[var]
+```
+
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+```{r}
+var<-1+var; legenda <- legendaaux[var]
+```
+
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+```{r}
+var<-1+var; legenda <- legendaaux[var]
+```
+
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+```{r}
+var<-1+var;legenda <- legendaaux[var]
+```
+
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+```{r}
+var<-1+var; legenda <- legendaaux[var]
+```
+
+```{r fig.cap=legenda}
+gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
+```
+
+
+```{r}
+# Resíduo baseado na distância Mahalanobis
+
+gen.graf.resid.quad.form(as.matrix(m.dados),fit.manova)
+```
 
 
 \newpage
