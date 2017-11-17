@@ -269,8 +269,14 @@ names(estim_medias) = c("Especie", "Estimativa", "EP", "IC inf", " IC sup")
 #xtable(estim_medias)
 
 ```
+\begin{center}
+\textbf{Questão 2}
+\end{center}
 
-# Introdução
+\setlength{\parindent}{3em}
+\doublespacing
+
+1. Introdução
 
 O banco de dados consiste em 70 observações vindas da medição de sete variáveis em duas espécies de moscas *Leptoconops carteri* e *Leptoconops torrens*, com 35 observações cada. As variáveis são: espécie (0 - torrens e 1- carteri), comprimento da asa, largura da asa, comprimento do terceiro palpo, largura do terceiro palpo, comprimento do quarto palpo, comprimento do décimo segundo segmento da antena e comprimento do décimo terceiro segmento da antena. Para  análises foram utilizados os softwares *R* \footnote{https://cran.r-project.org/}, versão 3.4.2 e *Rstudio* \footnote{https://www.rstudio.com/}, versão 1.0.1. 
 
@@ -280,7 +286,7 @@ As duas espécies têm semelhanças morfologicamente e por um período de tempo 
 
 \vspace{0.5cm}
 
-# Análise descritiva
+2. Análise descritiva
 
 A partir da Figura 1, podemos observar no screeplot que as variâncias (autovalores) associadas a cada componente nos trazem informações relevantes sobre a proporção da variância explicada (PVE), onde observa-se que as variâncias das componentes de 1 a 3 trazem uma contribuição maior no PVE do que os outros componentes de acordo com Tabela 1.  Na mesma tabela podemos observar que a proporção da variância explicada acumulada (PVEA), indicam que é adequado o uso das três primeiras componentes, já que estas explicam conjuntamente ``r formattable::percent(var_comp_prin[3,3])` da variância total. Pelo fato das componentes 4 à 7 não estarem contribuindo significantemente no PVEA e suas variâncias estarem bem próximas, nesta análise foram considerados apenas os três primeiros componentes.
 
@@ -397,7 +403,7 @@ qqPlot(scale(cp3[especie=="Torrens"]),dist="norm",mean=0,sd=1,col.lines="red",gr
 
 \newpage
 
-# Análise Inferencial
+3. Análise Inferencial
 
 
 
@@ -435,7 +441,7 @@ fit = lm(cp1~dadosmoscas$Esp)
 sum_fit = summary(fit)
 coefs = round(sum_fit$coefficients,2)
 ```
-\doublespacing
+
   
 Podemos ver que todas as informações sobre os parâmetros se encontram na Tabela 3 abaixo. Foi realizado um teste do tipo $CBU = M$, para verificar as possíveis diferenças entre as médias entre as espécies **Carteri** e **Torrens**.
   
@@ -471,8 +477,6 @@ As estimativas para as médias estão na Tabela 4 e vemos que para Carteri o val
 \end{tabular}
 \end{table}
 
-\setlength{\parindent}{3em}
-\doublespacing
 
 A Análise de resíduos mostra que o modelo proposto não está bem ajustado, podemos observar no gráfico A que os resíduos supostamente são independentes, pois parecem se distribuir aleatoriamente em torno do zero. No gráfico B, há indícios de heterocedasticidade nos resíduos pois a variabilidade muda de uma espécie para outra. No gráfico C, pelo histograma vemos que a distribuição aparenta ter uma leve assimetria positiva, já gráfico D vemos que supostamente os resíduos não seguem uma distribuição normal, já que existem pontos fora do envelope, e possivelmente há uma leve sistematização dos resíduos em torno da linha de referência, além disso parece haver caudas pesadas.
 
@@ -483,11 +487,11 @@ diag2norm(fit)
 
 \newpage
 
-# Conclusões 
+4. Conclusões 
 
 A partir das análises realizadas, a análise de componentes principais nos trouxe a informação que algumas variáveis se comportam de forma diferente para cada grupo, mas não nos possibilitou uma visualização clara da separação dos dois grupos. Além disso, a análise da componente 1, usando um modelo de regressão, possibilitou ver que existe diferenças entre as espécies, mas conforme a análise de resíduos, o modelo não tem um bom ajuste já que seus resíduos indicam que as suposições de homocedasticidade e normalidade não foram satisfeitas, uma das formas de contornam este problema, talvez seja ajustar um modelo que nos possibilite analisar os dados de maneira mais viável possivel. 
 
-# Bibliografia
+5. Bibliografia
 
 \begin{itemize}
 
