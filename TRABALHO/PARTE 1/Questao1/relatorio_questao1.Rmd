@@ -351,9 +351,9 @@ vF2 <- apply(((mx2-vmu2)*(mx2-vmu2)%*%solve(s22)),1,sum)
 vF2<- (n2-nvar2)*vF2/((n2-1)*nvar2)
 ```
 
-
 \setlength{\parindent}{3em}
 \doublespacing
+
 
 1. Introdução
 
