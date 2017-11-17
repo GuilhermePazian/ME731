@@ -32,8 +32,8 @@ fontsize: 10pt
 \includegraphics[width=40pt,height=45pt]{logoUnicamp.png} 
 \end{minipage}\begin{minipage}[s]{11.25cm}\noindent
 {\begin{center} {\Large Universidade Estadual de Campinas}\\
-{Instituto de Matem·tica, EstatÌstica e ComputaÁ„o CientÌfica}\\
-{\sc Departamento de EstatÌstica}
+{Instituto de Matem√°tica, Estat√≠stica e Computa√ß√£o Cient√≠fica}\\
+{\sc Departamento de Estat√≠stica}
 \end{center}}
 \end{minipage}
 \begin{minipage}[s]{0.5cm}
@@ -49,7 +49,7 @@ fontsize: 10pt
 \vspace*{3.5cm}
 {\rule[0 ex]{16cm}{0.05cm}}
 {\huge \sc Trabalho - Parte 1 \\[8pt]
-RelatÛrio - Quest„o 1}
+Relat√≥rio - Quest√£o 1}
 {\rule[0 ex]{16cm}{0.05cm}}
 \end{center}
 
@@ -67,7 +67,7 @@ RelatÛrio - Quest„o 1}
 
 \vspace{0.2cm}
 
-Disciplina: {\bf ME731 - An·lise Multivariada}\\
+Disciplina: {\bf ME731 - An√°lise Multivariada}\\
 Professor: {\bf Caio Lucidius Naberezny Azevedo}
 \vspace{1cm}
 
@@ -77,7 +77,7 @@ Professor: {\bf Caio Lucidius Naberezny Azevedo}
 
 ```{r, echo=FALSE}
 
-#definindo opÁıes padrıes 
+#definindo op√ß√µes padr√µes 
 
 options(OutDec= ",")
 
@@ -86,7 +86,7 @@ knitr::opts_chunk$set(fig.width=6, fig.height=3.5, fig.path='Figs/', fig.align='
 
 ```{r pacotes utilizados, echo=FALSE,eval=TRUE, warning=FALSE, message=FALSE}
 
-#lendo as funÁoes que o caio disponibilizou para MANOVA (mudei uma coisa l·)
+#lendo as fun√ßoes que o caio disponibilizou para MANOVA (mudei uma coisa l√°)
 #source("codigoscaioMANOVA.r")
 source("funcoes_murilo.r")
 source("funcoes_eli.r")
@@ -95,7 +95,7 @@ source("funcoes_eli.r")
 
 packages= c("ggplot2","knitr","dplyr","tidyverse","xtable","gridExtra", "plyr", "plotrix", "car","magrittr")
 
-#caso necess·rio a instalaÁ„o de algum pacote
+#caso necess√°rio a instala√ß√£o de algum pacote
 #install.packages(packages)
 
 #mostra quais pacotes foram carregados
@@ -103,10 +103,10 @@ invisible(lapply(packages, require, character.only = TRUE))
 ```
 
 ```{r}
-###### FunÁıes do Caio Referente ‡ MANOVA
+###### Fun√ß√µes do Caio Referente √† MANOVA
 
 ########
-#FunÁıes Gerais
+#Fun√ß√µes Gerais
 ########
 
 Box.teste.Igual.MCov<-function(m.X.completa,v.grupos,v.n,G)
@@ -132,19 +132,19 @@ Box.teste.Igual.MCov<-function(m.X.completa,v.grupos,v.n,G)
   }
   Sigma.P <- Sigma.P/(sum(v.n)-G)
   
-  # EstatÌstica de ajuste
+  # Estat√≠stica de ajuste
   aux.u <- (sum(1/(v.n - 1)) - (1/(sum(v.n - 1))))*(2*p^2 + 3*p - 1)/(6*(p+1)*(G-1))
   Q.B <-  (1 - aux.u)*(sum(v.n-1)*log(det(Sigma.P)) - aux.k.1)
   aux.v <- 0.5*p*(p+1)*(G-1)
   e.nd.QB <- 1 - pchisq(Q.B,aux.v)
-#  cat("EstatÌstica do Teste: ", Q.B, "\n")
-#  cat("nÌvel descritivo: ",e.nd.QB,"\n")
-#  cat("Matrizes de Covari‚ncias por grupo: \n")
+#  cat("Estat√≠stica do Teste: ", Q.B, "\n")
+#  cat("n√≠vel descritivo: ",e.nd.QB,"\n")
+#  cat("Matrizes de Covari√¢ncias por grupo: \n")
 #  print(m.Sigma.completa)
   Sigma.P <-as.matrix(data.frame(Sigma.P))
-  #mudei aqui para conseguir printar o pvalor e o qui-quadrado mais f·cil
+  #mudei aqui para conseguir printar o pvalor e o qui-quadrado mais f√°cil
   return(list(Sigma.P=Sigma.P,p.valor = e.nd.QB, est.test = Q.B))
-} # fim fa funÁ„o
+} # fim fa fun√ß√£o
 
 
 TesteF.CBU.M<-function(fit.model,m.Sigma.P,p,G,m.C,m.U,m.M)
@@ -173,7 +173,7 @@ TesteF.CBU.M<-function(fit.model,m.Sigma.P,p,G,m.C,m.U,m.M)
 
 
 #########
-#An·lise de diagnÛstico
+#An√°lise de diagn√≥stico
 #########
 
 
@@ -201,25 +201,25 @@ gen.graf.resid<-function(mY,mresult,var,typeresid,wplot)
   if (wplot == "diagnostics")
   {
     par(mfrow =c(2,2))
-    plot(mresiduo[,var],ylim=c(min(-3,min(mresiduo[,var])),max(3,max(mresiduo[,var]))),xlab="Ìndice",ylab="resÌduo studentizado",main = "gr·fico 1")
+    plot(mresiduo[,var],ylim=c(min(-3,min(mresiduo[,var])),max(3,max(mresiduo[,var]))),xlab="√≠ndice",ylab="res√≠duo studentizado",main = "Gr√°fico 1")
     abline(-2,0,lty=2)
     abline(2,0,lty=2)
     abline(0,0,lty=2)
     #
-    plot(mfit[,var],mresiduo[,var],ylim=c(min(-3,min(mresiduo[,var])),max(3,max(mresiduo[,var]))),xlab="valor ajustado",ylab="resÌduo studentizado",main = "gr·fico 2")
+    plot(mfit[,var],mresiduo[,var],ylim=c(min(-3,min(mresiduo[,var])),max(3,max(mresiduo[,var]))),xlab="valor ajustado",ylab="res√≠duo studentizado",main = "Gr√°fico 2")
     abline(-2,0,lty=2)
     abline(2,0,lty=2)
     abline(0,0,lty=2)
     #
-    hist(mresiduo[,var],probability=TRUE,xlab="resÌduo studentizado",ylab="densidade",main = "gr·fico 3")
+    hist(mresiduo[,var],probability=TRUE,xlab="res√≠duo studentizado",ylab="densidade",main = "Gr√°fico 3")
     #
-    qqPlot((mresiduo[,var]),dist="norm",mean=0,sd=1,col.lines=1,grid="FALSE",xlab="quantil da N(0,1)",ylab=paste("quantil do resÌduo studentizado"),cex=1.2,id.cex=1.2, main = "gr·fico 4")
+    qqPlot((mresiduo[,var]),dist="norm",mean=0,sd=1,col.lines=1,grid="FALSE",xlab="quantil da N(0,1)",ylab=paste("quantil do res√≠duo studentizado"),cex=1.2,id.cex=1.2, main = "Gr√°fico 4")
   }
   
   else if (wplot == "envelope")
   {
     par(mfrow =c(1,1))
-    qqPlot((mresiduo[,var]),dist="norm",mean=0,sd=1,col.lines=1,grid="FALSE",xlab="quantil da N(0,1)",ylab=paste("quantil do resÌduo studentizado"),cex=1.2,id.cex=1.2, main = "gr·fico 1")
+    qqPlot((mresiduo[,var]),dist="norm",mean=0,sd=1,col.lines=1,grid="FALSE",xlab="quantil da N(0,1)",ylab=paste("quantil do res√≠duo studentizado"),cex=1.2,id.cex=1.2, main = "Gr√°fico 1")
   }
 }
 
@@ -238,7 +238,7 @@ gen.graf.resid.quad.form<-function(mY,mresult)
   #vresid<- #(n-nvar)*vresid/((n-1)*n)
   nvar <- length(vmu)
   n <- length(vresid)
-  #  qqPlot(vresid,dist="chisq",df=nvar,col.lines=1,grid="FALSE",xlab="quantil da distribuiÁ„o qui-quadrado",ylab="quantil da forma quadr·tica",cex=1.2,id.cex=1.2)
+  #  qqPlot(vresid,dist="chisq",df=nvar,col.lines=1,grid="FALSE",xlab="quantil da distribui√ß√£o qui-quadrado",ylab="quantil da forma quadr√°tica",cex=1.2,id.cex=1.2)
   mX <- model.matrix(mresult)
   vresidA <- matrix(0,n,1)
   #mident <- diag(1,p)
@@ -249,17 +249,17 @@ gen.graf.resid.quad.form<-function(mY,mresult)
     Ai <- 1 - mXi%*%solve(t(mX)%*%mX)%*%t(mXi)
     vresidA[i] <- (Ai^(-2))*mYi%*%solve(mSigma)%*%t(mYi)
   }
-  #par(mfrow =c(1,1)) #tirei para conseguir juntar os gr·ficos
-  car::qqPlot(vresidA,dist="chisq",df=nvar,col.lines=1,grid="FALSE",xlab="quantil da distribuiÁ„o qui-quadrado",ylab="quantil da forma quadr·tica",cex=1.2,id.cex=1.2)
+  #par(mfrow =c(1,1)) #tirei para conseguir juntar os Gr√°ficos
+  car::qqPlot(vresidA,dist="chisq",df=nvar,col.lines=1,grid="FALSE",xlab="quantil da distribui√ß√£o qui-quadrado",ylab="quantil da forma quadr√°tica",cex=1.2,id.cex=1.2)
   
 }  
 ```
 
 ```{r}
 #nomes para usar nas tabelas
-inames <- c("EspÈcie","Comprimento da Asa","Largura da Asa","Comprimento 3∞ palpo","Largura 3∞ palpo", "Comprimento 4∞ palpo", "Comprimento 12∞ segmento da antena", "Comprimento 13∞ segmento da antena")
+inames <- c("Esp√©cie","Comprimento da Asa","Largura da Asa","Comprimento 3¬∞ palpo","Largura 3¬∞ palpo", "Comprimento 4¬∞ palpo", "Comprimento 12¬∞ segmento da antena", "Comprimento 13¬∞ segmento da antena")
 
-##leitura do banco de dados e IdentificaÁ„o das colunas do Banco de dados
+##leitura do banco de dados e Identifica√ß√£o das colunas do Banco de dados
 
 dadosmoscas <- read.table(file = "dadosmoscas.txt",col.names = c("Esp","Comp_Asa","Larg_Asa","Comp_3_palpo","Larg_3_palpo", "Comp_4_palpo", "Comp_12_seg_ant", "Comp_13_seg_ant"))
 
@@ -306,19 +306,19 @@ resumo.Comp_13_seg_ant=tabela.descritiva(dadosmoscas_graf_tab$Comp_13_seg_ant)
 ```{r}
 #boxplots
 
-g_Comp_asa=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_Asa))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "EspÈcie", y="Comprimento da Asa")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none", axis.text.y=element_text(size=6), axis.title.y = element_text(size=6))+theme_bw()
+g_Comp_asa=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_Asa))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "Esp√©cie", y="Comprimento da Asa")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none", axis.text.y=element_text(size=6), axis.title.y = element_text(size=6))+theme_bw()
 
-g_Larg_asa=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Larg_Asa))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "EspÈcie", y="Largura da Asa")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=6))+theme_bw()
+g_Larg_asa=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Larg_Asa))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "Esp√©cie", y="Largura da Asa")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=6))+theme_bw()
 
-g_Comp_3_palpo=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_3_palpo))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "EspÈcie", y="Comprimento 3∞ palpo")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=6), axis.title.y = element_text(size=6))+theme_bw()
+g_Comp_3_palpo=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_3_palpo))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "Esp√©cie", y="Comprimento 3¬∞ palpo")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=6), axis.title.y = element_text(size=6))+theme_bw()
 
-g_Larg_3_palpo=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Larg_3_palpo))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "EspÈcie", y="Largura 3∞ palpo")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=6), axis.title.y = element_text(size=6))+theme_bw()        
+g_Larg_3_palpo=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Larg_3_palpo))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "Esp√©cie", y="Largura 3¬∞ palpo")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=6), axis.title.y = element_text(size=6))+theme_bw()        
                       
-g_Comp_4_palpo=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_4_palpo))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "EspÈcie", y="Comprimento 4∞ palpo")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=6), axis.title.y = element_text(size=6))+theme_bw()  
+g_Comp_4_palpo=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_4_palpo))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "Esp√©cie", y="Comprimento 4¬∞ palpo")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=6), axis.title.y = element_text(size=6))+theme_bw()  
 
-g_Comp_12_seg_ant=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_12_seg_ant))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "EspÈcie", y="Comprimento 12∞ seg antena")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=4), axis.title.y = element_text(size=6))+theme_bw()
+g_Comp_12_seg_ant=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_12_seg_ant))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "Esp√©cie", y="Comprimento 12¬∞ seg antena")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y=element_text(size=4), axis.title.y = element_text(size=6))+theme_bw()
                          
-g_Comp_13_seg_ant=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_13_seg_ant))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "EspÈcie", y="Comprimento 13∞ seg antena")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y = element_text(size=4), axis.title.y = element_text(size=6))+theme_bw()
+g_Comp_13_seg_ant=ggplot(dadosmoscas_graf_tab, aes(x=Esp, y=Comp_13_seg_ant))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+labs( x = "Esp√©cie", y="Comprimento 13¬∞ seg antena")+theme(plot.title = element_text(hjust = 0.5),legend.position = "none",axis.text.y = element_text(size=4), axis.title.y = element_text(size=6))+theme_bw()
 
 ```
 
@@ -338,7 +338,7 @@ s22 <- cov(mx)
 vvar2<-diag(s2)
 nvar2<-4
 
-#inames <- c("EspÈcie","Comprimento da Asa","Largura da Asa","Comprimento 3∞ palpo","Largura 3∞ palpo", "Comprimento 4∞ palpo", "Comprimento 12∞ segmento da antena", "Comprimento 13∞ segmento da antena") #j· est· definido acima
+#inames <- c("Esp√©cie","Comprimento da Asa","Largura da Asa","Comprimento 3¬∞ palpo","Largura 3¬∞ palpo", "Comprimento 4¬∞ palpo", "Comprimento 12¬∞ segmento da antena", "Comprimento 13¬∞ segmento da antena") #j√° est√° definido acima
 
 
 mmu <- t(matrix(t(vmu),nvar,n))
@@ -355,35 +355,32 @@ vF2<- (n2-nvar2)*vF2/((n2-1)*nvar2)
 \setlength{\parindent}{3em}
 \doublespacing
 
-1. IntroduÁ„o
+1. Introdu√ß√£o
 
-O conjunto de dados utilizado neste relatÛrio s„o relativos a moscas chamadas, em inglÍs, de "bitting fly".Neste conjunto de dados foram consideradas no total 70 moscas, sendo 35 da espÈcie Leptoconops carteri e 35 da Leptoconops torrens. Tais espÈcies ser„o tratadas a partir de agora por Carteri e Torrens, respectivamente. 
+O conjunto de dados utilizado neste relat√≥rio √© relativo √† moscas chamadas, em ingl√™s, de "bitting fly".Neste conjunto de dados foram consideradas no total 70 moscas, sendo 35 da esp√©cie Leptoconops carteri e 35 da Leptoconops torrens. Tais esp√©cies ser√£o tratadas a partir de agora por Carteri e Torrens, respectivamente. 
 
-Para cada uma das espÈcies, foram medidas sete vari·veis referentes ao aspecto morfolÛgico das moscas e para cada unidade amostral (mosca), foram medidas oito vari·veis, sendo elas: espÈcie (0 - Torrens e 1 - Carteri), comprimento da asa (CA), largura da asa(LA), comprimento do 3∫ palpo (CP3), largura do 3∫ palpo (LP3), comprimento do 4∫ palpo (CP4), comprimento do 12∫ segmento da antena (SA12) e comprimento do 13∫ segmento da antena (SA13).
+Para cada uma das esp√©cies, foram medidas sete vari√°veis referentes ao aspecto morfol√≥gico das moscas e para cada unidade amostral (mosca), foram medidas oito vari√°veis, sendo elas: esp√©cie (0 - Torrens e 1 - Carteri), comprimento da asa (CA), largura da asa(LA), comprimento do 3¬∫ palpo (CP3), largura do 3¬∫ palpo (LP3), comprimento do 4¬∫ palpo (CP4), comprimento do 12¬∫ segmento da antena (SA12) e comprimento do 13¬∫ segmento da antena (SA13).
 
-Dado que as duas espÈcies s„o bastante semelhantes morfologicamente (Johson e Wichern (2007)), o objetivo desta an·lise È realizar a comparaÁ„o  das mÈdias de todas as vari·veis consideradas entre as espÈcies, com o intuito de verificar se e quais vari·veis diferem entre os grupos.
+Dado que as duas esp√©cies s√£o bastante semelhantes morfologicamente (Johson e Wichern (2007)), o objetivo desta an√°lise √© realizar a compara√ß√£o  das m√©dias de todas as vari√°veis consideradas entre as esp√©cies, com o intuito de verificar se e quais vari√°veis diferem entre os grupos.
 
-Como abordagem inicial, ser· utilizada a An·lise de Vari‚ncia Multivariada (MANOVA) (veja mais em Johnson e Wichern (2007)), para verificar a possÌvel existÍncia de diferenÁas entre as mÈdias. Posteriormente, caso a hipÛtese de igualdade entre as mÈdias for rejeitada ser„o realizados testes do tipo $CBU = M$ (veja mais em Azevedo (2017)), com o intuito de descobrir onde essas diferenÁas se encontram.
+Como abordagem inicial, ser√° utilizada a An√°lise de Vari√¢ncia Multivariada (MANOVA) (veja mais em Johnson e Wichern (2007)), para verificar a poss√≠vel exist√™ncia de diferen√ßas entre √≥ vetor de m√©dias. Posteriormente, caso a hip√≥tese de igualdade entre as m√©dias for rejeitada ser√£o realizados testes do tipo $CBU = M$ (veja mais em Azevedo (2017)), com o intuito de descobrir onde essas diferen√ßas se encontram.
 
-Todas as an·lises ser„o realizadas com o suporte dos softwares R vers„o 3.4.2 e R Studio vers„o 1.1.383.
+Todas as an√°lises ser√£o realizadas com o suporte dos softwares R vers√£o 3.4.2 e R Studio vers√£o 1.1.383.
 
-Foi-se considerado um nÌvel de signific‚ncia de 5% para a tomar decisıes quanto aos testes estatÌsticos aqui apresentados.
+Foi-se considerado um n√≠vel de signific√¢ncia de 5% para a tomar decis√µes quanto aos testes estat√≠sticos aqui apresentados.
 
 \vspace{0.5cm}
 
-2. An·lise descritiva
+2. An√°lise descritiva
 
-A tabela 1 mostra algumas medidas resumo para as todas vari·veis citadas anteriormente, sepadas por espÈcie. … possÌvel notar que as
-mÈdias amostrais para as vari·veis comprimento da asa, comprimento do 3o palpo e do 4o palpo s„o relativamente diferentes entre as espÈcies,
-enquanto que para as demais as mÈdias amostrais s„o relativamente iguais. Pode se notar tambÈm, que os desvios padrıes para as vari·veis largura da asa e comprimento do 4o palpo aparentemente s„o diferentes entre as espÈcies, enquanto que para as demais vari·veis os desvios padr„o s„o consideravelmente prÛximos.
+A tabela 1 mostra algumas medidas resumo para as todas vari√°veis citadas anteriormente, sepadas por esp√©cie. √â poss√≠vel notar que as
+m√©dias amostrais para as vari√°veis comprimento da asa, comprimento do 3o palpo e do 4o palpo s√£o relativamente diferentes entre as esp√©cies,
+enquanto que para as demais as m√©dias amostrais s√£o relativamente iguais. Pode se notar tamb√©m, que os desvios padr√µes para as vari√°veis largura da asa e comprimento do 4o palpo aparentemente s√£o diferentes entre as esp√©cies, enquanto que para as demais vari√°veis os desvios padr√£o s√£o consideravelmente pr√≥ximos.
 
-Na figura 1, temos os boxplots para todas as vari·veis separadas por espÈcie. Algumas distribuiÁıes apresentam ligeiras assimetrias, observando de um modo geral. Por exemplo na vari·vel largura da asa para a espÈcie Torrens, essa assimetria È um pouco mais evidente. Podemos afirmar que as distribuiÁıes quando comparadas entre as espÈcies s„o diferentes observando de um modo geral. … possÌvel afirmar que as medianas s„o ligeiramente maiores para todas a vari·veis na espÈcie Carteri, exceto para a vari·vel referente ao comprimento do 13∫ segmeno da antena. Por fim, nota-se a presenÁa de alguns pontos discrepantes, sendo que em maioria das vezes, estes pontos est„o mais presentes na espÈcie Carteri.
+Na figura 1, temos os boxplots para todas as vari√°veis separadas por esp√©cie. Algumas distribui√ß√µes apresentam ligeiras assimetrias, observando de um modo geral. Por exemplo na vari√°vel largura da asa para a esp√©cie Torrens, essa assimetria √© um pouco mais evidente. Podemos afirmar que as distribui√ß√µes quando comparadas entre as esp√©cies s√£o diferentes observando de um modo geral. √â poss√≠vel afirmar que as medianas s√£o ligeiramente maiores para todas a vari√°veis na esp√©cie Carteri, exceto para a vari√°vel referente ao comprimento do 13¬∫ segmeno da antena. Por fim, nota-se a presen√ßa de alguns pontos discrepantes, sendo que em maioria das vezes, estes pontos est√£o mais presentes na esp√©cie Carteri.
 
-A figura 2 apresenta uma matriz de diagramas de dispers„o entre as vari·veis, separadas por espÈcie. De um modo geral, podemos notar que a espÈcie Torrens apresenta valores inferiores ‡ espÈcie Carteri, como por exemplo, no gr·fico de Largura por Comprimento do 3∫ Palpo, em que os pontos verser se concentram abaixo dos azuis. Cada diagrama apresenta seu respectivo valor do coeficiente de correlaÁ„o linear, ent„o pode-se notar que aparentemente as vari·veis que mais se destacaram em relaÁ„o ‡ uma possÌvel associaÁ„o linear foram as var·veis referentes ao comprimento do 12∫ palpo e ao comprimento do 13∫ palpo (0,81) e as referentes ao comprimento e largura da asa (0,6). AlÈm disso, observam-se tambÈm possÌveis associaÁıes entre as
-demais vari·veis, porÈm com grau menor de correlaÁ„o, como por exemplo entre as vari·veis referentes ao comprimento da asa e comprimento do 3∫ palpo (0,45) e entre comprimento da asa e comprimento do 4∫ palpo (0,48).
-
-
-A figura 3 apresenta o gr·fico de quantis-quantis com envelopes, para a dist‚ncia de Mahalanobis (Azevedo(2017)), para cada espÈcie. Pode-se observar que a suposiÁ„o de normalidade multivariada dos dados parece n„o ser razo·vel, uma vez que h· grandes fugas para quantis maiores da distribuiÁ„o F na parte superior dos gr·ficos.
+A figura 2 apresenta uma matriz de diagramas de dispers√£o entre as vari√°veis, separadas por esp√©cie. De um modo geral, podemos notar que a esp√©cie Torrens apresenta valores inferiores √† esp√©cie Carteri, como por exemplo, no gr√°fico de Largura por Comprimento do 3¬∫ Palpo, em que os pontos verdes se concentram abaixo dos azuis. Cada diagrama apresenta seu respectivo valor do coeficiente de correla√ß√£o linear, ent√£o pode-se notar que aparentemente as vari√°veis que mais se destacaram em rela√ß√£o √† uma poss√≠vel associa√ß√£o linear foram as var√°veis referentes ao comprimento do 12¬∫ palpo e ao comprimento do 13¬∫ palpo (0,81) e as referentes ao comprimento e largura da asa (0,6). Al√©m disso, observam-se tamb√©m poss√≠veis associa√ß√µes entre as
+demais vari√°veis, por√©m com grau menor de correla√ß√£o, como por exemplo entre as vari√°veis referentes ao comprimento da asa e comprimento do 3¬∫ palpo (0,45) e entre comprimento da asa e comprimento do 4¬∫ palpo (0,48).
 
 
 \vspace{0.5cm}
@@ -396,27 +393,27 @@ tab_resumo=rbind(resumo_Comp_Asa,resumo_Larg_Asa,resumo_Comp_3_palpo,resumo.Larg
 
 \begin{center}
 \begin{table}[!h]
-\caption{Medidas Resumo das vari·veis por espÈcie}
+\caption{Medidas Resumo das vari√°veis por esp√©cie}
 \bgroup
 \def\arraystretch{1.0}
 \begin{tabular}{cccccccccc}
   \toprule
   
- & EspÈcie & n & MÈdia & Vari‚ncia & Desvio Padr„o & CV(\%) & MÌnimo & Mediana & M·ximo \\ \midrule
+ & Esp√©cie & n & M√©dia & Vari√¢ncia & Desvio Padr√£o & CV(\%) & M√≠nimo & Mediana & M√°ximo \\ \midrule
   \hline
 \multirow{2}{*}{Comprimento da Asa} & Carteri & 35 & 96,457 & 40,726 & 6,382 & 6,616 & 85 & 95 & 109 \\ 
                           & Torrens & 35 & 99,343 & 31,291 & 5,594 & 5,631 & 82 & 99 & 112 \\ \midrule
 \multirow{2}{*}{Largura da Asa} & Carteri & 35 & 42,914 & 7,492 & 2,737 & 6,378 & 38 & 44 & 49 \\ 
                           & Torrens & 35 & 43,743 & 25,785 & 5,078 & 11,608 & 19 & 45 & 50 \\ \midrule
-\multirow{2}{*}{Comprimento 3∫ Palpo} & Carteri & 35 & 35,371 & 4,829 & 2,197 & 6,212 & 31 & 36 & 39 \\ 
+\multirow{2}{*}{Comprimento 3¬∫ Palpo} & Carteri & 35 & 35,371 & 4,829 & 2,197 & 6,212 & 31 & 36 & 39 \\ 
                           & Torrens & 35 & 39,314 & 8,045 & 2,836 & 7,215 & 33 & 39 & 44 \\  \midrule
-\multirow{2}{*}{Largura 3∫ Palpo} & Carteri & 35 & 14,514 & 3,375 & 1,837 & 12,657 & 11 & 14 & 18 \\ 
+\multirow{2}{*}{Largura 3¬∫ Palpo} & Carteri & 35 & 14,514 & 3,375 & 1,837 & 12,657 & 11 & 14 & 18 \\ 
                           & Torrens & 35 & 14,657 & 2,703 & 1,644 & 11,216 & 11 & 15 & 19 \\ \midrule
-\multirow{2}{*}{Comprimento 4∫ Palpo} & Carteri & 35 & 25,629 & 6,24 & 2,498 & 9,747 & 21 & 26 & 31 \\ 
+\multirow{2}{*}{Comprimento 4¬∫ Palpo} & Carteri & 35 & 25,629 & 6,24 & 2,498 & 9,747 & 21 & 26 & 31 \\ 
                           & Torrens & 35 & 30,00 & 21,294 & 4,615 & 15,382 & 20 & 31 & 38 \\ \midrule
-\multirow{2}{*}{Comprimento 12∞ Seg antena} & Carteri & 35 & 9,571 & 0,84 & 0,917 & 9,577 & 8 & 9 & 13 \\ 
+\multirow{2}{*}{Comprimento 12¬∞ Seg antena} & Carteri & 35 & 9,571 & 0,84 & 0,917 & 9,577 & 8 & 9 & 13 \\ 
                           & Torrens & 35 & 9,657 & 1,585 & 1,259 & 13,036 & 6 & 10 & 12 \\ \midrule
-\multirow{2}{*}{Comprimento 13∞ Seg antena} & Carteri & 35 & 9,714 & 0,798 & 0,893 & 9,198 & 8 & 10 & 13 \\ 
+\multirow{2}{*}{Comprimento 13¬∞ Seg antena} & Carteri & 35 & 9,714 & 0,798 & 0,893 & 9,198 & 8 & 10 & 13 \\ 
                           & Torrens & 35 & 9,371 & 1,182 & 1,087 & 11,599 & 7 & 9 & 11 \\  \bottomrule
 
    \hline
@@ -426,8 +423,8 @@ tab_resumo=rbind(resumo_Comp_Asa,resumo_Larg_Asa,resumo_Comp_3_palpo,resumo.Larg
 \end{center}
 
 
-```{r, fig.width=12, fig.height=13, fig.cap=c("Matriz de diagramas de dispers„o entre as vari·veis")}
-#Matriz de dispers„o
+```{r, fig.width=12, fig.height=13, fig.cap=c("Matriz de diagramas de dispers√£o entre as vari√°veis")}
+#Matriz de dispers√£o
 
 matriz= pairs(dadosmoscas[,2:8], lower.panel = NULL, 
       upper.panel = upper.panel)
@@ -437,13 +434,13 @@ legend(0.2, 0.4, as.vector(unique(dadosmoscas_graf_tab$Esp)),
 ```
 
 
-```{r, fig.width=7, fig.height=8,fig.cap=c("Box-plot das vari·veis por espÈcie")}
+```{r, fig.width=7, fig.height=8,fig.cap=c("Box-plot das vari√°veis por esp√©cie")}
 grid.arrange(g_Comp_asa, g_Larg_asa, g_Comp_3_palpo, g_Larg_3_palpo, g_Comp_4_palpo, g_Comp_12_seg_ant, g_Comp_13_seg_ant, ncol=2)
 ```
 
 
 ```{r}
-#Pegando a coluna das espÈcies (grupos) para fazer o vetor identificador de grupos
+#Pegando a coluna das esp√©cies (grupos) para fazer o vetor identificador de grupos
 
 
 #v.especies <- cbind(as.numeric(dadosmoscas[,1]))
@@ -453,26 +450,26 @@ v.especies <- dadosmoscas[,1]
 m.dados <- dadosmoscas[,-1]
 
 
-#Criando um vetor com as quantidades de observaÁıes de cada grupo, constam 35 de cada grupo
+#Criando um vetor com as quantidades de observa√ß√µes de cada grupo, constam 35 de cada grupo
 v.n_especies <- rbind(35,35)
 
-#IdentificaÁ„o da quantidade de grupos
+#Identifica√ß√£o da quantidade de grupos
 k.G <- 2
 
-#IdentificaÁ„o da quantidade de vari·veis
+#Identifica√ß√£o da quantidade de vari√°veis
 k.P <- 7
 ```
 
 ```{r}
-#Teste de igualdade das matrizes de covari‚ncia entre os grupos
+#Teste de igualdade das matrizes de covari√¢ncia entre os grupos
 
-#resuldado da funÁ„o
+#resuldado da fun√ß√£o
 test.igual.matriz <-Box.teste.Igual.MCov(as.matrix(m.dados),as.numeric(v.especies),v.n_especies,k.G)
 
-#matriz sigma P (n„o lembro o que È exatamente)
+#matriz sigma P (n√£o lembro o que √© exatamente)
 m.sigma.P <- test.igual.matriz$Sigma.P
 
-#estatÌstica do teste
+#estat√≠stica do teste
 est.test.igual.m.cov <- test.igual.matriz$est.test
 
 #p-valor do teste
@@ -484,28 +481,28 @@ p.valor.igual.m.cov <- test.igual.matriz$p.valor
 
 \vspace{0.5cm}
 
-3. An·lise Inferencial
+3. An√°lise Inferencial
 
-A figura 3 apresenta o gr·fico de envelopes para a dist‚ncia de Mahalanobis (veja Azevedo,2017) para os dados de ambas as espÈcies de moscas, note que existem muitos pontos fora das bandas de confianÁa para ambas as espÈcies de moscas, indicando que parece n„o ser razo·vel a suposiÁ„o de normalidade multivariada dos dados referentes ‡ ambas as espÈcies. Foi realizado o teste de Box para igualdade de matrizes de covari‚ncias dos dados das duas espÈcies de moscas, ao qual resultou num p-valor de `r ifelse(p.valor.igual.m.cov < 0.001,"<0,001",round(p.valor.igual.m.cov,3))`, indicando que existe diferenÁa estatisticamente significante entre as matrizes de covari‚ncias dos grupos de moscas, indicando que n„o parece ser razo·vel a suposiÁ„o de igualdade das matrizes de covari‚ncias entre as espÈcies de moscas.
+A figura 3 apresenta o gr√°fico de envelopes para a dist√¢ncia de Mahalanobis (veja mais em Azevedo (2017)) para os dados de ambas as esp√©cies de moscas, note que existem muitos pontos fora das bandas de confian√ßa para ambas as esp√©cies de moscas, indicando que parece n√£o ser razo√°vel a suposi√ß√£o de normalidade multivariada dos dados referentes √† ambas as esp√©cies. Foi realizado o teste de Box para igualdade de matrizes de covari√¢ncias dos dados das duas esp√©cies de moscas, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov < 0.001,"<0,001",round(p.valor.igual.m.cov,3))`, indicando que existe diferen√ßa estatisticamente significante entre as matrizes de covari√¢ncias dos grupos de moscas, indicando que n√£o parece ser razo√°vel a suposi√ß√£o de igualdade das matrizes de covari√¢ncias entre as esp√©cies de moscas.
 
-```{r, fig.height=4,fig.width=8,fig.cap=c("Gr·fico de quantil-quantil com envelopes para a dist‚ncia de Mahalanobis; A) Torrens, B) Carteri")}
+```{r, fig.height=4,fig.width=8,fig.cap=c("Gr√°fico de quantil-quantil com envelopes para a dist√¢ncia de Mahalanobis; A) Torrens, B) Carteri")}
 
 par(mfrow=c(1,2))
 
-qqPlot(vF,dist="f",df1=nvar,df2=n-nvar,col.lines=1,grid="FALSE",xlab="Quantil da distribuiÁ„o F",ylab="Forma quadr·tica",cex=1.2,id.cex=1.2)
+qqPlot(vF,dist="f",df1=nvar,df2=n-nvar,col.lines="red",grid="FALSE",xlab="Quantil da distribui√ß√£o F",ylab="Forma quadr√°tica",cex=1.2,id.cex=1.2, main=" A) Torrens")
 
-qqPlot(vF2,dist="f",df1=nvar2,df2=n2-nvar2,col.lines=1,grid="FALSE",xlab="Quantil da distribuiÁ„o F",ylab="Forma quadr·tica",cex=1.2,id.cex=1.2)
+qqPlot(vF2,dist="f",df1=nvar2,df2=n2-nvar2,col.lines="red",grid="FALSE",xlab="Quantil da distribui√ß√£o F",ylab="Forma quadr√°tica",cex=1.2,id.cex=1.2, main="B) Carteri")
 
 
 ```
 
 
-Mesmo n„o sendo razo·veis as suposiÁıes descritas acima, dado o contexto da disciplina, ajustou-se um modelo de regress„o normal linear homocedastico multivariado ajustado via mÌnimos quadrados generalizados (veja Azevedo,2017), tendo como objetivo identificar as diferenÁas entre as espÈcies de moscas:
+Mesmo n√£o sendo razo√°veis as suposi√ß√µes descritas acima, dado o contexto da disciplina, ajustou-se um modelo de regress√£o normal linear homocedastico multivariado ajustado via m√≠nimos quadrados generalizados (veja mais em Azevedo (2017)), tendo como objetivo identificar as diferen√ßas entre as esp√©cies de moscas:
 
 $$ Y_{ijk} = \mu_k + \alpha_{ik} + \varepsilon_{ijk},\  \varepsilon_{ijk} \sim N_k(0,\Sigma),
-$$ $$ i = 1,2 \textrm{ (espÈcie, 1 - Leptoconops torrens,2 - Leptoconops carteri)} ,\ j = 1,2,...,35\ \textrm{(moscas) e }
-$$ $$ k = 1,...,7 \ \textrm{(vari·vel, 1 - Comprimento da Asa, 2 - Largura da Asa, 3 - Comprimento 3∞ palpo, 4 - Largura 3∞ palpo, } 
-$$ $$ \textrm{5 - Comprimento 4∞ palpo, 6 - Comprimento 12∞ segmento da antena, 7 - Compimento 13∞ segmento da antena),}
+$$ $$ i = 1,2 \textrm{ (esp√©cie, 1 - Leptoconops torrens,2 - Leptoconops carteri)} ,\ j = 1,2,...,35\ \textrm{(moscas) e }
+$$ $$ k = 1,...,7 \ \textrm{(vari√°vel, 1 - Comprimento da Asa, 2 - Largura da Asa, 3 - Comprimento 3¬∞ palpo, 4 - Largura 3¬∞ palpo, } 
+$$ $$ \textrm{5 - Comprimento 4¬∞ palpo, 6 - Comprimento 12¬∞ segmento da antena, 7 - Compimento 13¬∞ segmento da antena),}
 $$ $$ \textrm{em que } \alpha_{1k} = 0, k = 1,...,7. $$
 
 
@@ -513,11 +510,11 @@ $$ $$ \textrm{em que } \alpha_{1k} = 0, k = 1,...,7. $$
 #Teste e resuldados MANOVA
 fit.manova <- manova(as.matrix(m.dados) ~ v.especies)
 
-#Aqui È apresentado testes anova para cada vari·vel
+#Aqui √© apresentado testes anova para cada vari√°vel
 anovas <-summary.aov(fit.manova)
 
-#Aqui È o resuldado das estatÌsticas de teste que ele passou para MANOVA
-#OBS acho que vai ter que copiar os p-valores "na m„o" pq n„o est· f·cil extrai-los
+#Aqui √© o resuldado das estat√≠sticas de teste que ele passou para MANOVA
+#OBS acho que vai ter que copiar os p-valores "na m√£o" pq n√£o est√° f√°cil extrai-los
 
 Wilks <- summary.manova(fit.manova,test="Wilks")
 Pillai <- summary.manova(fit.manova,test="Pillai")
@@ -529,32 +526,33 @@ arredonda <- function(x) ifelse(x<0.001&x>=0,"<0,001",round(x,digits = 3))
 tbl_resultados_MANOVA <- apply(tbl_resultados_MANOVA,2, arredonda)
 aux <- c("Wilks","Pillai","Hotelling-Lawley","Roy")
 tbl_resultados_MANOVA <- cbind(aux,tbl_resultados_MANOVA)
-colnames(tbl_resultados_MANOVA) <- c("EstatÌstica","Valor","Aprox. distr. F", "p-valor")
+colnames(tbl_resultados_MANOVA) <- c("Estat√≠stica","Valor","Aprox. distr. F", "p-valor")
 
 tbl_resultados_MANOVA <- data.frame(tbl_resultados_MANOVA)
 ```
 
 
-A fim de qualificar o ajuste do modelo proposto, avaliamos as das suposiÁıes de normalidade multivariada dos erros do modelo considerando as espÈcies (consequentemente normalidade univariada) e homoced·sticidade multivariada entre as espÈcies (consequentemente homocedasticidade univariada) com base nas figuras 4 a 10, as quais apresentam gr·ficos para os resÌduos studentizados para cada uma das 7 vari·veis, e na figura 11 que apresenta o gr·fico de envelopes baseado na dist‚ncia de Mahalanobis (veja Azevedo, 2017). 
+A fim de qualificar o ajuste do modelo proposto, avaliamos as suposi√ß√µes de normalidade multivariada dos erros do modelo considerando as esp√©cies (consequentemente normalidade univariada) e homoced√°sticidade multivariada entre as esp√©cies (consequentemente homocedasticidade univariada) com base nas figuras 4 a 10, as quais apresentam gr√°ficos para os res√≠duos studentizados para cada uma das 7 vari√°veis, e na figura 11 que apresenta o gr√°fico de envelopes baseado na dist√¢ncia de Mahalanobis (Azevedo, 2017). 
 
-A partir da observaÁ„o destes gr·ficos, pode-se identificar muitos comportamentos e tendencias n„o esperadas, as quais podemos destacar o comportamento apresentado no gr·fico 4 das figuras 4, 7, 9 e 10 tendo muitos pontos fora dos limites das bandas de confianÁa, nas figuras 5 e 6 onde parece existir uma pequena tendÍncia nos valores dos resÌduos e na figura 8 que apresenta muitos pontos com quantis baixos fora das bandas de confianÁa. Adicionalmente, observa-se comportamento de distribuiÁ„o com assimÈtria negativa no gr·fico 3 das figuras 4, 5, 6 e 8 e com assimetria positiva na figura 10. Dadas as observaÁıes referentes aos gr·ficos 1 e 4 das figuras 4 a 10 temos fortes indÌcios de que a suposiÁ„o de normalidade n„o È razo·vel para os resÌduos referentes a nenhum das vari·veis presentes no banco de dados.
+A partir da observa√ß√£o destes gr√°ficos, pode-se identificar muitos comportamentos e tendencias n√£o esperados, as quais podemos destacar o comportamento apresentado no gr√°fico 4 das figuras 4, 7, 9 e 10 tendo muitos pontos fora dos limites das bandas de confian√ßa, nas figuras 5 e 6 onde parece existir uma pequena tend√™ncia nos valores dos res√≠duos e na figura 8 que apresenta muitos pontos com quantis baixos fora das bandas de confian√ßa. Adicionalmente, observa-se comportamento de distribui√ß√£o com assim√©tria negativa no gr√°fico 3 das figuras 4, 5, 6 e 8 e com assimetria positiva na figura 10. Dadas as observa√ß√µes referentes aos gr√°ficos 1 e 4 das figuras 4 a 10 temos fortes ind√≠cios de que a suposi√ß√£o de normalidade n√£o √© razo√°vel para os erros referentes a nenhum das vari√°veis presentes no banco de dados.
 
-Observando o gr·fico 2 das figuras 4 a 10, identificamos evidencias de presenÁa de heteroced·sticidade entre os resÌduos das espÈcies de moscas no gr·fico 2 nas figuras 4, 6, 7 de maneira mais leve e nas figuras 8, 9 e 10 de maneira mais acentuada, j· para a figura 5 n„o nota-se, a menos de um valor extremo, a presenÁa de indicios de heteroced·sticidade. Portanto, a suposiÁ„o de igualdade das matrizes de covari‚ncia das duas espÈcies parece n„o ser razo·vel.
-N„o identificamos nenhum comportamento a ser destacado referente ao gr·fico 1 das figuras 4 a 10.
+Observando o gr√°fico 2 das figuras 4 a 10, identificamos evidencias de presen√ßa de heteroced√°sticidade entre os res√≠duos das esp√©cies de moscas nas figuras 4, 6, 7 de maneira mais leve e nas figuras 8, 9 e 10 de maneira mais acentuada, j√° para a figura 5 n√£o nota-se, a menos de um valor extremo, a presen√ßa de indicios de heteroced√°sticidade. Portanto, a suposi√ß√£o de igualdade das matrizes de covari√¢ncia das duas esp√©cies parece n√£o ser razo√°vel.
 
-Na figura 11 observamos alguns valores fora das bandas de confianÁa para valores de quantis menores da forma quadr·tica, alÈm disso, valores de quantis maiores da forma quadr·tica tendem a se apresentar abaixo da linha de referÍncia que È baseada no quantil da distribuiÁ„o qui-quadrado, deste modo temos indicaÁıes de que a suposiÁ„o de normalidade multivariada dos erros n„o parece ser uma suposiÁ„o razo·vel neste caso.
+N√£o identificamos nenhum comportamento a ser destacado referente ao gr√°fico 1 das figuras 4 a 10.
 
-Contudo, dadas as observaÁıes destacadas, temos que a ˙nica vari·vel do banco de dados a qual n„o seria irrasu·vel supor normalidade e homoced·sticidade dos dados seria a vari·vel "Largura da Asa", j· que todas as vari·veis restantes apresentam ao menos um indicio evidente da fuga das suposiÁıes. 
-Como n„o seria razo·vel supor normalide e homoced·sticidade multivariada neste caso, o modelo de an·lise de vari‚ncia multivariada n„o apresentou um ajuste adequado, e se È necess·rio procurar tÈcnicas alternativas para realizar uma an·lise adequada ao banco de dados. Dado o nosso contexto acadÍmico, iremos continuar com as an·lises dos resultados para elaborar a concluÁ„o do presente trabalho.
+Na figura 11 observamos alguns valores fora das bandas de confian√ßa para valores de quantis menores da forma quadr√°tica, al√©m disso, valores de quantis maiores da forma quadr√°tica tendem a se apresentar abaixo da linha de refer√™ncia que √© baseada no quantil da distribui√ß√£o qui-quadrado, deste modo temos indica√ß√µes de que a suposi√ß√£o de normalidade multivariada dos erros n√£o parece ser uma suposi√ß√£o razo√°vel neste caso.
+
+Contudo, dadas as observa√ß√µes destacadas, temos que a √∫nica vari√°vel do banco de dados a qual n√£o seria irrasu√°vel supor normalidade e homoced√°sticidade dos dados seria a vari√°vel "Largura da Asa", j√° que todas as vari√°veis restantes apresentam ao menos um indicio evidente da fuga das suposi√ß√µes. 
+Como n√£o seria razo√°vel supor normalide e homoced√°sticidade multivariada neste caso, o modelo de an√°lise de vari√¢ncia multivariada n√£o apresentou um ajuste adequado, e se √© necess√°rio procurar t√©cnicas alternativas para realizar uma an√°lise adequada ao banco de dados. Dado o nosso contexto acad√™mico, iremos continuar com as an√°lises dos resultados para elaborar a conclu√ß√£o do presente trabalho.
 
 ```{r}
 ################################################
-######Legendas para an·lises de resÌduos########
+######Legendas para an√°lises de res√≠duos########
 ################################################
 
 legendaaux <- rep(" ",length(inames)-1)
 for (i in 2:length(inames)) {
-  aux <- "Gr·ficos para os resÌduos referentes ‡ vari·vel"
+  aux <- "Gr√°ficos para os res√≠duos referentes √† vari√°vel"
   aux2 <- as.character(inames[i])
   legendaaux[i-1] <- paste(aux,aux2,sep = " ")
   }
@@ -562,7 +560,7 @@ for (i in 2:length(inames)) {
 
 
 ```{r}
-var = 0 #iniciando a vari·vel
+var = 0 #iniciando a vari√°vel
 var<-1+var; legenda <- legendaaux[var]
 ```
 
@@ -619,15 +617,15 @@ gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
 ```
 
 
-```{r fig.cap=c("Gr·fico de quantil-quantil com envelopes para a dist‚ncia de Mahalanobis referente aos resÌduos do modelo ajustado")}
-# ResÌduo baseado na dist‚ncia Mahalanobis
+```{r fig.cap=c("Gr√°fico de quantil-quantil com envelopes para a dist√¢ncia de Mahalanobis referente aos res√≠duos do modelo ajustado")}
+# Res√≠duo baseado na dist√¢ncia Mahalanobis
 
 gen.graf.resid.quad.form(as.matrix(m.dados),fit.manova)
 ```
 
 
 
-Na tabela 2 est„o apresentadas as quatro estatÌsticas referentes ao teste de an·lise de vari‚ncia multivariada realizado com base no modelo proposto:
+Na tabela 2 est√£o apresentadas as quatro estat√≠sticas referentes ao teste de an√°lise de vari√¢ncia multivariada realizado com base no modelo proposto.
 
 ```{r}
 #xtable(tbl_resultados_MANOVA)
@@ -641,7 +639,7 @@ Na tabela 2 est„o apresentadas as quatro estatÌsticas referentes ao teste de an·
 \def\arraystretch{2.0}
 \begin{tabular}{rllll}
   \toprule
- & EstatÌstica & Valor & Aprox..distr..F & p.valor \\ \midrule
+ & Estat√≠stica & Valor & Aprox..distr..F & p.valor \\ \midrule
   \hline
 1 & Wilks & 0,391 & 13,824 & $<$0,001 \\ 
   2 & Pillai & 0,609 & 13,824 & $<$0,001 \\ 
@@ -652,19 +650,19 @@ Na tabela 2 est„o apresentadas as quatro estatÌsticas referentes ao teste de an·
 \egroup
 \end{table}
 
-Note pela tabela 2 que todos os p-valores referentes ‡s quatro estatÌsticas s„o menores que o nÌvel de signific‚ncia adotado, portanto, todas os testes apresentam evidencias estatÌsticamente significativas de que as espÈcies difiram em ao menos uma das vari·veis presentes no banco de dados.
+Note pela tabela 2 que todos os p-valores referentes √†s quatro estat√≠sticas s√£o menores que o n√≠vel de signific√¢ncia adotado, portanto, todas os testes apresentam evidencias estat√≠sticamente significativas de que as esp√©cies difiram em ao menos uma das vari√°veis presentes no banco de dados.
 
 
 ```{r}
-# Par‚metros preditos pelo modelo
-m.B <- matrix(coef(fit.manova),2,7) #2 Grupos e 7 vari·veis
+# Par√¢metros preditos pelo modelo
+m.B <- matrix(coef(fit.manova),2,7) #2 Grupos e 7 vari√°veis
 v.beta <- matrix(t(m.B))
 m.X <- model.matrix(fit.manova)
 m.Sigmabeta <- kronecker(solve(t(m.X)%*%m.X),m.sigma.P)
 ```
 
 ```{r}
-# Estimativa dos par‚metros
+# Estimativa dos par√¢metros
 vbeta<- c(coef(fit.manova))
 mcovbeta <- vcov(fit.manova)
 epbeta <- as.vector(sqrt(diag(mcovbeta)))
@@ -677,17 +675,17 @@ mresult <- apply(mresult,2,arredonda)
 
 nomes_par <- c("\ mu_1","\alpha_{21}","\ mu_2","\alpha_{22}","\ mu_3","\alpha_{23}","\ mu_4","\alpha_{24}","\ mu_5","\alpha_{25}","\ mu_6","\alpha_{26}","\ mu_7","\alpha_{27}")
 mresult <- cbind(nomes_par,mresult)
-colnames(mresult) <- c("Par‚metro","Estimativa","Erro Padr„o","EstatÌstica t", "p-valor")
+colnames(mresult) <- c("Par√¢metro","Estimativa","Erro Padr√£o","Estat√≠stica t", "p-valor")
 
 #xtable(mresult)
 ```
 
 ```{r}
-#MÈdias preditas pelo modelo com os respectivos Erro padr„o e IC's
-#Lembre que algumas matrizes usadas aqui foram definidas no cÛdigo anterior ‡ isto (logo acima)
+#M√©dias preditas pelo modelo com os respectivos Erro padr√£o e IC's
+#Lembre que algumas matrizes usadas aqui foram definidas no c√≥digo anterior √† isto (logo acima)
 
 
-#k.posicao_Var È o Ìndice "k" do \mu_k que vocÍ quer prever
+#k.posicao_Var √© o √≠ndice "k" do \mu_k que voc√™ quer prever
 MedidasPreditasModelo <- function(k.posicao_var){
 
 m.x_mu <- matrix(data = rep(0,28), nrow = 2, ncol = 14)
@@ -704,14 +702,14 @@ return(list(mu = m.mu_pred,ep = m.ep_mu_pred, IC = m.IC_mu_pred))
 ```
 
 ```{r}
-#funÁ„o para gerar as matrizes CBU sÛ para facilitar
+#fun√ß√£o para gerar as matrizes CBU s√≥ para facilitar
 GeraMatriz_C_B_U <- function(k.ncomp,k.i,k.j,k.k,k.s) {
   
-  #k.ncomp  #n˙mero de par‚metros \alphas a serem comparados ‡ 0.
+  #k.ncomp  #n√∫mero de par√¢metros \alphas a serem comparados √† 0.
 
   m.C1 <- cbind(0,1) # para testar os \alpha's
 
-  #ComparaÁ„o de k.ncomp \alpha's com zero e s„o 7 vari·veis
+  #Compara√ß√£o de k.ncomp \alpha's com zero e s√£o 7 vari√°veis
   m.U1 <- matrix(data = c(rep(0,k.ncomp*7)), nrow = 7, ncol = k.ncomp)
 
   m.U1[k.i,1] <- 1
@@ -732,9 +730,9 @@ GeraMatriz_C_B_U <- function(k.ncomp,k.i,k.j,k.k,k.s) {
 ```{r}
 #testar igualdade entre os grupos para 
 #largura da asa 
-#Largura 3∞ palpo
-#comprimento do 12∫ segmento da antena
-#comprimento do 13∫ segmento da antena
+#Largura 3¬∞ palpo
+#comprimento do 12¬∫ segmento da antena
+#comprimento do 13¬∫ segmento da antena
 m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 3,2,4,6)
 
 resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
@@ -748,13 +746,13 @@ pvalor_CBU[1] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultad
 label_pvalor_CBU[1] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = 0$"
 ```
 
-```{r fig.height=12, fig.width=10, fig.cap=c("MÈdias preditas pelo modelo e respectivos intervalos de confianÁa para cada vari·vel")}
-#IC para as mÈdias preditas para vari·veis para cada espÈcie
+```{r fig.height=12, fig.width=10, fig.cap=c("M√©dias preditas pelo modelo e respectivos intervalos de confian√ßa para cada vari√°vel")}
+#IC para as m√©dias preditas para vari√°veis para cada esp√©cie
 
 IC_predito <- function(i){
 a <- MedidasPreditasModelo(k.posicao_var = i)
 
-plotrix::plotCI(a$mu,ui=a$IC[,2],li=a$IC[,1],col=c("seagreen", "navyblue"),axes=FALSE,xlab="espÈcie",ylab="mÈdia",pch=19,cex=1.2,cex.lab=1.2,cex.axis=1.2,main= inames[i+1])
+plotrix::plotCI(a$mu,ui=a$IC[,2],li=a$IC[,1],col=c("seagreen", "navyblue"),axes=FALSE,xlab="esp√©cie",ylab="m√©dia",pch=19,cex=1.2,cex.lab=1.2,cex.axis=1.2,main= inames[i+1])
 axis(2,seq(4,7,0.2),cex.axis=1.2)
 axis(1,1:2,c("Carteri","Torrens"),cex.axis=1.2)
 }
@@ -765,30 +763,30 @@ for (i in 1:7){IC_predito(i)}
 
 ```
 
-A tabela 3 apresenta as estimativas, os erros padr„o e os respectivos testes de nulidade para os par‚metros ajustados no modelo. 
+A tabela 3 apresenta as estimativas, os erros padr√£o e os respectivos testes de nulidade para os par√¢metros ajustados no modelo. 
 
 \begin{table}[!h]
 \centering
-\caption{Estimativas dos par‚metros do modelo de regress„o}
+\caption{Estimativas dos par√¢metros do modelo de regress√£o}
 \bgroup
 \def\arraystretch{1.5}
 \begin{tabular}{rlllll}
   \hline
- & Par‚metro & Estimativa & Erro Padr„o & EstatÌstica t & p-valor \\ \midrule
+ & Par√¢metro & Estimativa & Erro Padr√£o & Estat√≠stica t & p-valor \\ \midrule
   \hline
- &  $mu\_1$ & 96,457 & 1,014 & 95,097 & $<$0,001 \\ 
+ &  $\mu_1$ & 96,457 & 1,014 & 95,097 & $<$0,001 \\ 
  & $\alpha_{21}$ & 2,886 & 1,434 & 2,012 & 0,048 \\ 
- &  $mu_2$ & 42,914 & 0,689 & 62,241 & $<$0,001 \\ 
+ &  $\mu_2$ & 42,914 & 0,689 & 62,241 & $<$0,001 \\ 
  & $\alpha_{22}$ & 0,829 & 0,975 & 0,85 & 0,398 \\ 
- &  $mu\_3$ & 35,371 & 0,429 & 82,479 & $<$0,001 \\ 
+ &  $\mu_3$ & 35,371 & 0,429 & 82,479 & $<$0,001 \\ 
  & $\alpha_{23}$ & 3,943 & 0,606 & 6,501 & $<$0,001 \\ 
- &  $mu_4$ & 14,514 & 0,295 & 49,259 & $<$0,001 \\ 
+ &  $\mu_4$ & 14,514 & 0,295 & 49,259 & $<$0,001 \\ 
  & $\alpha_{24}$ & 0,143 & 0,417 & 0,343 & 0,733 \\ 
- &  $mu_5$ & 25,629 & 0,627 & 40,863 & $<$0,001 \\ 
+ &  $\mu_5$ & 25,629 & 0,627 & 40,863 & $<$0,001 \\ 
  & $\alpha_{25}$ & 4,371 & 0,887 & 4,929 & $<$0,001 \\ 
- &  $mu_6$ & 9,571 & 0,186 & 51,422 & $<$0,001 \\ 
+ &  $\mu_6$ & 9,571 & 0,186 & 51,422 & $<$0,001 \\ 
  & $\alpha_{26}$ & 0,086 & 0,263 & 0,326 & 0,746 \\ 
- &  $mu_7$ & 9,714 & 0,168 & 57,762 & $<$0,001 \\ 
+ &  $\mu_7$ & 9,714 & 0,168 & 57,762 & $<$0,001 \\ 
  & $\alpha_{27}$ & $<$0,001 & 0,238 & $<$0,001 & 0,15\\ 
    \hline
 \end{tabular}
@@ -796,13 +794,13 @@ A tabela 3 apresenta as estimativas, os erros padr„o e os respectivos testes de 
 \end{table}
 
 
-Note pelos gr·ficos da figura 12 que os Intervalos de ConfianÁa para as mÈdias preditas para as espÈcies de moscas se interceptam num intervalo grande para as vari·veis `r inames[2+1]`, `r inames[4+1]` e `r inames[6+1]`, portanto È razo·vel conjecturar que as espÈcies de moscas tem mÈdias iguais para estas vari·veis. Por meio da metodologia CBU=M (veja Azevedo,2017), testou-se simultaneamente a igualdade das mÈdias destas vari·veis entre as espÈcies de moscas, ao qual resultou num p-valor = `r ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))`, ou seja, `r ifelse(resultados_teste$pvalor<0.05,"temos","n„o temos")` evidencias estatÌsticas suficientes para rejeitar a hipÛtese de igualdade simult‚nea das mÈdias entre as espÈcies para as vari·veis `r inames[2+1]`, `r inames[4+1]` e `r inames[6+1]`. A fim de identificar melhor onde residem as diferenÁas entre as espÈcies de moscas, aplicamos esta mesma metodologia acrescentando as demais vari·veis na hipÛtese de igualdade (uma de cada vez), os resultados deste teste constam na tabela 4.
+Note pelos gr√°ficos da figura 12 que os Intervalos de Confian√ßa para as m√©dias preditas para as esp√©cies de moscas se interceptam num intervalo grande para as vari√°veis `r inames[2+1]`, `r inames[4+1]` e `r inames[6+1]`, portanto √© razo√°vel conjecturar que as esp√©cies de moscas tem m√©dias iguais para estas vari√°veis. Por meio da metodologia CBU=M (veja Azevedo,2017), testou-se simultaneamente a igualdade das m√©dias destas vari√°veis entre as esp√©cies de moscas, ao qual resultou num p-valor = `r ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))`, ou seja, `r ifelse(resultados_teste$pvalor<0.05,"temos","n√£o temos")` evidencias estat√≠sticas suficientes para rejeitar a hip√≥tese de igualdade simult√¢nea das m√©dias entre as esp√©cies para as vari√°veis `r inames[2+1]`, `r inames[4+1]` e `r inames[6+1]`. A fim de identificar melhor onde residem as diferen√ßas entre as esp√©cies de moscas, aplicamos esta mesma metodologia acrescentando as demais vari√°veis na hip√≥tese de igualdade (uma de cada vez), os resultados deste teste constam na tabela 4.
 
 
 
 ```{r}
 #testar igualdade entre os grupos para 
-#largura da asa ,#Largura 3∞ palpo, #comprimento do 12∫ segmento da antena, #comprimento do 13∫ segmento da antena
+#largura da asa ,#Largura 3¬∞ palpo, #comprimento do 12¬∫ segmento da antena, #comprimento do 13¬∫ segmento da antena
 #acrescentando : Comprimento da Asa
 m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 4,1,2,4,6)
 resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
@@ -810,31 +808,31 @@ pvalor_CBU[2] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultad
 label_pvalor_CBU[2] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = \alpha_{11} = 0$"
 
 #testar igualdade entre os grupos para 
-#largura da asa ,#Largura 3∞ palpo, #comprimento do 12∫ segmento da antena, #comprimento do 13∫ segmento da antena
-#acrescentando : Comprimento 3∞ palpo
+#largura da asa ,#Largura 3¬∞ palpo, #comprimento do 12¬∫ segmento da antena, #comprimento do 13¬∫ segmento da antena
+#acrescentando : Comprimento 3¬∞ palpo
 m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 4,2,3,4,6)
 resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
 pvalor_CBU[3] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))
 label_pvalor_CBU[3] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = \alpha_{13} = 0$"
 
 #testar igualdade entre os grupos para 
-#largura da asa ,#Largura 3∞ palpo, #comprimento do 12∫ segmento da antena, #comprimento do 13∫ segmento da antena
-#acrescentando : Comprimento 4∞ palpo
+#largura da asa ,#Largura 3¬∞ palpo, #comprimento do 12¬∫ segmento da antena, #comprimento do 13¬∫ segmento da antena
+#acrescentando : Comprimento 4¬∞ palpo
 m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 4,2,4,5,6)
 resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
 pvalor_CBU[4] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))
 label_pvalor_CBU[4] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = \alpha_{15} = 0$"
 
 #testar igualdade entre os grupos para 
-#largura da asa ,#Largura 3∞ palpo, #comprimento do 12∫ segmento da antena, #comprimento do 13∫ segmento da antena
-#acrescentando : Comprimento 4∞ palpo
+#largura da asa ,#Largura 3¬∞ palpo, #comprimento do 12¬∫ segmento da antena, #comprimento do 13¬∫ segmento da antena
+#acrescentando : Comprimento 4¬∞ palpo
 m.teste1 <- GeraMatriz_C_B_U(k.ncomp = 4,2,4,6,7)
 resultados_teste <- TesteF.CBU.M(fit.manova,m.sigma.P,k.P,k.G,m.teste1$C,m.teste1$U,m.teste1$M)
 pvalor_CBU[5] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))
 label_pvalor_CBU[5] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = \alpha_{17} = 0$"
 
 tabela_CBU <- cbind(label_pvalor_CBU,pvalor_CBU)
-colnames(tabela_CBU) <- c("HipÛtese","p-valor do teste CBU=M")
+colnames(tabela_CBU) <- c("Hip√≥tese","p-valor do teste CBU=M")
 #xtable(tabela_CBU)
 
 
@@ -849,7 +847,7 @@ colnames(tabela_CBU) <- c("HipÛtese","p-valor do teste CBU=M")
 \def\arraystretch{1.5}
 \begin{tabular}{rlr}
   \toprule
- & HipÛtese & p-valor do teste CBU=M \\  \midrule
+ & Hip√≥tese & p-valor do teste CBU=M \\  \midrule
   \hline
  & $\alpha_{12}$ = $\alpha_{14}$ = $\alpha_{16}$ = 0 & 0,864 \\ 
    & $\alpha_{12}$ = $\alpha_{14}$ = $\alpha_{16}$ = $\alpha_{11}$ = 0 & 0,342 \\ 
@@ -861,21 +859,21 @@ colnames(tabela_CBU) <- c("HipÛtese","p-valor do teste CBU=M")
 \egroup
 \end{table}
 
-Note pela tabela 4 que os dois primeiros testes indicam a n„o rejeiÁ„o da hipÛtese apresentada, portanto temos evidencias estatÌsticamente significantes de que as espÈcies tem mÈdias conjuntamente iguais para as vari·veis `r inames[2+1]`,`r inames[4+1]`,`r inames[6+1]` e `r inames[1+1]`, ou seja, as diferenÁas parecem residir nas vari·veis `r inames[3+1]`, `r inames[5+1]` e `r inames[7+1]`.
+Note pela tabela 4 que os dois primeiros testes indicam a n√£o rejei√ß√£o da hip√≥tese apresentada, portanto temos evidencias estat√≠sticamente significantes de que as esp√©cies tem m√©dias conjuntamente iguais para as vari√°veis `r inames[2+1]`,`r inames[4+1]`,`r inames[6+1]` e `r inames[1+1]`, ou seja, as diferen√ßas parecem residir nas vari√°veis `r inames[3+1]`, `r inames[5+1]` e `r inames[7+1]`.
 
 \vspace{0.5cm}
 
 
-4. Conclusıes 
+4. Conclus√µes 
 
-Com base nas informaÁıes descritas neste relatÛrio, podemos concluir que o modelo multivariado ajustado n„o teve um ajuste adequado, portanto os resultados apresentados referentes ao modelo proposto podem n„o representar o comportamento dos dados de maneira adequada, porem estes resultados parecem ser razo·veis, uma vez que concordam em boa parte com a an·lise descritiva realizada. Com a interpretaÁ„o dos resultados obtidos, temos fortes indicaÁıes de que as espÈcies de moscas diferem quanto ‡s vari·veis `r inames[3+1]`, `r inames[5+1]` e `r inames[7+1]`, mas n„o diferem quanto ‡s vari·veis `r inames[2+1]`,`r inames[4+1]`,`r inames[6+1]` e `r inames[1+1]`.
+Com base nas informa√ß√µes descritas neste relat√≥rio, podemos concluir que o modelo multivariado ajustado n√£o teve um ajuste adequado, portanto os resultados apresentados referentes ao modelo proposto podem n√£o representar o comportamento dos dados de maneira adequada, porem estes resultados parecem ser razo√°veis, uma vez que concordam em boa parte com a an√°lise descritiva realizada. Com a interpreta√ß√£o dos resultados obtidos, temos fortes indica√ß√µes de que as esp√©cies de moscas diferem quanto √†s vari√°veis `r inames[3+1]`, `r inames[5+1]` e `r inames[7+1]`, mas n√£o diferem quanto √†s vari√°veis `r inames[2+1]`,`r inames[4+1]`,`r inames[6+1]` e `r inames[1+1]`.
 
 \vspace{0.5cm}
 
 
 5. Bibliografia
 
-- Azevedo, C. L. N. (2017). Notas de aula sobre an·lise multivariada de dados http://www.ime.unicamp.br/~cnaber/Material_AM_2S_2017.htm
+- Azevedo, C. L. N. (2017). Notas de aula sobre an√°lise multivariada de dados http://www.ime.unicamp.br/~cnaber/Material_AM_2S_2017.htm
 
 
-- Johnson, R. A. & Wichern, D. W. (2007). Applied Multivariate Statistical Analysis. 6 a ediÁ„o, Upper Saddle River, NJ: Pearson Prentice Hall.
+- Johnson, R. A. & Wichern, D. W. (2007). Applied Multivariate Statistical Analysis. 6 a edi√ß√£o, Upper Saddle River, NJ: Pearson Prentice Hall.
