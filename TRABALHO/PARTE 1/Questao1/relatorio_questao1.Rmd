@@ -477,7 +477,6 @@ p.valor.igual.m.cov <- test.igual.matriz$p.valor
 
 ```
 
-\newpage
 
 \vspace{0.5cm}
 
@@ -485,13 +484,15 @@ p.valor.igual.m.cov <- test.igual.matriz$p.valor
 
 A figura 3 apresenta o gráfico de envelopes para a distância de Mahalanobis (veja mais em Azevedo (2017)) para os dados de ambas as espécies de moscas, note que existem muitos pontos fora das bandas de confiança para ambas as espécies de moscas, indicando que parece não ser razoável a suposição de normalidade multivariada dos dados referentes à ambas as espécies. Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados das duas espécies de moscas, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov < 0.001,"<0,001",round(p.valor.igual.m.cov,3))`, indicando que existe diferença estatisticamente significante entre as matrizes de covariâncias dos grupos de moscas, indicando que não parece ser razoável a suposição de igualdade das matrizes de covariâncias entre as espécies de moscas.
 
-```{r, fig.height=4,fig.width=8,fig.cap=c("Gráfico de quantil-quantil com envelopes para a distância de Mahalanobis; A) Torrens, B) Carteri")}
+\newpage
 
+```{r, fig.height=3,fig.width=9,fig.cap=c("Gráfico de quantil-quantil com envelopes para a distância de Mahalanobis; A) Torrens, B) Carteri")}
+library(car)
 par(mfrow=c(1,2))
 
-qqPlot(vF,dist="f",df1=nvar,df2=n-nvar,col.lines="red",grid="FALSE",xlab="Quantil da distribuição F",ylab="Forma quadrática",cex=1.2,id.cex=1.2, main=" A) Torrens")
+car::qqPlot(vF,dist="f",df1=nvar,df2=n-nvar,col.lines="red",grid="FALSE",xlab="Quantil da distribuição F",ylab="Forma quadrática",cex=1.2,id.cex=1.2, main=" A) Torrens")
 
-qqPlot(vF2,dist="f",df1=nvar2,df2=n2-nvar2,col.lines="red",grid="FALSE",xlab="Quantil da distribuição F",ylab="Forma quadrática",cex=1.2,id.cex=1.2, main="B) Carteri")
+car::qqPlot(vF2,dist="f",df1=nvar2,df2=n2-nvar2,col.lines="red",grid="FALSE",xlab="Quantil da distribuição F",ylab="Forma quadrática",cex=1.2,id.cex=1.2, main="B) Carteri")
 
 
 ```
