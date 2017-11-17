@@ -87,7 +87,7 @@ knitr::opts_chunk$set(fig.width=6, fig.height=3.5, fig.path='Figs/', fig.align='
 ```{r pacotes utilizados, echo=FALSE,eval=TRUE, warning=FALSE, message=FALSE}
 
 #lendo as funçoes que o caio disponibilizou para MANOVA (mudei uma coisa lá)
-source("codigoscaioMANOVA.r")
+#source("codigoscaioMANOVA.r")
 source("funcoes_murilo.r")
 source("funcoes_eli.r")
 
@@ -102,6 +102,158 @@ packages= c("ggplot2","knitr","dplyr","tidyverse","xtable","gridExtra", "plyr", 
 invisible(lapply(packages, require, character.only = TRUE))
 ```
 
+```{r}
+###### Funções do Caio Referente à MANOVA
+
+########
+#Funções Gerais
+########
+
+Box.teste.Igual.MCov<-function(m.X.completa,v.grupos,v.n,G)
+{
+  # v.grupos (1,2,3...)
+  # m.X.completa : matriz de dados com todos os grupos
+  grupo <- 1
+  p<- ncol(m.X.completa)
+  m.X.k <- m.X.completa[v.grupos==grupo,]
+  Sigma.k <- cov(m.X.k)
+  m.Sigma.completa <- cbind(grupo,Sigma.k)
+  Sigma.P <- (v.n[grupo]-1)*Sigma.k # estimativa ponderada
+  aux.k.1 <- (v.n[grupo] - 1)*log(det(Sigma.k))
+  grupo <- grupo + 1
+  for (i in 2:G)
+  {
+    m.X.k <- m.X.completa[v.grupos==grupo,] # pegar os dados referentes ao grupo i
+    Sigma.k <- cov(m.X.k)
+    m.Sigma.completa <- rbind(m.Sigma.completa,cbind(grupo,Sigma.k))
+    Sigma.P <- Sigma.P + (v.n[grupo]-1)*Sigma.k # estimativa ponderada
+    aux.k.1 <- aux.k.1 + (v.n[grupo] - 1)*log(det(Sigma.k))
+    grupo <- grupo + 1
+  }
+  Sigma.P <- Sigma.P/(sum(v.n)-G)
+  
+  # Estatística de ajuste
+  aux.u <- (sum(1/(v.n - 1)) - (1/(sum(v.n - 1))))*(2*p^2 + 3*p - 1)/(6*(p+1)*(G-1))
+  Q.B <-  (1 - aux.u)*(sum(v.n-1)*log(det(Sigma.P)) - aux.k.1)
+  aux.v <- 0.5*p*(p+1)*(G-1)
+  e.nd.QB <- 1 - pchisq(Q.B,aux.v)
+#  cat("Estatística do Teste: ", Q.B, "\n")
+#  cat("nível descritivo: ",e.nd.QB,"\n")
+#  cat("Matrizes de Covariâncias por grupo: \n")
+#  print(m.Sigma.completa)
+  Sigma.P <-as.matrix(data.frame(Sigma.P))
+  #mudei aqui para conseguir printar o pvalor e o qui-quadrado mais fácil
+  return(list(Sigma.P=Sigma.P,p.valor = e.nd.QB, est.test = Q.B))
+} # fim fa função
+
+
+TesteF.CBU.M<-function(fit.model,m.Sigma.P,p,G,m.C,m.U,m.M)
+{
+  m.B <- matrix(coef(fit.model),G,p)
+  v.beta <- matrix(t(m.B))
+  m.X <- model.matrix(fit.model)
+  m.Ca <- kronecker(m.C,t(m.U))
+  m.Ma <- matrix(t(m.M))
+  v.theta <- m.Ca%*%v.beta - m.Ma
+  m.Sigmabeta <- kronecker(solve(t(m.X)%*%m.X),m.Sigma.P)
+  estat <- t(v.theta)%*%solve(m.Ca%*%(m.Sigmabeta)%*%t(m.Ca))%*%v.theta
+  p.valor <- 1-pchisq(estat,df=nrow(m.C)*ncol(m.U))
+#  cat("Estatistica Qui-quadrado = ",round(estat,2),"\n")
+#  cat("pvalor = ",round(p.valor,4),"\n")
+#  cat("Matriz C :","\n")
+#  print(m.C)
+#  cat("Matriz U :","\n")
+#  print(m.U)
+#  cat("Matriz M :","\n")
+#  print(m.M)
+  return(list(pvalor = p.valor,M = m.M,U = m.U,C = m.C,estatqui = estat))
+}
+
+
+
+
+#########
+#Análise de diagnóstico
+#########
+
+
+
+gen.graf.resid<-function(mY,mresult,var,typeresid,wplot)
+{
+  mresiduo <- mresult$residuals
+  mbeta <- coef(mresult) 
+  mX <- as.matrix(model.matrix(mresult))
+  n <- nrow(mX)
+  p <- ncol(mbeta)
+  q <- nrow(mbeta)
+  mSigma<-t(mY-mX%*%mbeta)%*%(mY-mX%*%mbeta)/(n-q)
+  if (typeresid == "univariate")
+  {
+    auxres <- diag((diag(n) - mX%*%solve(t(mX)%*%mX)%*%t(mX)))
+    mresiduo <- mresiduo/(sqrt((matrix(auxres,n,p))%*%diag(diag(mSigma))))
+  }
+  else if (typeresid == "multivariate")
+  {
+    mresiduo <- t(solve(t(chol(mSigma)))%*%t(mresiduo))
+  }
+  mfit <- fitted.values(mresult)
+  #
+  if (wplot == "diagnostics")
+  {
+    par(mfrow =c(2,2))
+    plot(mresiduo[,var],ylim=c(min(-3,min(mresiduo[,var])),max(3,max(mresiduo[,var]))),xlab="índice",ylab="resíduo studentizado",main = "gráfico 1")
+    abline(-2,0,lty=2)
+    abline(2,0,lty=2)
+    abline(0,0,lty=2)
+    #
+    plot(mfit[,var],mresiduo[,var],ylim=c(min(-3,min(mresiduo[,var])),max(3,max(mresiduo[,var]))),xlab="valor ajustado",ylab="resíduo studentizado",main = "gráfico 2")
+    abline(-2,0,lty=2)
+    abline(2,0,lty=2)
+    abline(0,0,lty=2)
+    #
+    hist(mresiduo[,var],probability=TRUE,xlab="resíduo studentizado",ylab="densidade",main = "gráfico 3")
+    #
+    qqPlot((mresiduo[,var]),dist="norm",mean=0,sd=1,col.lines=1,grid="FALSE",xlab="quantil da N(0,1)",ylab=paste("quantil do resíduo studentizado"),cex=1.2,id.cex=1.2, main = "gráfico 4")
+  }
+  
+  else if (wplot == "envelope")
+  {
+    par(mfrow =c(1,1))
+    qqPlot((mresiduo[,var]),dist="norm",mean=0,sd=1,col.lines=1,grid="FALSE",xlab="quantil da N(0,1)",ylab=paste("quantil do resíduo studentizado"),cex=1.2,id.cex=1.2, main = "gráfico 1")
+  }
+}
+
+gen.graf.resid.quad.form<-function(mY,mresult)
+{
+  mresiduo <- mresult$residuals
+  mbeta <- coef(mresult) 
+  mX <- as.matrix(model.matrix(mresult))
+  n <- nrow(mX)
+  p <- ncol(mbeta)
+  q <- nrow(mbeta)
+  mSigma<-t(mY-mX%*%mbeta)%*%(mY-mX%*%mbeta)/(n-q)
+  vmu<- apply(mresiduo,2,mean)
+  #vresid <- n*apply(((mresiduo-vmu)*(mresiduo-vmu)%*%solve(mSigma)),1,sum)
+  vresid <- n*mahalanobis(mresiduo,center=vmu,cov=mSigma)
+  #vresid<- #(n-nvar)*vresid/((n-1)*n)
+  nvar <- length(vmu)
+  n <- length(vresid)
+  #  qqPlot(vresid,dist="chisq",df=nvar,col.lines=1,grid="FALSE",xlab="quantil da distribuição qui-quadrado",ylab="quantil da forma quadrática",cex=1.2,id.cex=1.2)
+  mX <- model.matrix(mresult)
+  vresidA <- matrix(0,n,1)
+  #mident <- diag(1,p)
+  for (i in 1:n)
+  {
+    mXi <- rbind(mX[i,])
+    mYi <- rbind(mY[i,])
+    Ai <- 1 - mXi%*%solve(t(mX)%*%mX)%*%t(mXi)
+    vresidA[i] <- (Ai^(-2))*mYi%*%solve(mSigma)%*%t(mYi)
+  }
+  #par(mfrow =c(1,1)) #tirei para conseguir juntar os gráficos
+  car::qqPlot(vresidA,dist="chisq",df=nvar,col.lines=1,grid="FALSE",xlab="quantil da distribuição qui-quadrado",ylab="quantil da forma quadrática",cex=1.2,id.cex=1.2)
+  
+}  
+```
 
 ```{r}
 #nomes para usar nas tabelas
@@ -246,6 +398,8 @@ tab_resumo=rbind(resumo_Comp_Asa,resumo_Larg_Asa,resumo_Comp_3_palpo,resumo.Larg
 \begin{center}
 \begin{table}[!h]
 \caption{Medidas Resumo das variáveis por espécie}
+\bgroup
+\def\arraystretch{1.0}
 \begin{tabular}{cccccccccc}
   \toprule
   
@@ -268,6 +422,7 @@ tab_resumo=rbind(resumo_Comp_Asa,resumo_Larg_Asa,resumo_Comp_3_palpo,resumo.Larg
 
    \hline
 \end{tabular}
+\egroup
 \end{table}
 \end{center}
 
@@ -283,15 +438,11 @@ legend(0.2, 0.4, as.vector(unique(dadosmoscas_graf_tab$Esp)),
        fill=c("seagreen", "navyblue"))
 ```
 
-\newpage
 
 ```{r, fig.width=7, fig.height=8,fig.cap=c("Box-plot das variáveis por espécie")}
 grid.arrange(g_Comp_asa, g_Larg_asa, g_Comp_3_palpo, g_Larg_3_palpo, g_Comp_4_palpo, g_Comp_12_seg_ant, g_Comp_13_seg_ant, ncol=2)
 ```
 
-\newpage
-
-3. Análise Inferencial
 
 ```{r}
 #Pegando a coluna das espécies (grupos) para fazer o vetor identificador de grupos
@@ -330,6 +481,10 @@ est.test.igual.m.cov <- test.igual.matriz$est.test
 p.valor.igual.m.cov <- test.igual.matriz$p.valor
 
 ```
+
+\newpage
+
+3. Análise Inferencial
 
 A figura 3 apresenta o gráfico de envelopes para a distância de Mahalanobis (veja Azevedo,2017) para os dados de ambas as espécies de moscas, note que existem muitos pontos fora das bandas de confiança para ambas as espécies de moscas, indicando que parece não ser razoável a suposição de normalidade multivariada dos dados referentes à ambas as espécies. Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados das duas espécies de moscas, ao qual resultou num p-valor de `r ifelse(p.valor.igual.m.cov < 0.001,"<0,001",round(p.valor.igual.m.cov,3))`, indicando que existe diferença estatisticamente significante entre as matrizes de covariâncias dos grupos de moscas, indicando que não parece ser razoável a suposição de igualdade das matrizes de covariâncias entre as espécies de moscas.
 
@@ -370,7 +525,7 @@ Hotelling <- summary.manova(fit.manova,test="Hotelling-Lawley")
 Roy <- summary.manova(fit.manova,test="Roy")
 
 tbl_resultados_MANOVA <- rbind(Wilks$stats[1,c(2,3,6)],Pillai$stats[1,c(2,3,6)],Hotelling$stats[1,c(2,3,6)],Roy$stats[1,c(2,3,6)])
-arredonda <- function(x) ifelse(x<0.001,"<0,001",round(x,digits = 3))
+arredonda <- function(x) ifelse(x<0.001&x>=0,"<0,001",round(x,digits = 3))
 tbl_resultados_MANOVA <- apply(tbl_resultados_MANOVA,2, arredonda)
 aux <- c("Wilks","Pillai","Hotelling-Lawley","Roy")
 tbl_resultados_MANOVA <- cbind(aux,tbl_resultados_MANOVA)
@@ -475,10 +630,27 @@ gen.graf.resid.quad.form(as.matrix(m.dados),fit.manova)
 Na tabela XX(tbl_resultados_MANOVA) estão apresentadas as quatro estatísticas referentes ao teste de análise de variância multivariada realizado com base no modelo proposto:
 
 ```{r}
-tbl_resultados_MANOVA
+#xtable(tbl_resultados_MANOVA)
 ```
 
-########   TABELA tbl_resultados_MANOVA #########
+
+\begin{table}[!h]
+\centering
+\caption{Resultados da MANOVA}
+\bgroup
+\def\arraystretch{2.5}
+\begin{tabular}{rllll}
+  \toprule
+ & Estatística & Valor & Aprox..distr..F & p.valor \\ \midrule
+  \hline
+1 & Wilks & 0,391 & 13,824 & $<$0,001 \\ 
+  2 & Pillai & 0,609 & 13,824 & $<$0,001 \\ 
+  3 & Hotelling-Lawley & 1,561 & 13,824 & $<$0,001 \\ 
+  4 & Roy & 1,561 & 13,824 & $<$0,001 \\ 
+   \hline
+\end{tabular}
+\egroup
+\end{table}
 
 Note pela tabela XX(tbl_resultados_MANOVA) que todos os p-valores referentes às quatro estatísticas são menores que o nível de significância adotado, portanto, todas os testes apresentam evidencias estatísticamente significativas de que as espécies difiram em ao menos uma das variáveis presentes no banco de dados.
 
@@ -491,6 +663,24 @@ m.X <- model.matrix(fit.manova)
 m.Sigmabeta <- kronecker(solve(t(m.X)%*%m.X),m.sigma.P)
 ```
 
+```{r}
+# Estimativa dos parâmetros
+vbeta<- c(coef(fit.manova))
+mcovbeta <- vcov(fit.manova)
+epbeta <- as.vector(sqrt(diag(mcovbeta)))
+#
+quantt <- qt(0.975,df=70-2)
+
+mresult <- cbind(vbeta,epbeta,vbeta/epbeta,2*(1-pt(vbeta/epbeta,df=70-2)))
+
+mresult <- apply(mresult,2,arredonda)
+
+nomes_par <- c("\ mu_1","\alpha_{21}","\ mu_2","\alpha_{22}","\ mu_3","\alpha_{23}","\ mu_4","\alpha_{24}","\ mu_5","\alpha_{25}","\ mu_6","\alpha_{26}","\ mu_7","\alpha_{27}")
+mresult <- cbind(nomes_par,mresult)
+colnames(mresult) <- c("Parâmetro","Estimativa","Erro Padrão","Estatística t", "p-valor")
+
+#xtable(mresult)
+```
 
 ```{r}
 #Médias preditas pelo modelo com os respectivos Erro padrão e IC's
@@ -558,7 +748,7 @@ pvalor_CBU[1] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultad
 label_pvalor_CBU[1] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = 0$"
 ```
 
-```{r fig.height=10, fig.width=10}
+```{r fig.height=7, fig.width=10}
 #IC para as médias preditas para variáveis para cada espécie
 
 IC_predito <- function(i){
@@ -566,14 +756,42 @@ a <- MedidasPreditasModelo(k.posicao_var = i)
 
 plotrix::plotCI(a$mu,ui=a$IC[,2],li=a$IC[,1],axes=FALSE,xlab="espécie",ylab="média",pch=19,cex=1.2,cex.lab=1.2,cex.axis=1.2,main= inames[i+1])
 axis(2,seq(4,7,0.2),cex.axis=1.2)
-axis(1,1:2,c("Leptoconops carteri","Leptoconops torrens"),cex.axis=1.2)
+axis(1,1:2,c("Carteri","Torrens"),cex.axis=1.2)
 }
 
-par(mfrow =c(3,3))
+par(mfrow =c(3,2))
 for (i in 1:7){IC_predito(i)}
 
 
 ```
+
+\begin{table}[!h]
+\centering
+\caption{Estimativas dos parâmetros do modelo de regressão}
+\bgroup
+\def\arraystretch{1.5}
+\begin{tabular}{rlllll}
+  \hline
+ & Parâmetro & Estimativa & Erro Padrão & Estatística t & p-valor \\ \midrule
+  \hline
+ &  $mu\_1$ & 96,457 & 1,014 & 95,097 & $<$0,001 \\ 
+ & $\alpha_{21}$ & 2,886 & 1,434 & 2,012 & 0,048 \\ 
+ &  $mu_2$ & 42,914 & 0,689 & 62,241 & $<$0,001 \\ 
+ & $\alpha_{22}$ & 0,829 & 0,975 & 0,85 & 0,398 \\ 
+ &  $mu\_3$ & 35,371 & 0,429 & 82,479 & $<$0,001 \\ 
+ & $\alpha_{23}$ & 3,943 & 0,606 & 6,501 & $<$0,001 \\ 
+ &  $mu_4$ & 14,514 & 0,295 & 49,259 & $<$0,001 \\ 
+ & $\alpha_{24}$ & 0,143 & 0,417 & 0,343 & 0,733 \\ 
+ &  $mu_5$ & 25,629 & 0,627 & 40,863 & $<$0,001 \\ 
+ & $\alpha_{25}$ & 4,371 & 0,887 & 4,929 & $<$0,001 \\ 
+ &  $mu_6$ & 9,571 & 0,186 & 51,422 & $<$0,001 \\ 
+ & $\alpha_{26}$ & 0,086 & 0,263 & 0,326 & 0,746 \\ 
+ &  $mu_7$ & 9,714 & 0,168 & 57,762 & $<$0,001 \\ 
+ & $\alpha_{27}$ & $<$0,001 & 0,238 & $<$0,001 & 0,15\\ 
+   \hline
+\end{tabular}
+\egroup
+\end{table}
 
 
 Note pelos gráficos da figura (X-1) que os Intervalos de Confiança para as médias preditas para as espécies de moscas se interceptam num intervalo grande para as variáveis `r inames[2+1]`, `r inames[4+1]` e `r inames[6+1]`, portanto é razoável conjecturar que as espécies de moscas tem médias iguais para estas variáveis. Por meio da metodologia CBU=M (veja Azevedo,2017), testou-se simultaneamente a igualdade das médias destas variáveis entre as espécies de moscas, ao qual resultou num p-valor = `r ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))`, ou seja, `r ifelse(resultados_teste$pvalor<0.05,"temos","não temos")` evidencias estatísticas suficientes para rejeitar a hipótese de igualdade simultânea das médias entre as espécies para as variáveis `r inames[2+1]`, `r inames[4+1]` e `r inames[6+1]`. A fim de identificar melhor onde residem as diferenças entre as espécies de moscas, aplicamos esta mesma metodologia acrescentando as demais variáveis na hipótese de igualdade (uma de cada vez), os resultados deste teste constam na tabela (n XX "tabela_CBU").
@@ -616,17 +834,34 @@ label_pvalor_CBU[5] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = \alpha_{17} =
 tabela_CBU <- cbind(label_pvalor_CBU,pvalor_CBU)
 colnames(tabela_CBU) <- c("Hipótese","p-valor do teste CBU=M")
 #xtable(tabela_CBU)
-tabela_CBU
+
 
 ```
 
 
-########## Colocar aqui a tabela CBU###########################
+\begin{table}[!h]
+\centering
+\caption{Testes CBU = M}
+\bgroup
+\def\arraystretch{1.5}
+\begin{tabular}{rlr}
+  \toprule
+ & Hipótese & p-valor do teste CBU=M \\  \midrule
+  \hline
+  \hline
+ & $\alpha_{12}$ = $\alpha_{14}$ = $\alpha_{16}$ = 0 & 0,864 \\ 
+   & $\alpha_{12}$ = $\alpha_{14}$ = $\alpha_{16}$ = $\alpha_{11}$ = 0 & 0,342 \\ 
+   & $\alpha_{12}$ = $\alpha_{14}$ = $\alpha_{16}$ = $\alpha_{13}$ = 0 & $<$ 0,001 \\ 
+   & $\alpha_{12}$ = $\alpha_{14}$ = $\alpha_{16}$ = $\alpha_{15}$ = 0 & $<$ 0,001 \\ 
+   & $\alpha_{12}$ = $\alpha_{14}$ = $\alpha_{16}$ = $\alpha_{17}$ = 0 & 0,029 \\ 
+   \hline
+\end{tabular}
+\egroup
+\end{table}
 
 Note pela tabela (n XX "tabela_CBU") que os dois primeiros testes indicam a não rejeição da hipótese apresentada, portanto temos evidencias estatísticamente significantes de que as espécies tem médias conjuntamente iguais para as variáveis `r inames[2+1]`,`r inames[4+1]`,`r inames[6+1]` e `r inames[1+1]`, ou seja, as diferenças parecem residir nas variáveis `r inames[3+1]`, `r inames[5+1]` e `r inames[7+1]`.
 
 
-\newpage
 
 4. Conclusões 
 
