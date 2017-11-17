@@ -1,0 +1,496 @@
+---
+geometry: textwidth=18cm,textheight=24cm
+header-includes:
+- \usepackage{setspace}
+- \usepackage{indentfirst}
+- \usepackage[utf8]{inputenc}
+- \usepackage{mathptmx}
+- \usepackage{enumerate}
+- \usepackage{url}
+- \usepackage{float}
+- \usepackage{lipsum}
+- \usepackage{multirow}
+- \usepackage{booktabs}
+- \usepackage{longtable}
+- \usepackage{subcaption}
+output:
+  pdf_document: 
+    number_sections: true
+  html_document: default
+  mainfont: Times New Roman
+  fig_caption: yes
+lang: pt-br
+fontsize: 10pt
+---
+
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{center}
+\begin{center}
+\begin{minipage}[s]{1.75cm}
+\includegraphics[width=40pt,height=45pt]{logoUnicamp.png} 
+\end{minipage}\begin{minipage}[s]{11.25cm}\noindent
+{\begin{center} {\Large Universidade Estadual de Campinas}\\
+{Instituto de Matemática, Estatística e Computação Científica}\\
+{\sc Departamento de Estatística}
+\end{center}}
+\end{minipage}
+\begin{minipage}[s]{0.5cm}
+\includegraphics[width=40pt,height=45pt]{logoimecc.png}
+\end{minipage}
+\end{center}
+\end{center}
+\vspace{3cm}
+\font\fontGrande=cmcsc10 scaled 2500
+\font\pessoal=cmr9 scaled 2500
+
+\begin{center}
+\vspace*{3.5cm}
+{\rule[0 ex]{16cm}{0.05cm}}
+{\huge \sc Trabalho - Parte 1 \\[8pt]
+Relatório - Questão 2}
+{\rule[0 ex]{16cm}{0.05cm}}
+\end{center}
+
+\begin{center}
+
+\normalsize \vspace{8mm}
+
+\vspace{4cm}
+
+{\sc  Eliane Ramos de Siqueira  RA:155233} \\
+{\sc  Guilherme Pazian  RA:160323}\\
+{\sc  Henrique Capatto  RA:146406}\\
+{\sc  Murilo Salgado Razoli  RA:150987}
+
+\vspace{0.2cm}
+
+Disciplina: {\bf ME731 - Análise Multivariada}\\
+Professor: {\bf Caio Lucidius Naberezny Azevedo}
+\vspace{1cm}
+
+{\footnotesize{Campinas - SP \\ 18 de Novembro de 2017}}
+\end{center}
+\end{titlepage}
+
+
+\doublespacing
+
+```{r, echo = FALSE}
+#definindo opções padrões 
+
+options(OutDec= ",")
+
+knitr::opts_chunk$set(fig.width=8, fig.height=4, fig.path='Figs/', fig.align='center', echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+
+
+```{r}
+#lendo as funções que o Murilo criou
+
+source("funcoes_murilo.r")
+```
+
+```{r}
+#pacotes utilizados
+
+packages= c("ggplot2",
+              "knitr",
+              "dplyr",
+              "tidyverse",
+              "xtable",
+              "gridExtra",
+              "devtools",
+              "magrittr",
+              "tidyr",
+              "tidyverse",
+              "kableExtra",
+              "rgl", "devtools", "formattable","car","factoextra")
+
+#caso necessário a instalação de algum pacote
+#ipak(packages)
+
+#mostra quais pacotes foram carregados
+invisible(lapply(packages, require, character.only = TRUE))
+
+#install_github("vqv/ggbiplot")
+library(ggbiplot)
+```
+
+
+```{r}
+library(plyr)
+#nomes para usar nas tabelas
+inames <- c("Espécie","Comprimento da Asa","Largura da Asa","Comprimento 3° palpo","Largura 3° palpo", "Comprimento 4° palpo", "Comprimento 12° segmento da antena", "Compimento 13° segmento da antena")
+
+#Identificação das colunas do Banco de dados
+
+dadosmoscas <- read.table(file = "dadosmoscas.txt",col.names = c("Esp","Comp_Asa","Larg_Asa","Comp_3_palpo","Larg_3_palpo", "Comp_4_palpo", "Comp_12_seg_ant", "Comp_13_seg_ant"))
+
+dadosmoscas$Esp %<>%  as.factor()#definindo o tipo da especie como fator
+#glimpse(dadosmoscas) #Verificando os tipos de variaveis.
+
+##TROQUEI O 0 por torrens e o 1 por Carteri usando a função plyr
+dadosmoscas$Especie <- mapvalues(dadosmoscas$Esp, from = c("0", "1"), to = c("Torrens","Carteri"))
+dadosmoscas$Especie  <- factor(dadosmoscas$Especie,levels = c("Carteri","Torrens"),ordered = TRUE)
+```
+
+```{r}
+#Neste exemplo trabalharei com os dados "dadosmoscas"
+
+#Coluna com os nomes de cada grupo
+especie <- dadosmoscas[,9] 
+
+#número de linhas dos dados nrow()
+n <- nrow(dadosmoscas)
+#Colocar o total de variaveis do banco nesta linha
+nvar <- 7
+
+#Criando uma matrix com os dados mosca
+mx.moscas <- dadosmoscas %>% select(c(2:8))
+mx.moscas <- as.matrix(mx.moscas)
+
+colnames(mx.moscas) <- c("CP_ASA", "LG_ASA", "CP_3P", "LG_3ASA", "CP_4P", "CP_12ANT", "CP_13ANT")
+
+#Análises descritivas - Medidas resumo
+descritivas_moscas = tab_estat(mx.moscas) #Colocar sempre sem as variaveis nominais - senão ERRO
+```
+
+```{r}
+#Correlação
+###############################
+# ACP via Matriz de correlações
+#Dimensão
+p <- ncol(mx.moscas)
+#Matrix de correlação
+m.cor<-cor(mx.moscas)
+#Matrix de correlação autovalores
+aut.val <-  eigen(m.cor)$values
+#Matrix de correlação autovetores
+aut.vec <- (eigen(m.cor)$vectors)
+
+#Matriz de autovalores
+m.aut.val <- t(matrix(((aut.val)),p,p))
+
+#matriz de componentes
+result.cp.cor <- princomp(mx.moscas,cor=TRUE)
+corr.cp.cor <- aut.vec*sqrt(m.aut.val)
+dp = sqrt(aut.val)
+
+# fiz esse código pq não consegui manipular a saída do summary #Summary(result.cp.cor)
+var_comp_prin=round(rbind(dp,aut.val/sum(aut.val),cumsum(aut.val/sum(aut.val))),2)
+colnames(var_comp_prin)=c(sapply(c(1,2,3,4,5,6,7),function(x) paste(rep("Comp ",7),x))[1,])
+rownames(var_comp_prin)=c("DP","PVE","PVEA")
+#
+cp1 <-  cbind((result.cp.cor$scores)[,1])
+cp2 <-  cbind((result.cp.cor$scores)[,2])
+cp3 <-  cbind((result.cp.cor$scores)[,3])
+
+cp = data.frame(cp1,cp2,cp3)
+mxcorr.cp = round(corr.cp.cor[,1:3],2)
+
+loa1 <- result.cp.cor$loadings[,1]
+loa2 <- result.cp.cor$loadings[,2]
+loa3 <- result.cp.cor$loadings[,3]
+#MATRIZ DE LOADINGS
+loadings <- round(cbind(loa1, loa2, loa3),2)
+colnames(loadings) = c(sapply(c(1,2,3),function(x) paste(rep("Comp ",3),x))[1,])
+
+
+##fazer matriz de dispersão com 3 componentes
+
+#scatterplot3d(result.cp.cor$scores[,1:3], main="3D Scatterplot",xlab="CP 1", ylab="CP 2", zlab="CP 3", color = as.numeric(dadosmoscas$Especie),pch = 19)
+
+# add the legend using `xyz.convert` to locate it 
+# juggle the coordinates to get something that works.
+#legend(cp123$xyz.convert(0.5, 0.7, 0.5), pch = 19, yjust=0,
+ #      legend = levels(dadosmoscas$Esp), col = seq_along(levels(dadosmoscas$Especie)))
+
+#cp123 =cloud(cp3~cp2+cp1, pch= 19, col.point = dadosmoscas$Especie, 
+ # key = list(points = list(pch = 19, col = seq_along(levels(dadosmoscas$Especie))), 
+  #text = list(levels(dadosmoscas$Especie)), space = 'top', columns = #nlevels(dadosmoscas$Especie)))
+
+cp = data.frame(cp1,cp2,cp3, dadosmoscas$Especie)
+names(cp) = c(sapply(c(1,2,3),function(x) paste(rep("cp",3),x))[1,],"Esp")
+```
+
+```{r}
+########## DISPERSAO R2#########
+cp12 = cp %>% ggplot(aes(cp1,cp2, col=Esp))+geom_point(size=2)+
+      labs(x = "Comp. 1", y = "Comp. 2", color = "Especie\n")+ scale_color_manual(labels=c("Torrens", "Carteri"), values=c("blue","black"))+theme_bw()+theme(legend.position = "none")
+
+cp13 = cp %>% ggplot(aes(cp1,cp3,col=Esp))+geom_point()+theme_bw()+geom_point(size=2)+labs(x = "Comp 1", y = "Comp. 3", color = "Especie\n")+ scale_color_manual(labels= c("Torrens", "Carteri"), values = c("blue","black"))+theme_bw()+theme(legend.position = "none")
+
+cp23 = cp %>% ggplot(aes(cp2,cp3, col=Esp))+geom_point()+theme_bw()+geom_point(size=2)+
+      labs(x = "Comp. 2", y = "Comp. 3", color = "Especie\n")+ scale_color_manual(labels = c("Torrens", "Carteri"), values = c("blue","black"))+theme_bw()
+```
+
+```{r}
+library(RColorBrewer)
+#Gráficos de densidade
+graf_disp <- cp %>%
+        gather(pcs,Valores,-Esp) %>%  ggplot(aes(x = Valores)) +
+        geom_density(aes(fill=factor(Esp)),position="identity", alpha=0.5) +
+        facet_grid(Esp ~ pcs) + theme_bw() + labs(y = "Valores", x = "Componentes", fill = "Espécies\n")+  scale_fill_brewer(palette="Accent")
+```
+
+```{r}
+#######BOX PLOT###### 
+myCol <- brewer.pal(7,"Greens")
+cp1_box = cp %>% ggplot(aes(as.factor(Esp),cp1))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+
+      labs(x = "Espécie", y = "Comp 1")+theme_bw()+guides(fill = F) +scale_fill_manual(values = myCol) 
+
+cp2_box = cp %>% ggplot(aes(as.factor(Esp),cp2))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+
+      labs(x = "Espécie", y = "Comp 2")+theme_bw()+guides(fill = F) +scale_fill_manual(values = myCol) 
+
+cp3_box = cp %>% ggplot(aes(as.factor(Esp),cp3))+stat_boxplot(geom ='errorbar')+geom_boxplot(outlier.colour = "red")+
+      labs(x = "Espécie", y = "Comp 3")+theme_bw()
+```
+
+```{r}
+library(broom)
+model_cp1 <- lm(cp1~dadosmoscas$Esp)
+par_model <- tidy(model_cp1) %>% 
+   mutate_if(.predicate = is.numeric,funs(round(.,2)))
+##estimativas Parametos
+par_model$term[2] <- sub("1","2",par_model$term[2])
+estim_medias <- par_model %>% select(term,estimate,std.error)
+names(par_model) <- c("Parâmetro","Estimativa","EP","Estatística t","p-valor")
+##intervalo de conf
+estim_medias$estimate[2] <- sum(estim_medias$estimate)
+estim_medias$term <- c("Torrens","Carteri")
+estim_medias %<>% 
+mutate(conf.low = estimate - 1.96*std.error,
+          conf.high = estimate + 1.96*std.error)
+names(estim_medias)[1:2] <- c("Espécie","Média")
+names(estim_medias) = c("Especie", "Estimativa", "EP", "IC inf", " IC sup")
+#xtable(par_model)
+#xtable(estim_medias)
+
+```
+
+# Introdução
+
+O banco de dados consiste em 70 observações vindas da medição de sete variáveis em duas espécies de moscas *Leptoconops carteri* e *Leptoconops torrens*, com 35 observações cada. As variáveis constituintes do banco são: espécie (0 - torrens e 1- carteri), comprimento da asa, largura da asa, comprimento do terceiro palpo, largura do terceiro palpo, comprimento do quarto palpo, comprimento do décimo segundo segmento da antena e comprimento do décimo terceiro segmento da antena. Para  análises foram utilizados os softwares *R* \footnote{https://cran.r-project.org/}, versão 3.4.2 e *Rstudio* \footnote{https://www.rstudio.com/}, versão 1.0.1. 
+
+As duas espécies têm semelhanças morfológicas e por um período de tempo foram consideradas como uma única espécie. O objetivo desta análise é verificar as possíveis distinções entre espécies e para atingirmos tal tarefa utlizaremos como método a análise de componentes principais via matriz de correlação (Principal Component Analisys (PCA) em inglês) para identificar tais distinções. Faremos também uma análise de regressão utilizando a primeira componente para identificarmos diferenças entre as médias da primeira componente para cada espécie.
+
+**Observação:** Para facilitar a interpretação deste relatório. assumimos que além da variável espécie (0 - torrens e 1- carteri), as variáveis foram consideradas com os seguintes nomes, comprimento da asa (CP_ASA), largura da asa (LG_ASA), comprimento do terceiro palpo (CP_3P), largura do terceiro palpo (LG_3ASA), comprimento do quarto palpo (CP_4P), comprimento do décimo segundo segmento da antena (CP_12ANT) e comprimento do décimo terceiro segmento da antena (CP_13ANT).
+
+\vspace{0.5cm}
+
+# Análise descritiva
+
+A partir da Figura 1, podemos observar no screeplot que as variâncias (autovalores) associadas a cada componente nos trazem informações relevantes sobre a proporção da variância explicada (PVE), onde se observa que as variâncias das componentes de 1 a 3 trazem uma contribuição maior no valor da PVE do que as outras componentes de acordo com Tabela 1.  Na mesma tabela podemos observar que a proporção da variância explicada acumulada (PVEA), indicam que é adequado o uso das três primeiras componentes, já que estas explicam conjuntamente ``r formattable::percent(var_comp_prin[3,3])` da variância total. Pelo fato das componentes 4 a 7 não estarem contribuindo significantemente no PVEA e suas variâncias estarem bem próximas, consideramos apenas os três primeiros componentes para as análises.
+
+
+```{r, fig.pos = '!h', fig.cap=c("Screeplot Variâncias associadas a cada componente principal")}
+screeplot=screeplot(result.cp.cor,type=c("lines"),main="autovalores",cex=1.2,cex.lab=1.2,cex.main=1.2)
+```
+
+
+```{r,eval=FALSE,fig.pos = '!h'}
+kable(var_comp_prin, format = "latex", booktabs = T)%>%kable_styling(position = "center")
+```
+
+
+```{r}
+#xtable(var_comp_prin)
+```
+
+\vspace{0.5cm}
+\begin{table}[!h]
+\centering
+\caption{Sumário das Componentes Principais}
+\bgroup
+\def\arraystretch{2.5}
+\begin{tabular}{rrrrrrrr}
+   \toprule
+ & Comp  1 & Comp  2 & Comp  3 & Comp  4 & Comp  5 & Comp  6 & Comp  7 \\ 
+  \hline
+DP & 1,71 & 1,24 & 0,95 & 0,77 & 0,72 & 0,58 & 0,42 \\ 
+  PVE & 0,42 & 0,22 & 0,13 & 0,09 & 0,07 & 0,05 & 0,02 \\ 
+  PVEA & 0,42 & 0,64 & 0,77 & 0,85 & 0,93 & 0,98 & 1,00 \\ 
+   \hline
+\end{tabular}
+\egroup
+\end{table}
+\vspace{0.5cm}
+
+
+Na Tabela 2, vemos os escores das três componentes e podemos interpretá-las de forma a termos um sentido relacionado ao problema. Vale ressaltar que os escores com valores menores que 0.10 serão descartas das análises. Interpretando esta tabela vemos que primeira componente pode ser vista como o escore ponderado entre as sete variáveis. A segunda componente observa-se  um constraste entre os escores das variáveis  CP_12ANT e CP_13ANT com as outras variaveis. A terceira componente, pode ser interpretada como o como constraste entre as variáveis LG_ASA e LG_3ASA, com CP_3P e CP_4P. Além disso, observamos que para as componentes 1 a 3, as variáveis estão bem correlacionadas com pelo menos uma dessas componentes.
+
+```{r}
+#xtable(loadings)
+```
+\vspace{0.5cm}
+
+\begin{table}[!h]
+\centering
+\caption{Coeficientes das três primeiras componentes principais e correlações com cada variável}
+\bgroup
+\def\arraystretch{2.5}
+\begin{tabular}{rrrr}
+  \toprule
+Variável & Componente  1 & Componente  2 & Componente  3 \\ 
+  \hline
+CP\_ASA & -0,49(-0,84) & \textbf{-0,08(-0,10)} & \textbf{0,09(0,08)} \\ 
+  LG\_ASA & -0,42(-0,72) & -0,18(-0,22) & -0,30(-0,28) \\ 
+  CP\_3P & -0,32(-0,54) & -0,30(-0,37) & 0,65(0,61) \\ 
+  LG\_3ASA & -0,32(-0,55) & -0,21(-0,26) & -0,67(-0.64) \\ 
+  CP\_4P & -0,37(-0,64) & -0,36(-0,45) & 0,15(0.15) \\ 
+  CP\_12ANT & -0,35(-0,60) & 0,58(0,72) & \textbf{0,04(0,04)} \\ 
+  CP\_13ANT & -0,34(-0,58) & 0,60(0,75) & \textbf{0,07(0,07)} \\ 
+   \hline
+\end{tabular}
+\egroup
+\end{table}
+
+\vspace{0.5cm}
+
+\newpage
+
+Na Figura 2. vemos os gráficos de dispersão dois a dois para entre cada componente. Observa-se que nos três gráficos não temos uma separação clara entre as duas espécies, havendo uma sobreposição entre dados. No primeiro e segundo gráfico, podemos perceber que a variabilidade de Carteri parece ser maior do que a de Torrens, já no terceiro parecem ter mesma variabilidade.
+
+```{r,fig.height=3, fig.width=8, fig.cap=c("Gráfico de dispersão entre as componentes principais"),fig.pos = '!h'}
+#DISPERSÃO
+grid.draw(cbind(ggplotGrob(cp12),
+                ggplotGrob(cp13),
+                ggplotGrob(cp23),size = "first"))
+```
+
+Na Figura 3, vemos pelos Boxplots das componentes que para a espécie Torrents, as duas primeiras componentes tem maiores valores da distribuição, porém para terceira componente o contrário ocorre, com a espécie Cartieri tendo maior valor.
+
+```{r, fig.height=3, fig.width=8,, fig.cap=c("Box-plots das componentes (Comp) por espécie"),fig.pos = '!h'}
+#BOXPLOT
+grid.arrange(cp1_box, cp2_box,cp3_box, nrow=1, ncol=3)
+```
+
+\newpage
+
+A partir da Figura 4, podemos observar que para a Componente 1, a distribuição estimada apresenta uma assimetria positiva para a Espécie Torrens e Carteri, também é possivel observar que para a componente 2, supostamente a distribuição apresenta uma assimetria negativa, mais visivel para a Especie Carteri, para este componente , Torrens apresenta visivelmente um ponto atipico, tanto na sua distribuição, quanto nos outros gráficos que foram apresentados. Além disso podemos observar que para a terceira componente a Espécie torrens tem distribuição assimétrica negativa e para Carteri, uma assimétria levemente positiva.
+
+```{r, fig.width=7, fig.height=3 ,fig.cap=c("Densidades estimadas das componentes (Comp) por espécie") ,fig.pos = '!h'}
+print(graf_disp)
+```
+
+\newpage
+
+Podemos ver na Figura 5. o gráfico qqPlot (quantis-quantis com envelopes) mostra que para a Componente 1, para a espécie Carteri, existem cinco pontos fora do envelope, além de um comportamento sistematico em torno da linha de refêrencia, o mesmo acontece com o componente 2, tendo uma forma concova, e o componente 3, reforçando o as densidades vistas acima, ou seja, não é razoavél a suposição de normalidade.
+
+Para a espécie Torrens vemos que para a Componente 1 e 3, existe um comportamento sistematico em torno da linha de referência, já o componente 2 existe um ponto atipico, que entra em concordância com o que foi dito anterioremente para esta espécie.
+
+Logo, para ambas as espécies não há concordancia de normalidade, já que nenhum dos gráficos de quantis-quantis com envelopes entraram em concordância com a normalidade, no qual já era esperado, já que as variaveis também não aparentam ter distribuição normal (Página 10 - Relatório referente a questão 1 - Figura 10),
+
+```{r, fig.cap=c("Quantis-quantis com envelopes dos componentes por espécie"),fig.pos = '!h', fig.height=7, fig.width=7}
+library(car)
+par(mfrow=c(2,3))
+qqPlot(scale(cp1[especie=="Carteri"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="CP1",cex=1.2,id.cex=1.2,main="Carteri")
+qqPlot(scale(cp2[especie=="Carteri"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="CP2",cex=1.2,id.cex=1.2,main="Carteri")
+qqPlot(scale(cp3[especie=="Carteri"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="CP3",cex=1.2,id.cex=1.2,main="Carteri")
+qqPlot(scale(cp1[especie=="Torrens"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="CP1",cex=1.2,id.cex=1.2,main="Torrens")
+qqPlot(scale(cp2[especie=="Torrens"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="CP2",cex=1.2,id.cex=1.2,main="Torrens")
+qqPlot(scale(cp3[especie=="Torrens"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="CP3",cex=1.2,id.cex=1.2,main="Torrens")
+```
+
+
+\newpage
+
+# Análise Inferencial
+
+Podemos ver no biplot (componente 1 vs componente 2) que para as as variáveis CP_ASA, LG_ASA, LG_3ASA, CP_3P e CP_4P, os pesos dela influênciam mais na componente 1, além disso observamos que há uma tendência maior de concentração dos indivíduos de Carteri na direção das setas, isso mostra que para esse grupo, as variáveis apresentam valores acima da média. Podemos perceber que para a Espécie Torrens, essas cinco variaveis possuem valores abaixo da média.
+
+Para o biplot (componente 1 vs componente 3) vemos que as CA, CP3 e CP4 tem grande influência no componente 1 e além disso, estas variáveis parecem ter valores acima da média para Carteri e abaixo da média para Torrens, mas não é possível tirar alguma conclusão sobre a dispersão dos individuos sobre as setas, já que não parece haver maior concentração de indivíduos de nenhum dos dois grupos na direção das setas.
+
+Para o biplot (componente 2 vs componente 3), vemos que as mesmas suposições do biplot B são válidas,mas também não parece haver maior concentração de individuos de nenhuma das duas spécies sobre as setas.
+
+Assim, concluimos que para as variaveis CP_12ANT e CP_13ANT, não há possibilidade de inferência sobre cada grupo , já que não foi possivel identificar a concentração de indivíduos nessas setas, além disso para as variaveis CP_ASA, CP_3P , CP_4P, a espécie Carteri apresenta valores acima da média ou em torno dela, já Torrens apresenta mais valores em torno ou abaixo da média.
+
+
+```{r}
+par(mfrow =c(1,3))
+v_comp <- cp %>% as.data.frame() %>% 
+  mutate(Text = ifelse(Esp=="Torrens","Tor","Car"))
+
+biplot(result.cp.cor,xlabs = v_comp$Text,xlab ="Componente 1",ylab ="Componente 2")
+biplot(result.cp.cor,c(1,3),xlabs = v_comp$Text,xlab ="Componente 1",ylab ="Componente 3")
+biplot(result.cp.cor,c(2,3),xlabs = v_comp$Text,xlab ="Componente 2",ylab ="Componente 3")
+```
+
+\newpage
+
+Queremos observar uma relação entre as duas espécies e podermos compará-las, vamos ajustar um modelo de regressão linear utilizando a primeira componente principal obtida. As vantagens deste método são: A redução de dimensionalidade via PCA, evitar multicolinearidade entre preditores e mitigação do *overfitting*.  O Modelo ajustado foi:
+\
+$$Y_{ij} = \mu_{1}+\alpha_{i}+\epsilon_{ij}$$ assim: $$\epsilon_{ij}\sim N(0,\sigma ^2)$$ 
+
+onde: $\alpha_{1}$=0 e $i$ = (1=Torrens,2=Cartieri), $j=1,2,\dots,35$.
+
+**Observação:** O Ajuste dos parâmetros foram realizados pela forma usual de mínimos quadrados.
+
+```{r, fig.cap=c("legenda aqui")}
+fit = lm(cp1~dadosmoscas$Esp)
+sum_fit = summary(fit)
+coefs = round(sum_fit$coefficients,2)
+```
+
+Podemos ver que todas as informações sobre os parâmetros se encontram na Tabela 3 abaixo. Foi realizado um teste do tipo $CBU = M$, para verificar as possíveis diferenças entre as médias entre as espécies **Carteri** e **Torrens**.
+  
+Podemos observar que o teste $CBU=M$ (Azevedo (2015)) equivale a testar $H_0: \alpha_{2} =0$, diante deste contexto, na Tabela 3, é possível notar que para a componente 1, Torrens e Carteri são espécies diferentes, já que o resultado do teste abaixo, rejeita a hipótese nula.  
+  
+As estimativas para as médias estão na Tabela 4 e vemos que para Carteri o valor da média é significativamente menor que a espécie Torrens, tal fato também é notado no biplot do componente 1 e além disso é possível notar que os Intervalos de confiança para as duas espécies estão sobrepostos, tal fato, não necessariamente será preciso, como já foi dito, a estimação intervalar não é muito precisa pois resíduos apontam que o modelo não seria apropriado.
+
+\begin{table}[ht]
+\caption{Estimativas dos parâmetros do modelo de regressão}
+\centering
+\begin{tabular}{rlrrrr}
+  \hline
+ & Parâmetro & Estimativa & EP & Estatística t & p-valor \\ 
+  \hline
+1 & $\mu_{1}$ & 0,51 & 0,28 & 1,84 & 0,07 \\ 
+  2 & $\alpha_{2}$ & -1,03 & 0,40 & -2,60 & 0,01 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\caption{Médias preditas pelo modelo}
+\centering
+\begin{tabular}{rlrrrr}
+  \hline
+ & Especie & Estimativa & EP & IC inf &  IC sup \\ 
+  \hline
+1 & Torrens & 0,51 & 0,28 & -0,04 & 1,07 \\ 
+  2 & Carteri & -0,51 & 0,28 & -1,07 & 0,04 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+\setlength{\parindent}{3em}
+\doublespacing
+
+A análise de resíduos mostrou que o modelo proposto não está bem ajustado, podemos observar no gráfico A que os resíduos supostamente são independentes, pois parecem se distribuir aleatoriamente em torno do zero. No gráfico B, há indícios de heterocedasticidade nos resíduos pois a variabilidade muda de uma espécie para outra. No gráfico C, pelo histograma vemos que a distribuição aparenta ter uma leve assimetria positiva, já gráfico D vemos que supostamente os resíduos não seguem uma distribuição normal, já que existem pontos fora do envelope, e possivelmente há uma leve sistematização dos resíduos em torno da linha de referência, além disso parece haver caudas pesadas.
+
+
+```{r, fig.cap=c("Gráficos para análise de resíduos do modelo ajustado utilizando a primeira componente"),fig.pos = '!h'}
+diag2norm(fit)
+```
+
+\newpage
+
+# Conclusões 
+
+A partir das análises realizadas, a análise de componentes principais nos trouxe a informação que algumas variáveis se comportam de forma diferente para cada grupo, mas não nos possibilitou uma visualização clara da separação dos dois grupos. Além disso, a análise da componente 1, usando um modelo de regressão, possibilitou ver que existe diferenças entre as espécies, mas conforme a análise de resíduos, o modelo não tem um bom ajuste já que seus resíduos indicam que as suposições de homocedasticidade e normalidade não foram satisfeitas, uma das formas de contornam este problema, talvez seja ajustar um modelo que nos possibilite analisar os dados de maneira mais assertiva. 
+
+# Bibliografia
+
+\begin{itemize}
+
+  \item Azevedo, C. L. N (2017). Notas de aula sobre análise multivariada de dados 
+  \item Johson, R. A. and Wichern, D. W. (2007). Applied Multivariate Statistical Analysis, 7a edição, Upper Saddle River, NJ : Prentice-Hall.
+
+\end{itemize}
+
+
+
+
