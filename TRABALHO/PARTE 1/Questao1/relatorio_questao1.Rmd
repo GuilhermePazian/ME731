@@ -535,15 +535,11 @@ tbl_resultados_MANOVA <- data.frame(tbl_resultados_MANOVA)
 ```
 
 
-########
-X <- é o número do primeiro gráfico de resíduos
-########
-
-A fim de qualificar o ajuste do modelo proposto, avaliamos as das suposições de normalidade multivariada dos erros do modelo considerando as espécies (consequentemente normalidade univariada) e homocedásticidade multivariada entre as espécies (consequentemente homocedasticidade univariada) com base nas figuras (X) a (X+7), as quais apresentam gráficos para os resíduos studentizados para cada uma das 7 variáveis, e na figura (X+8) que apresenta o gráfico de envelopes baseado na distância de Mahalanobis (veja Azevedo, 2017). 
-A partir da observação destes gráficos, pode-se identificar muitos comportamentos e tendencias não esperadas, as quais podemos destacar o comportamento apresentado no gráfico 4 das figuras (X), (X+3), (X+5) e (X+6) tendo muitos pontos fora dos limites das bandas de confiança, nas figuras (X+1), (X+2) onde parece existir uma pequena tendência nos valores dos resíduos e na figura (X+4) que apresenta muitos pontos com quantis baixos fora das bandas de confiança. Adicionalmente, observa-se comportamento de distribuição com assimétria negativa no gráfico 3 das figuras (X),(X+1),(X+2) e (X+4)  e com assimetria positiva na figura (X+6). Dadas as observações referentes aos gráficos 1 e 4 das figuras (X) a (X+6) temos fortes indícios de que a suposição de normalidade não é razoável para os resíduos referentes a nenhum das variáveis presentes no banco de dados.
-Observando o gráfico 2 das figuras (X) a (X+7), identificamos evidencias de presença de heterocedásticidade entre os resíduos das espécies de moscas no gráfico 2 nas figuras (X), (X+2), (X+3) de maneira mais leve e nas figuras (X+4),(X+5) e (X+6) de maneira mais acentuada, já para a figura (X+1) não nota-se, a menos de um valor extremo, a presença de indicios de heterocedásticidade. Portanto, a suposição de igualdade das matrizes de covariância das duas espécies parece não ser razoável.
-Não identificamos nenhum comportamento a ser destacado referente ao gráfico 1 das figuras (X) a (X+7).
-Na figura (X+8) observamos alguns valores fora das bandas de confiança para valores de quantis menores da forma quadrática, além disso, valores de quantis maiores da forma quadrática tendem a se apresentar abaixo da linha de referência que é baseada no quantil da distribuição qui-quadrado, deste modo temos indicações de que a suposição de normalidade multivariada dos erros não parece ser uma suposição razoável neste caso.
+A fim de qualificar o ajuste do modelo proposto, avaliamos as das suposições de normalidade multivariada dos erros do modelo considerando as espécies (consequentemente normalidade univariada) e homocedásticidade multivariada entre as espécies (consequentemente homocedasticidade univariada) com base nas figuras 4 a 10, as quais apresentam gráficos para os resíduos studentizados para cada uma das 7 variáveis, e na figura 11 que apresenta o gráfico de envelopes baseado na distância de Mahalanobis (veja Azevedo, 2017). 
+A partir da observação destes gráficos, pode-se identificar muitos comportamentos e tendencias não esperadas, as quais podemos destacar o comportamento apresentado no gráfico 4 das figuras 4, 7, 9 e 10 tendo muitos pontos fora dos limites das bandas de confiança, nas figuras 5 e 6 onde parece existir uma pequena tendência nos valores dos resíduos e na figura 8 que apresenta muitos pontos com quantis baixos fora das bandas de confiança. Adicionalmente, observa-se comportamento de distribuição com assimétria negativa no gráfico 3 das figuras 4, 5, 6 e 8 e com assimetria positiva na figura 10. Dadas as observações referentes aos gráficos 1 e 4 das figuras 4 a 10 temos fortes indícios de que a suposição de normalidade não é razoável para os resíduos referentes a nenhum das variáveis presentes no banco de dados.
+Observando o gráfico 2 das figuras 4 a 10, identificamos evidencias de presença de heterocedásticidade entre os resíduos das espécies de moscas no gráfico 2 nas figuras 4, 6, 7 de maneira mais leve e nas figuras 8, 9 e 10 de maneira mais acentuada, já para a figura 5 não nota-se, a menos de um valor extremo, a presença de indicios de heterocedásticidade. Portanto, a suposição de igualdade das matrizes de covariância das duas espécies parece não ser razoável.
+Não identificamos nenhum comportamento a ser destacado referente ao gráfico 1 das figuras 4 a 10.
+Na figura 11 observamos alguns valores fora das bandas de confiança para valores de quantis menores da forma quadrática, além disso, valores de quantis maiores da forma quadrática tendem a se apresentar abaixo da linha de referência que é baseada no quantil da distribuição qui-quadrado, deste modo temos indicações de que a suposição de normalidade multivariada dos erros não parece ser uma suposição razoável neste caso.
 Contudo, dadas as observações destacadas, temos que a única variável do banco de dados a qual não seria irrasuável supor normalidade e homocedásticidade dos dados seria a variável "Largura da Asa", já que todas as variáveis restantes apresentam ao menos um indicio evidente da fuga das suposições. 
 Como não seria razoável supor normalide e homocedásticidade multivariada neste caso, o modelo de análise de variância multivariada não apresentou um ajuste adequado, e se é necessário procurar técnicas alternativas para realizar uma análise adequada ao banco de dados. Dado o nosso contexto acadêmico, iremos continuar com as análises dos resultados para elaborar a conclução do presente trabalho.
 
@@ -566,7 +562,7 @@ var = 0 #iniciando a variável
 var<-1+var; legenda <- legendaaux[var]
 ```
 
-```{r fig.cap=legenda}
+```{r fig.cap=legenda,fig.width=7.5, fig.height=4.6}
 gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
 ```
 
@@ -574,7 +570,7 @@ gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
 var<-1+var; legenda <- legendaaux[var]
 ```
 
-```{r fig.cap=legenda}
+```{r fig.cap=legenda,fig.width=7.5, fig.height=4.6}
 gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
 ```
 
@@ -582,7 +578,7 @@ gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
 var<-1+var; legenda <- legendaaux[var]
 ```
 
-```{r fig.cap=legenda}
+```{r fig.cap=legenda,fig.width=7.5, fig.height=4.6}
 gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
 ```
 
@@ -590,7 +586,7 @@ gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
 var<-1+var; legenda <- legendaaux[var]
 ```
 
-```{r fig.cap=legenda}
+```{r fig.cap=legenda,fig.width=7.5, fig.height=4.6}
 gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
 ```
 
@@ -598,7 +594,7 @@ gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
 var<-1+var; legenda <- legendaaux[var]
 ```
 
-```{r fig.cap=legenda}
+```{r fig.cap=legenda,fig.width=7.5, fig.height=4.6}
 gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
 ```
 
@@ -606,7 +602,7 @@ gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
 var<-1+var;legenda <- legendaaux[var]
 ```
 
-```{r fig.cap=legenda}
+```{r fig.cap=legenda,fig.width=7.5, fig.height=4.6}
 gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
 ```
 
@@ -614,12 +610,12 @@ gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
 var<-1+var; legenda <- legendaaux[var]
 ```
 
-```{r fig.cap=legenda}
+```{r fig.cap=legenda,fig.width=7.5, fig.height=4.6}
 gen.graf.resid(as.matrix(m.dados),fit.manova,var,"univariate","diagnostics")
 ```
 
 
-```{r}
+```{r fig.cap=c("Gráfico de quantil-quantil com envelopes para a distância de Mahalanobis referente aos resíduos do modelo ajustado")}
 # Resíduo baseado na distância Mahalanobis
 
 gen.graf.resid.quad.form(as.matrix(m.dados),fit.manova)
@@ -627,7 +623,7 @@ gen.graf.resid.quad.form(as.matrix(m.dados),fit.manova)
 
 
 
-Na tabela XX(tbl_resultados_MANOVA) estão apresentadas as quatro estatísticas referentes ao teste de análise de variância multivariada realizado com base no modelo proposto:
+Na tabela 2 estão apresentadas as quatro estatísticas referentes ao teste de análise de variância multivariada realizado com base no modelo proposto:
 
 ```{r}
 #xtable(tbl_resultados_MANOVA)
@@ -652,7 +648,7 @@ Na tabela XX(tbl_resultados_MANOVA) estão apresentadas as quatro estatísticas 
 \egroup
 \end{table}
 
-Note pela tabela XX(tbl_resultados_MANOVA) que todos os p-valores referentes às quatro estatísticas são menores que o nível de significância adotado, portanto, todas os testes apresentam evidencias estatísticamente significativas de que as espécies difiram em ao menos uma das variáveis presentes no banco de dados.
+Note pela tabela 2 que todos os p-valores referentes às quatro estatísticas são menores que o nível de significância adotado, portanto, todas os testes apresentam evidencias estatísticamente significativas de que as espécies difiram em ao menos uma das variáveis presentes no banco de dados.
 
 
 ```{r}
@@ -748,7 +744,7 @@ pvalor_CBU[1] <- ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultad
 label_pvalor_CBU[1] <- "$\alpha_{12} = \alpha_{14} = \alpha_{16} = 0$"
 ```
 
-```{r fig.height=7, fig.width=10}
+```{r fig.height=6, fig.width=10,fig.cap=c("Intervalos de confiança para as médias estimadas")}
 #IC para as médias preditas para variáveis para cada espécie
 
 IC_predito <- function(i){
@@ -759,11 +755,13 @@ axis(2,seq(4,7,0.2),cex.axis=1.2)
 axis(1,1:2,c("Carteri","Torrens"),cex.axis=1.2)
 }
 
-par(mfrow =c(3,2))
+par(mfrow =c(3,3))
 for (i in 1:7){IC_predito(i)}
 
 
 ```
+
+A tabela 3 apresenta as estimativas, os erros padrão e os respectivos testes de nulidade para os parâmetros ajustados no modelo. 
 
 \begin{table}[!h]
 \centering
@@ -774,19 +772,19 @@ for (i in 1:7){IC_predito(i)}
   \hline
  & Parâmetro & Estimativa & Erro Padrão & Estatística t & p-valor \\ \midrule
   \hline
- &  $mu\_1$ & 96,457 & 1,014 & 95,097 & $<$0,001 \\ 
+ &  $\mu_1$ & 96,457 & 1,014 & 95,097 & $<$0,001 \\ 
  & $\alpha_{21}$ & 2,886 & 1,434 & 2,012 & 0,048 \\ 
- &  $mu_2$ & 42,914 & 0,689 & 62,241 & $<$0,001 \\ 
+ &  $\mu_2$ & 42,914 & 0,689 & 62,241 & $<$0,001 \\ 
  & $\alpha_{22}$ & 0,829 & 0,975 & 0,85 & 0,398 \\ 
- &  $mu\_3$ & 35,371 & 0,429 & 82,479 & $<$0,001 \\ 
+ &  $\mu_3$ & 35,371 & 0,429 & 82,479 & $<$0,001 \\ 
  & $\alpha_{23}$ & 3,943 & 0,606 & 6,501 & $<$0,001 \\ 
- &  $mu_4$ & 14,514 & 0,295 & 49,259 & $<$0,001 \\ 
+ &  $\mu_4$ & 14,514 & 0,295 & 49,259 & $<$0,001 \\ 
  & $\alpha_{24}$ & 0,143 & 0,417 & 0,343 & 0,733 \\ 
- &  $mu_5$ & 25,629 & 0,627 & 40,863 & $<$0,001 \\ 
+ &  $\mu_5$ & 25,629 & 0,627 & 40,863 & $<$0,001 \\ 
  & $\alpha_{25}$ & 4,371 & 0,887 & 4,929 & $<$0,001 \\ 
- &  $mu_6$ & 9,571 & 0,186 & 51,422 & $<$0,001 \\ 
+ &  $\mu_6$ & 9,571 & 0,186 & 51,422 & $<$0,001 \\ 
  & $\alpha_{26}$ & 0,086 & 0,263 & 0,326 & 0,746 \\ 
- &  $mu_7$ & 9,714 & 0,168 & 57,762 & $<$0,001 \\ 
+ &  $\mu_7$ & 9,714 & 0,168 & 57,762 & $<$0,001 \\ 
  & $\alpha_{27}$ & $<$0,001 & 0,238 & $<$0,001 & 0,15\\ 
    \hline
 \end{tabular}
@@ -794,7 +792,7 @@ for (i in 1:7){IC_predito(i)}
 \end{table}
 
 
-Note pelos gráficos da figura (X-1) que os Intervalos de Confiança para as médias preditas para as espécies de moscas se interceptam num intervalo grande para as variáveis `r inames[2+1]`, `r inames[4+1]` e `r inames[6+1]`, portanto é razoável conjecturar que as espécies de moscas tem médias iguais para estas variáveis. Por meio da metodologia CBU=M (veja Azevedo,2017), testou-se simultaneamente a igualdade das médias destas variáveis entre as espécies de moscas, ao qual resultou num p-valor = `r ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))`, ou seja, `r ifelse(resultados_teste$pvalor<0.05,"temos","não temos")` evidencias estatísticas suficientes para rejeitar a hipótese de igualdade simultânea das médias entre as espécies para as variáveis `r inames[2+1]`, `r inames[4+1]` e `r inames[6+1]`. A fim de identificar melhor onde residem as diferenças entre as espécies de moscas, aplicamos esta mesma metodologia acrescentando as demais variáveis na hipótese de igualdade (uma de cada vez), os resultados deste teste constam na tabela (n XX "tabela_CBU").
+Note pelos gráficos da figura 12 que os Intervalos de Confiança para as médias preditas para as espécies de moscas se interceptam num intervalo grande para as variáveis `r inames[2+1]`, `r inames[4+1]` e `r inames[6+1]`, portanto é razoável conjecturar que as espécies de moscas tem médias iguais para estas variáveis. Por meio da metodologia CBU=M (veja Azevedo,2017), testou-se simultaneamente a igualdade das médias destas variáveis entre as espécies de moscas, ao qual resultou num p-valor = `r ifelse(resultados_teste$pvalor < 0.001,"< 0,001",round(resultados_teste$pvalor,3))`, ou seja, `r ifelse(resultados_teste$pvalor<0.05,"temos","não temos")` evidencias estatísticas suficientes para rejeitar a hipótese de igualdade simultânea das médias entre as espécies para as variáveis `r inames[2+1]`, `r inames[4+1]` e `r inames[6+1]`. A fim de identificar melhor onde residem as diferenças entre as espécies de moscas, aplicamos esta mesma metodologia acrescentando as demais variáveis na hipótese de igualdade (uma de cada vez), os resultados deste teste constam na tabela 4.
 
 
 
@@ -859,7 +857,7 @@ colnames(tabela_CBU) <- c("Hipótese","p-valor do teste CBU=M")
 \egroup
 \end{table}
 
-Note pela tabela (n XX "tabela_CBU") que os dois primeiros testes indicam a não rejeição da hipótese apresentada, portanto temos evidencias estatísticamente significantes de que as espécies tem médias conjuntamente iguais para as variáveis `r inames[2+1]`,`r inames[4+1]`,`r inames[6+1]` e `r inames[1+1]`, ou seja, as diferenças parecem residir nas variáveis `r inames[3+1]`, `r inames[5+1]` e `r inames[7+1]`.
+Note pela tabela 4 que os dois primeiros testes indicam a não rejeição da hipótese apresentada, portanto temos evidencias estatísticamente significantes de que as espécies tem médias conjuntamente iguais para as variáveis `r inames[2+1]`,`r inames[4+1]`,`r inames[6+1]` e `r inames[1+1]`, ou seja, as diferenças parecem residir nas variáveis `r inames[3+1]`, `r inames[5+1]` e `r inames[7+1]`.
 
 
 
