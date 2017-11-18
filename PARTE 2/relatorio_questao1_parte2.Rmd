@@ -1,0 +1,240 @@
+---
+title: 
+geometry: textwidth=18cm,textheight=24cm
+header-includes:
+- \usepackage{setspace}
+- \usepackage{indentfirst}
+- \usepackage[utf8]{inputenc}
+- \usepackage{mathptmx}
+- \usepackage{enumerate}
+- \usepackage{url}
+- \usepackage{float}
+- \usepackage{lipsum}
+- \usepackage{multirow}
+- \usepackage{booktabs}
+- \usepackage{longtable}
+- \usepackage{subcaption}
+output:
+  pdf_document: 
+    number_sections: true
+  html_document: default
+  mainfont: Times New Roman
+  fig_caption: yes
+lang: pt-br
+setspace: doublespacing
+fontsize: 10pt
+---
+
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{center}
+\begin{center}
+\begin{minipage}[s]{1.75cm}
+\includegraphics[width=40pt,height=45pt]{logoUnicamp.png} 
+\end{minipage}\begin{minipage}[s]{11.25cm}\noindent
+{\begin{center} {\Large Universidade Estadual de Campinas}\\
+{Instituto de Matemática, Estatística e Computação Científica}\\
+{\sc Departamento de Estatística}
+\end{center}}
+\end{minipage}
+\begin{minipage}[s]{0.5cm}
+\includegraphics[width=40pt,height=45pt]{logoimecc.png}
+\end{minipage}
+\end{center}
+\end{center}
+\vspace{3cm}
+\font\fontGrande=cmcsc10 scaled 2500
+\font\pessoal=cmr9 scaled 2500
+
+\begin{center}
+\vspace*{3.5cm}
+{\rule[0 ex]{16cm}{0.05cm}}
+{\huge \sc Trabalho - Parte 2 \\[8pt]
+Relatório - Questão 1}
+{\rule[0 ex]{16cm}{0.05cm}}
+\end{center}
+
+\begin{center}
+
+\normalsize \vspace{8mm}
+
+
+\vspace{4cm}
+
+{\sc  Eliane Ramos de Siqueira  RA:155233} \\
+{\sc  Guilherme Pazian  RA:160323}\\
+{\sc  Henrique Capatto  RA:146406}\\
+{\sc  Murilo Salgado Razoli  RA:150987}
+
+\vspace{0.2cm}
+
+Disciplina: {\bf ME731 - Análise Multivariada}\\
+Professor: {\bf Caio Lucidius Naberezny Azevedo}
+\vspace{1cm}
+
+{\footnotesize{Campinas - SP \\ 24 de Novembro de 2017}}
+\end{center}
+\end{titlepage}
+
+```{r echo=FALSE}
+#mudando o separador decimal para resultados "printados"
+options(OutDec= ",")
+```
+
+```{r, echo=FALSE}
+#definindo opções padrões dos chunks
+knitr::opts_chunk$set(fig.align='center', echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+
+```{r pacotes,cache = FALSE,echo=FALSE, warning = FALSE,eval=TRUE,message = FALSE, error = FALSE}
+#eval= FALSE faz com que o R ignore este chunk
+#echo = FALSE não permite que o chunk apareça no pdf
+
+#pacotes = c("tidyverse","reshape2","knitr","captioner","gdata","gridExtra","Matrix","plotrix","xtable")
+
+packages= c("tidyverse","data.table","reshape2","captioner","gridExtra","caret","e1071","MASS","psych","xtable","corrplot","scales","knitr","kableExtra","formattable")
+
+
+#install.packages(packages)
+
+#mostra quais pacotes foram carregados
+invisible(lapply(packages, require, character.only = TRUE))
+
+figs <- captioner(prefix="Figura")
+tbls <- captioner(prefix="Tabela")
+
+#instalacao de um pacote pra "printar" tabelas mais bonitinhas
+#install.packages('printr',type = 'source',repos = c('http://yihui.name/xran', 'http://cran.rstudio.com'))
+
+```
+
+
+```{r func_aux}
+
+```
+
+
+```{r dados}
+path_arq = glue::glue(getwd(),'/dados_salmao.txt')
+
+dados = read.table(path_arq)
+
+# descrição das colunas  
+# procedência (1 - Alasca, 2 - Canadá), 
+# gênero (1 - fêmea, 2 - macho), 
+# diâmetro das guelras durante a fase em água doce (em mm), diâmetro das guelras durante a fase no mar (em mm)
+
+
+# renomeando as colunas (Está na ordem do banco)
+names(dados) = c("Reg","Gen","DGAD","DGM")
+
+# fiz este data frame para manipulação na função dscrmnante
+
+dados2 = dados
+# Renomeando as variáves
+dados$Reg =  as.factor(ifelse(dados$Reg==1,"Alasca","Canadá"))
+dados$Gen =  as.factor(ifelse(dados$Gen==1,"fêmea","macho"))
+```
+
+```{r ana_descr}
+
+# aqui estão as análses descrtvas
+
+# número de ind no banco de dados
+n = nrow(dados)
+
+# Tabela
+
+# funlçao do pacote psych, retorna:
+#
+#
+descr = describeBy(dados[,3:4], group = dados$Reg)
+colnames = c("Tam","Média","DP","Mediana","Mín","Máx","Assimetria","Curtose")
+descr_Alasca = descr$Alasca = descr$Alasca[,-c(1,6,7,10,13)]
+names(descr_Alasca)=colnames
+descr_Canada = descr$Canadá = descr$Canadá[,-c(1,6,7,10,13)]
+names(descr_Canada)=colnames
+
+# gráficos
+
+# Boxplot de cada variável com relação a região
+g1 = dados %>% ggplot(aes(Reg, DGAD))+geom_boxplot()+theme_bw()
+g2 = dados %>% ggplot(aes(Reg, DGM))+geom_boxplot()+theme_bw()
+
+#gráfico de disperção das variáveis separadas por Região via coloração
+g3 = dados %>% ggplot(aes(DGAD, DGM, color=Reg))+geom_point()+theme_bw() 
+
+# densidade
+g4 = dados %>% ggplot(aes(DGAD, colour=Reg)) + geom_density()+theme_bw()
+g5 = dados %>% ggplot(aes(DGM, colour=Reg)) + geom_density()+theme_bw()
+
+#falta plotar as distâncias de mahalanobs
+
+```
+
+```{r modelos}
+# aqu estão as modelagens
+
+#lda.fit = lda(Reg~DGAD+DGM, dados2)
+
+
+
+# Selecionando as amostras. Selecionei 25 observações de cada grupo para montar o treinamento do modelo
+
+treinog1 <- sort(sample(1:50,25,replace=FALSE))
+treinog2 <- sort(sample(51:100,25,replace=FALSE))
+treino <- c(treinog1,treinog2)
+
+# Amostra treino
+#atrein <- iris[treino,]
+
+# Utilizando a função lda
+#m.X <- rbind(irisd[51:100,3:4],irisd[101:150,3:4])
+#Sp = rep(c("VE","VI"), rep(50,2))
+#m.Iris <- data.frame(m.X,Sp)
+#table(m.Iris$Sp[treino])
+#result.ad <- lda(Sp~., m.Iris, prior = c(1,1)/2,subset = treino)
+
+# as prioris tem de ser diferentes. Custo iguais
+
+result.ad <- lda(dados$Reg~., dados[,c(3,4)], prior = c(1,1)/2,subset = treino)
+result.ad
+# coeficientes da função discriminante
+# result.ad$scaling
+# predizendo os grupos na amostra teste
+pred<-predict(result.ad, dados[-treino, c(3,4)])$class
+# função discriminante
+y <-predict(result.ad, dados[-treino, c(3,4)])$x 
+# Pegando a amostra teste
+data.teste <- dados[-treino,1]
+# Tabela de classificação
+tc <- table(data.teste,pred)
+#matriz de confusão
+#confusionMatrix(tc)
+
+#xtable(tc)
+
+
+
+
+```
+
+
+
+
+# Introdução
+
+O banco de dados consiste em `r n` indivíduos cujas variáveis foram coletadas para deferenciação entre dos grupos. As variáveis componentes do banco de dados são:  
+
+
+# Análise Desccritiva
+
+# Análise Inferencial
+
+# Bibliografia
+
+- Azevedo, C. L. N. (2017). Notas de aula sobre análise multivariada de dados http://www.ime.unicamp.br/~cnaber/Material_AM_2S_2017.htm
+
+
+- Johnson, R. A. & Wichern, D. W. (2007). Applied Multivariate Statistical Analysis. 6 a edição, Upper Saddle River, NJ: Pearson Prentice Hall.
