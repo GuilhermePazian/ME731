@@ -430,9 +430,10 @@ Os salmões nascem em água doce mas migram para o mar retornando, posteriorment
   
 Veja mais sobre esse conflito em (THE PACIFIC SALMON TREATY: A BRIEF TRUCE IN THE CANADA/U.S.A. PACIFIC SALMON WAR  (COLOCAR NAS REFERÊNCIAS)).
   
-Com o presente trabalho, pretende-se criar uma regra de classificação, visando poder identificar mais facilmente a origem de salmões pescados, utilizando-se um banco de dados contendo duas variáveis (diâmetro da guelra (em mm) na fase de água doce e na fase no mar) medidas em 50 salmões provenientes do Alasca e em 50 salmões provenientes do Canadá, assim como o sexo destes peixes.
+Com o presente trabalho, pretende-se criar uma regra de classificação, visando poder identificar mais facilmente a origem de salmões pescados, utilizando-se um banco de dados contendo duas variáveis intituladas aqui como DGAD e DGM  (diâmetro da guelra (em mm) na fase de água doce e na fase no mar respectivamente) medidas em 50 salmões provenientes do Alasca e em 50 salmões provenientes do Canadá, assim como o sexo destes peixes. A origem dos salmões (Alasca ou Canadá) é identificada por uma variável aqui utilizada indistintamente como Região, localidade e/ou grupo.
 
 Todas as análises serão realizadas com o suporte dos softwares *R* versão 3.4.2 e *RStudio* versão 1.1.383.
+Foi-se considerado um nível de significância de 5% para a tomar decisões quanto aos testes estatísticos aqui apresentados.
 
 \begin{table}[!h]
 \centering
@@ -479,7 +480,7 @@ A tabela 1, apresenta mostra algumas medidas resumo para as vaiáveis DGAD e DGM
 \end{table}
 
 
-A partir da Figura 1, temos o gráfico de dispersão entre as variaveis, separadas por Região (Alasca e Canadá), iremos considerar a variavel Região com o mesmo significado de Grupo neste presente trabalho. Podemos observar que os indíviduos (objetos) do Canáda tendem a ter um diâmetro (em mm) da guelra durante a fase de água doce maior que os indivíduos do Alasca e na durante a fase no Mar tendem a ter um diametro menor (em mm). Podemos ver que olharmos separadamente os dois grupos, vemos que existe uma correlação levemente positiva entre os índividuos do Canadá, e levemente negativa para os índividuos do Alasca. Vale ressaltar que se considerarmos ambos os Grupos, parecer haver uma correlação negativa entre as variaveis.
+A partir da Figura 1, que consta o gráfico de dispersão entre as variaveis separadas por Região (Alasca e Canadá), podemos observar que os indíviduos do Canáda tendem a ter um diâmetro (em mm) da guelra durante a fase de água doce maior que os indivíduos do Alasca e durante a fase no Mar tendem a ter um diametro menor (em mm). Se olharmos separadamente os dois grupos, vemos que existe uma correlação levemente positiva entre os índividuos do Canadá, e levemente negativa para os índividuos do Alasca. Vale ressaltar que se considerarmos ambos os Grupos, parecer haver uma correlação negativa entre as variaveis.
 
 ```{r,fig.cap=c("Figura 1: Gráfico de dispersão entre os diâmetros da guelra de salmões em água doce e no mar"), fig.pos = '!h',fig.height=3}
 #LINHA DE REGRESSAO PARA AMBOS OS GRUPOS
@@ -489,9 +490,9 @@ grid.draw(cbind(ggplotGrob(d1),
 
 \vspace{1cm}
 
-Na Figura 2 notamos que o diâmetro da guelra é relativamente maior na água doce para os índividuos de ambos os grupos, constatamos isso também na distribuição de densidade na Figura X, e reforçado nos valores das medidas centrais, como a da média e mediana, na Tabela X. Estes resultados são esperados devido a natureza dos dados pois as medidas em água doce foram obtidas quando da nascitura dos peixes e as medições obtidas no mar aconteceram na maturidade dos salmões. 
+Na Figura 2 notamos que o diâmetro da guelra é menor na água doce para os índividuos de ambos os grupos, constatamos isso também na distribuição de densidade na Figura X, e reforçado nos valores das medidas centrais, como a da média e mediana, na Tabela X. Estes resultados são esperados devido a natureza dos dados, pois as medidas em água doce foram obtidas na fase inícial da vida dos peixes e as medições obtidas no mar aconteceram na maturidade destes salmões. 
 
-Podemos observar também nos box-plot, que o diâmetro das guelras para o salmão do Canadá é consideravelmente maior do que os do Alasca, já durante a fase no mar, o contrário ocorre. Para ambas as variáveis,(DGAD, DGM) é possível notar uma sobreposição em boa parte da distribuições apresentadas Figura 3. As distribuições parecem ser levemente assimétricas, mais evidente para o diâmetro da guelra no mar de indivíduos do Canadá, e menos evidente para diâmetro da guelra na água doce de indivíduos do Alasca.
+Podemos observar também nos box-plot, que o diâmetro das guelras para o salmão do Canadá é consideravelmente maior do que os do Alasca, já durante a fase no mar, o contrário ocorre. Para ambas as variáveis (DGAD, DGM) é possível notar uma sobreposição em boa parte da distribuições apresentadas Figura 3. As distribuições parecem ser levemente assimétricas, mais evidente para o diâmetro da guelra no mar de indivíduos do Canadá, e menos evidente para diâmetro da guelra na água doce de indivíduos do Alasca.
 
 ```{r,fig.cap=c("Boxplots por grupo"), fig.pos = '!h', fig.height=3}
 grid.arrange(b1,b2, nrow=1, ncol=2)
@@ -502,7 +503,7 @@ grid.draw(cbind(ggplotGrob(g1),
                 ggplotGrob(g2),size = "first"))+ theme(legend.position = "bottom") 
 ```
 
-Podemos observar na Figura 4. que para cada variavel DGAD e DGM foi realizado um gráfico de quantil-quantil para cada Grupo (Canadá e Alasca), vemos que para o diâmetro da guelra na fase em água doce de indíviduos do Alasca, os pontos se comportaram de maneira razoável em torno da linha de referência, não apresentando sinais anormais, diferentemente dos outros três gráficos que apresentam uma sistematização em torno da linha de referência, descartando a suposição de normalidade. Portanto consideremos apenas a suposição de normalidade para o diâmetro da guelra em água doce, que são os índivíduos do Alasca, já que existe uma leve tendência no qual o ajuste é consideravelmente razoavel.
+Podemos observar na Figura 4 que para cada variavel DGAD e DGM foi realizado um gráfico de quantil-quantil para cada Grupo (Canadá e Alasca), vemos que para o diâmetro da guelra na fase em água doce de indíviduos do Alasca, os pontos se comportaram de maneira razoávelmente aleatória em torno da linha de referência, não apresentando sinais evidentes de tendência, já os outros três gráficos, apresentam uma certa sitematização no comportamento dos dados em torno da linha de referência, evidenciando uma certa tendência, embora pareça ser uma tendencia amena, é um ponto contra a suposição de normalidade dos dados, porém não seria irrazuável supor normalidade para as variáveis neste caso dada a fraca intensidade desta tendência. 
 
 
 ```{r,fig.cap=c("Figura 4: Quantil-quantil para cada Grupo"),fig.width=8, fig.height=5.5,fig.pos = '!h'}
@@ -520,7 +521,8 @@ qqPlot(scale(dgm[grupo=="Canadá"]),dist="norm",mean=0,sd=1,col.lines="red",grid
 ```
 
 
-No gráfico abaixo podemos ver que a normalidade bivariada não parece ser uma suposição razoavel para nenhum dos grupos, porque além da sistematização em torno da linha de referência e existem  pontos fora das bandas de confiança. Canadá particularmente a forma dos seus pontos se comportam de maneira concava, mesmo apresentando pontos fora.
+No gráfico abaixo podemos ver que a normalidade bivariada não parece ser uma suposição razoavel para nenhum dos grupos, porque além da sistematização em torno da linha de referência, existem  muitos pontos fora das bandas de confiança. Dadas as observações, vemos que a suposição de normalidade multivariada para ambas as regiões parece ser irrazuável.
+Contudo, a técnica de análise discriminante de Fisher foi desenvolvida sem supor normalidade dos dados, portanto, a suposição de normalidade avaliadas com base nos gráficos 4 e 5 não são relevantes para a aplicação da técnica de análise discriminante de Fisher.
 
 
 ```{r, fig.height=4.5,fig.width=9,fig.cap=c(" Gráfico de quantil-quantil com envelopes para a distância de Mahalanobis; A) Alasca, B) Canadá"),fig.pos = '!h'}
@@ -577,7 +579,7 @@ p.valor.igual.m.cov <- test.igual.matriz$p.valor
 
 
 
-Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados dos dois tipos de salmão, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov < 0.001,"<0,001",round(p.valor.igual.m.cov,3))`, indicando que `r if(p.valor.igual.m.cov >0.05)"não"` existe diferença estatisticamente significante entre as matrizes de covariâncias dos tipos de salmão, indicando que `r if(p.valor.igual.m.cov < 0.05)"não"` parece ser razoável a suposição de igualdade das matrizes de covariâncias entre os tipos de salmão.
+Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados dos dois tipos de salmão (alasca e Canadá), ao qual resultou num p-valor = `r ifelse(p.valor.igual.m.cov < 0.001,"<0,001",round(p.valor.igual.m.cov,3))`, indicando que `r if(p.valor.igual.m.cov >0.05)"não"` existe diferença estatisticamente significante entre as matrizes de covariâncias dos tipos de salmão, indicando que `r if(p.valor.igual.m.cov < 0.05)"não"` parece ser razoável a suposição de igualdade das matrizes de covariâncias entre os tipos de salmão. Este resultado têm grande relevância, uma vez que a técnica de análise discriminante de Fisher supõe homocedásticidade multivariada, ou seja, igualdade das matrizes de covariâncias para os grupos. O teste de box, portanto, indicou que a suposição de homocedásticidade neste caso `r if(p.valor.igual.m.cov < 0.05)"não"` parece ser razoável quando se considera os grupos de salmão originários do Alasca e do Canadá.
 
 ########################## teste de igualdade de matrizes de covariância considerando os sexos ############
 
@@ -628,7 +630,7 @@ p.valor.igual.m.cov.macho <- test.igual.matriz$p.valor
 
 
 
-Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados dos dois tipos de salmão macho, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov.macho < 0.001,"<0,001",round(p.valor.igual.m.cov,3))`, indicando que `r if(p.valor.igual.m.cov.macho >0.05)"não"` existe diferença estatisticamente significante entre as matrizes de covariâncias dos tipos de salmão machos, indicando que `r if(p.valor.igual.m.cov.macho <0.05) "não"` parece ser razoável a suposição de igualdade das matrizes de covariâncias entre os tipos de salmão macho.
+Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados dos dois tipos de salmão macho, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov.macho < 0.001,"<0,001",round(p.valor.igual.m.cov.macho,3))`, indicando que `r if(p.valor.igual.m.cov.macho >0.05)"não"` existe diferença estatisticamente significante entre as matrizes de covariâncias dos tipos de salmão machos, indicando que `r if(p.valor.igual.m.cov.macho <0.05) "não"` parece ser razoável a suposição de igualdade das matrizes de covariâncias entre os tipos de salmão macho. Este resultado têm grande relevância, uma vez que a técnica de análise discriminante de Fisher supõe homocedásticidade multivariada, ou seja, igualdade das matrizes de covariâncias para os grupos. O teste de Box, portanto, indicou que a suposição de homocedásticidade neste caso `r if(p.valor.igual.m.cov.macho < 0.05)"não"` parece ser razoável quando se considera os grupos de salmão do sexo masculino originários do Alasca e do Canadá.
 
 
 
@@ -651,7 +653,7 @@ p.valor.igual.m.cov.femea <- test.igual.matriz$p.valor
 ```
 
 
-Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados dos dois tipos de salmão fêmea, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov.femea < 0.001,"<0,001",round(p.valor.igual.m.cov,3))`, indicando que `r if(p.valor.igual.m.cov.femea >0.05)"não"` existe diferença estatisticamente significante entre as matrizes de covariâncias dos tipos de salmão femeas, indicando que `r if(p.valor.igual.m.cov.femea <0.05) "não"` parece ser razoável a suposição de igualdade das matrizes de covariâncias entre os tipos de salmão femea.
+Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados dos dois tipos de salmão fêmea, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov.femea < 0.001,"<0,001",round(p.valor.igual.m.cov.femea,3))`, indicando que `r if(p.valor.igual.m.cov.femea >0.05)"não"` existe diferença estatisticamente significante entre as matrizes de covariâncias dos tipos de salmão femeas, indicando que `r if(p.valor.igual.m.cov.femea <0.05) "não"` parece ser razoável a suposição de igualdade das matrizes de covariâncias entre os tipos de salmão femea. Este resultado têm grande relevância, uma vez que a técnica de análise discriminante de Fisher supõe homocedásticidade multivariada, ou seja, igualdade das matrizes de covariâncias para os grupos. O teste de box, portanto, indicou que a suposição de homocedásticidade neste caso `r if(p.valor.igual.m.cov.femea < 0.05)"não"` parece ser razoável quando se considera os grupos de salmão do sexo feminino originários do Alasca e do Canadá.
 
 
 
@@ -661,7 +663,7 @@ Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dad
 
 Não encontramos nenhuma informação que nos dê direcionamento direto à definição de probabilidades à priori de um salmão ser proveniente de uma ou outra localidade (Alasca ou Canada), uma vez que essa probabilidade está muito relacionada ao local onde o salmão foi pescado. Por não ter informações suficientes iríamos supor probabilidades iguais para cada localidade, porém como foi orientação utilizar probabilidades diferentes para cada localidade, utilizamos os dados sobre toneladas de salmão comercial pescados e o respectivo valor monetário gerado no ano de 2015 (dado mais atual) a partir dessa pesca para as duas localidades, estes valores são apresentados na tabela 01 ("tabela com as quantidades de salmão Alasca/CANADA e $"). Observe que o volume de pesca de salmão para o ano de 2015 é muito maior no Alasca em comparação com o Canadá, isso nos leva a acreditar que a população de salmão do Alasca é maior que a população de salmão do Canadá, o que nos leva a conjecturar que a probabilidade de um salmão ser originário do Alasca é maior do que um salmão ser originário do Canadá. Acreditamos que considerar a probabilidade à priori de um salmão ser originário do Alasca como sendo 0,6 e ser originário do Canadá como sendo 0,4 parece ser razoável diante dos dados da tabela 01 e da relação levantada entre a probabilidade do salmão pertencer a uma determinada localidade e o local da pesca, uma vez que não se têm informações mais precisas quanto às populações de salmão e seus respectivos comportamentos migratórios destes de ambas as localidades.
 
-Com base na metodologia de Análise de discriminantes, considerando custos iguais de classificação errada e probabilidades à priori destacadas acima, obtivemos uma regra de classificação à qual estão apresentados os resultados abaixo
+Com base na metodologia de Análise discriminante de Fisher, considerando custos iguais de classificação errada e probabilidades à priori destacadas acima, obtivemos uma regra de classificação à qual estão apresentados os resultados abaixo.
 
 ```{r}
 #xtable(tc)
