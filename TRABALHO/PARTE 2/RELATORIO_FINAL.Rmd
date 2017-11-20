@@ -633,7 +633,7 @@ p.valor.igual.m.cov.macho <- test.igual.matriz$p.valor
 
 
 
-Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados dos dois tipos de salmão macho, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov.macho < 0.001,"<0,001",round(p.valor.igual.m.cov.macho,3))`, indicando que `r if(p.valor.igual.m.cov.macho >0.05)"não"` existe diferença estatisticamente significante entre as matrizes de covariâncias dos tipos de salmão machos, indicando que `r if(p.valor.igual.m.cov.macho <0.05) "não"` parece ser razoável a suposição de igualdade das matrizes de covariâncias entre os tipos de salmão macho. Este resultado têm grande relevância, uma vez que a técnica de análise discriminante de Fisher supõe homocedásticidade multivariada, ou seja, igualdade das matrizes de covariâncias para os grupos. O teste de Box, portanto, indicou que a suposição de homocedásticidade neste caso `r if(p.valor.igual.m.cov.macho < 0.05)"não"` parece ser razoável quando se considera os grupos de salmão do sexo masculino originários do Alasca e do Canadá.
+Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados dos dois tipos de salmão macho, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov.macho < 0.001,"<0,001",round(p.valor.igual.m.cov.macho,3))`, indicando que `r if(p.valor.igual.m.cov.macho >0.05)"não"` existe diferença estatisticamente significante entre as matrizes de covariâncias dos tipos de salmão machos, indicando que `r if(p.valor.igual.m.cov.macho <0.05) "não"` parece ser razoável a suposição de igualdade das matrizes de covariâncias entre os tipos de salmão macho. O teste de Box, portanto, indicou que a suposição de homocedásticidade neste caso `r if(p.valor.igual.m.cov.macho < 0.05)"não"` parece ser razoável quando se considera os grupos de salmão do sexo masculino originários do Alasca e do Canadá.
 
 
 
@@ -656,7 +656,8 @@ p.valor.igual.m.cov.femea <- test.igual.matriz$p.valor
 ```
 
 
-Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados dos dois tipos de salmão fêmea, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov.femea < 0.001,"<0,001",round(p.valor.igual.m.cov.femea,3))`, indicando que `r if(p.valor.igual.m.cov.femea >0.05)"não"` existe diferença estatisticamente significante entre as matrizes de covariâncias dos tipos de salmão femeas, indicando que `r if(p.valor.igual.m.cov.femea <0.05) "não"` parece ser razoável a suposição de igualdade das matrizes de covariâncias entre os tipos de salmão femea. Este resultado têm grande relevância, uma vez que a técnica de análise discriminante de Fisher supõe homocedásticidade multivariada, ou seja, igualdade das matrizes de covariâncias para os grupos. O teste de box, portanto, indicou que a suposição de homocedásticidade neste caso `r if(p.valor.igual.m.cov.femea < 0.05)"não"` parece ser razoável quando se considera os grupos de salmão do sexo feminino originários do Alasca e do Canadá.
+Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados dos dois tipos de salmão fêmea, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov.femea < 0.001,"<0,001",round(p.valor.igual.m.cov.femea,3))`, indicando que `r if(p.valor.igual.m.cov.femea >0.05)"não"` existe diferença estatisticamente significante entre as matrizes de covariâncias dos tipos de salmão femeas, indicando que `r if(p.valor.igual.m.cov.femea <0.05) "não"` parece ser razoável a suposição de igualdade das matrizes de covariâncias entre os tipos de salmão femea. O teste de box, portanto, indicou que a suposição de homocedásticidade neste caso `r if(p.valor.igual.m.cov.femea < 0.05)"não"` parece ser razoável quando se considera os grupos de salmão do sexo feminino originários do Alasca e do Canadá.
+  
 \newpage
 
 3. Análise Inferencial
@@ -697,15 +698,12 @@ Canadá & 1 & 24 \\ \bottomrule
 
 Ao observar a tabela XX (Resultados da classificação da amostra teste), observamos a qualidade da regra de classificação, obtemos uma taxa de erro aparente TEA =  `r round(TEA,2)` $\%$, valor bem próximo ao da taxa ótima de erro TOE = `r round(TOE,2)` $\%$ ao qual leva em consideração a validade das suposição de igualdade das matrizes de covariância relativas aos dois tipos de salmão, ou seja, mesmo com as observações indicativas à fuga da suposição mencionadas, a regra de classificação mostrou uma taxa de erro bem próxima à taxa ótima, indicando uma boa performance da regra proposta.
   
-TEA = `r TEA` $\%$
-
-TOE = `r TOE` $\%$
-
+A tabela XX (Medidas resumo para os valores função discriminante aplicada na amostra teste, por grupo:) apresenta medidas resumo para os valores da função discriminante e a figuar XX (Boxplots da função discriminante aplicada à amostra teste, por grupo) apresenta os boxplots para estes mesmos valores. Note que o valor máximo para o grupo Alasca é bem proximo ao valor da mediana para o grupo Canadá, o mesmo acontece para o mínimo do grupo Canadá em comparação com a mediana do grupo Alasca, o desvio padrão dos valores dos dois grupos é bastante similar (diferença de 0,19). Para ambos os grupos os valores da média e mediana se apresentam com valores bastante próximos e os boxplots parecem ser simétricos (ou pouco assimétricos). A figura XX (Densidade estimada da função discriminante aplicada à amostra teste, por grupo)) apresenta as densidades estimadas da função discriminante para os grupos, note que, a luz do comportamento apresentado pelos boxplots temos uma interseção entre estas densidades, o que demonstra que a regra de decisão obtida não consegue isolar totalmente as distribuições e consequentemente diferenciar totalmente os tipos de salmão, porém isso é intrinseco ao banco de dados, já que as variáveis propriamente não tem um comportamento totalmente distinto entre os tipos de salmão. 
 
 
 ```{r}
 
-#legenda: Medidas resumo para os valores função discriminante aplicada na amostra teste, por grupo
+#legenda: Medidas resumo para os valores da função discriminante aplicada na amostra teste, por grupo
 #xtable(medados) #medidas resumo 
 ```
  
