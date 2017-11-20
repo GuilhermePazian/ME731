@@ -217,7 +217,7 @@ vF2<- (n2-nvar2)*vF2/((n2-1)*nvar2)
 #lda.fit = lda(Reg~DGAD+DGM, dados2)
 
 # Selecionando as amostras. Selecionei 25 observações de cada grupo para montar o treinamento do modelo
-#set.seed(1)
+set.seed(1)
 treinog1 <- sort(sample(1:50,25,replace=FALSE))
 treinog2 <- sort(sample(51:100,25,replace=FALSE))
 treino <- c(treinog1,treinog2)
@@ -247,116 +247,126 @@ data.teste <- dados2[-treino,1]
 tc <- table(data.teste,pred)
 #matriz de confusão
 #confusionMatrix(tc)
-
+names(tc)<-c("Alasca", "Canadá")
 #xtable(tc)
 
-
 ```
-
-
-
-\setlength{\parindent}{3em}
-\doublespacing
-
-1. Introdução
-
-\newpage
-
-2. Análise Descritiva
-
-A tabela 1, apresenta mostra algumas medidas resumo para as vaiáveis DGAD e DGM separadas por região (Alasca e Canadá).
 
 
 ```{r}
-#xtable(tab_resumo_regiao)
+# TEA
+TEA <- (tc[1,2]+tc[2,1])/sum(tc)
+
+
 ```
+
+
+```{r}
+
+m.dados<- dados2[treino,]
+
+Dados.1 <- (m.dados[m.dados[,1]=="Alasca",][,3:4])
+Dados.2 <- (m.dados[m.dados[,1]=="Canadá",][,3:4])
+v.mean1 <- cbind(c(result.ad$means[1,]))
+v.mean2 <- cbind(c(result.ad$means[2,]))
+S21 <- cov(Dados.1[,1:2])
+S22 <- cov(Dados.2[,1:2])
+
+
+Sp <- ((nrow(Dados.1)-1)*S21 +  ((nrow(Dados.2)-1)*S22))/(nrow(Dados.1) + nrow(Dados.2) - 2)
+q.classifi <- 0.5*t(v.mean1-v.mean2)%*%solve(Sp)%*%(v.mean1+v.mean2)
+delta2 <-  t(v.mean1-v.mean2)%*%solve(Sp)%*%(v.mean1 - v.mean2)
+#
+TOE <- pnorm(-sqrt(delta2)/2)
+```
+
+```{r}
+# Análise da função discriminante para a amostra teste
+grupo <- as.factor(rep(c("Alasca","Canadá"), rep(25,2)))
+# Medidas resumo
+datadados<-data.frame(y,grupo)
+colnames(datadados)<-c("y","dados")
+medados<-ddply(datadados,.(grupo),summarise,media=mean(y),dp=sqrt(var(y)),vari=var(y),minimo=min(y),mediana=quantile(y,0.5),maximo=max(y),n=length(y))
+colnames(medados)<-c("Grupo","Média","DP","Var.","Mínimo","Mediana","Máximo","n")
+
+```
+
+```{r}
+boxplot_ac=ggplot(datadados, aes(grupo,y))+stat_boxplot(geom ='errorbar')+geom_boxplot()+theme_bw()
+```
+
+
+
+3. Análise Inferencial
+
+
+```{r}
+#xtable(tc)
+
+#TEA
+TEA=100*TEA
+
+#TOE 
+TOE=100*TOE
+
+```
+
+
 
 \begin{table}[ht]
 \centering
-\caption{Medidas Resumo das variáveis por região}
+\caption{Resultados da classificação da amostra teste}
 \bgroup
 \def\arraystretch{1.0}
-\begin{tabular}{rlllllllll}
-  \hline
- & Região & n & Media & Variancia & Desvio Padrao & CV(\%) & Minimo & Mediana & Maximo \\ 
-  \hline
-\multirow{2}{*}{DGAD} & Alasca & 50 & 98,38 & 260,608 & 16,143 & 16,409 & 53 & 99 & 131 \\ 
-   & Canadá & 50 & 137,46 & 326,09 & 18,058 & 13,137 & 90 & 140 & 179 \\ \midrule
-\multirow{2}{*}{DGM} & Alasca & 50 & 429,66 & 1399,086 & 37,404 & 8,706 & 355 & 427,5 & 511 \\ 
-   & Canadá & 50 & 366,62 & 893,261 & 29,887 & 8,152 & 301 & 369,5 & 438 \\ \bottomrule
-   \hline
+\begin{tabular}{rrr}
+\toprule
+& Alasca & Canadá \\ \midrule
+\hline
+Alasca & 23 & 2 \\
+Canadá & 1 & 24 \\ \bottomrule
+\hline
 \end{tabular}
 \egroup
 \end{table}
 
 
-A partir da Figura 1, temos o gráfico de dispersão entre as variaveis, separadas por Região (Alasca e Canadá), iremos considerar a variavel Região com o mesmo significado de Grupo neste presente trabalho. Podemos observar que os indíviduos (objetos) do Canáda tendem a ter um diâmetro (em mm) da guelra durante a fase de água doce maior que os indivíduos do Alasca e na durante a fase no Mar tendem a ter um diametro menor (em mm). Podemos ver que olharmos separadamente os dois grupos, vemos que existe uma correlação levemente posivita entre os índividuos do Canadá, e levemente negativa para os índividuos do Alasca. Vale ressaltar que se considerarmos ambos os Grupos, parecer haver uma correlação negativa entre as variaveis.
+TEA = `r TEA` $\%$
 
-```{r,fig.cap=c("Figura 1: Gráfico de dispersão entre os diâmetros da guelra de salmões em água doce e no mar"), fig.pos = '!h',fig.height=3}
-#LINHA DE REGRESSAO PARA AMBOS OS GRUPOS
-grid.draw(cbind(ggplotGrob(d1),
-                ggplotGrob(d2),size = "first"))
+TOE = `r TOE` $\%$
+
+
+
+```{r}
+
+#legenda: Medidas resumo para os valores função discriminante aplicada na amostra teste, por grupo
+#xtable(medados) #medidas resumo 
 ```
 
-\vspace{1cm}
+ \begin{table}[ht]
+\centering
+\caption{Medidas resumo para os valores função discriminante aplicada na amostra teste, por grupo:}
+\bgroup
+\def\arraystretch{1.0}
+\begin{tabular}{rlrrrrrrr}
+\toprule
+& Grupo & Média & DP & Var. & Mínimo & Mediana & Máximo & n \\ \midrule
+\hline
+1 & Alasca & -0,63 & 1,15 & 1,33 & -3,16 & -0,62 & 1,94 & 25 \\
+2 & Canadá & 1,97 & 0,96 & 0,93 & -0,64 & 1,97 & 3,77 & 25 \\ \bottomrule
+\hline
+\end{tabular}
+\egroup
+\end{table}
 
-O salmão nasce em rios e lagos de água doce, e só na maturidade, cerca de 2 a 5 anos, seguem em direção ao mar, a partir dos box-plot encontrado na Figura 2, notamos que o diâmetro da guelra é relativamente maior na água doce para os índividuos de ambos os grupos, podemos notar isso também na distribuição de densidade na Figura X, fato que é reforçado pelas tabela de medidas Tabela X., que reforça a ideia incial que estes resultados são esperados já que o salmão nasce em rios e lagos de água doce. 
 
-Podemos observar também nos box-plot, que o diametro das guelras para o salmão do canadá  é consideravelmente maior do que os do Alasca, já durante a fase no mar, o diametro das guelras do Alasca é maior que do Canadá. Para ambas as variáveis,(DGAD, DGM) é possível notar uma sobreposição em boa parte da distribuições apresentadas Figura 3. As distribuições parecem ser levemente assimétricas, mais evidente para o diâmetro da guelra no mar de indivíduos do Canadá, e menos evidente para diâmetro da guelra na água doce de indivíduos do Alasca.
 
-```{r,fig.cap=c("Boxplots por grupo"), fig.pos = '!h', fig.height=3}
-grid.arrange(b1,b2, nrow=1, ncol=2)
+```{r, fig.cap=c("Boxplots da função discriminante aplicada à amostra teste, por grupo"), fig.pos= '!h', fig.height=3.5, fig.width=7}
+
+boxplot_ac
 ```
 
-```{r,fig.cap=c("Figura 3: Distribuição estimada por grupo"), fig.pos = '!h', fig.height=3}
-grid.draw(cbind(ggplotGrob(g1),
-                ggplotGrob(g2),size = "first"))+ theme(legend.position = "bottom") 
+```{r, fig.cap=c("Densidade estimada da função discriminante aplicada à amostra teste, por grupo"), fig.height=4.5, fig.width=7}
+plot(density(y[grupo=="Alasca",1]),lwd=2,xlim=c(min(y[,1])-1,max(y[,1])+3),xlab="função discriminante",ylab="densidade",cex=1.2,cex.lab=1.2,cex.main=1.2,main="",ylim=c(0,0.9))
+lines(density(y[grupo=="Canadá",1]),col=2,lwd=2)
+legend(3.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canadá"),bty="n",cex=1.2)
 ```
-
-Podemos observar na Figura 4. que para cada variavel DGAD e DGM foi realizado um gráfico de quantil-quantil para cada Grupo (Canadá e Alasca), vemos que para o diâmetro da guelra na fase em água doce de indíviduos do Alasca, os pontos se comportaram de maneira razoavel em torno da linha de referência, não apresentando sinais anormais, diferentemente dos outros três gráficos que apresentam uma sistematização em torno da linha de referência, descartando a suposição de normalidade. Portanto consideremos apenas a suposição de normalidade para o diâmetro da guelra em água doce, que são os índivíduos do Alasca, já que existe uma leve tendência no qual o ajuste é consideravelmente razoavel.
-
-
-```{r,fig.cap=c("Figura 4: Quantil-quantil para cada Grupo"),fig.width=8, fig.height=5.5,fig.pos = '!h'}
-library(car)
-#Por grupos - quantis-quantis
-grupo=dados$Reg
-dgad =dados$DGAD
-dgm = dados$DGM
-
-par(mfrow=c(2,2))
-qqPlot(scale(dgad[grupo=="Alasca"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="Quantil da distriuição amostral",cex=1.2,id.cex=1.2,main="Fase em água doce - Alasca")
-qqPlot(scale(dgm[grupo=="Alasca"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="Quantil da distriuição amostral",cex=1.2,id.cex=1.2,main="Fase no mar - Alasca")
-qqPlot(scale(dgad[grupo=="Canadá"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="Quantil da distriuição amostral",cex=1.2,id.cex=1.2,main="Fase em água doce - Canadá")
-qqPlot(scale(dgm[grupo=="Canadá"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="Quantil da distriuição amostral",cex=1.2,id.cex=1.2,main="Fase no mar - Canadá")
-```
-
-
-No gráfico abaixo podemos ver que a normalidade bivariada não parece ser uma suposição razoavel para nenhum dos grupos, porque além da sistematização em torno da linha de referência e existem  pontos fora do gráfico de envelope. Canadá particularmente a forma dos seus pontos se comportam de maneira concava, mesmo apresentando pontos fora.
-
-
-```{r, fig.height=4.5,fig.width=9,fig.cap=c(" Gráfico de quantil-quantil com envelopes para a distância de Mahalanobis; A) Alasca, B) Canadá"),fig.pos = '!h'}
-library(car)
-par(mfrow=c(1,2))
-
-car::qqPlot(vF,dist="f",df1=nvar,df2=n-nvar,col.lines="red",grid="FALSE",xlab="Quantil da distribuição F",ylab="Forma quadrática",cex=1.2,id.cex=1.2, main=" A) Alasca")
-
-car::qqPlot(vF2,dist="f",df1=nvar2,df2=n2-nvar2,col.lines="red",grid="FALSE",xlab="Quantil da distribuição F",ylab="Forma quadrática",cex=1.2,id.cex=1.2, main="B) Canadá")
-```
-
-
-\newpage
-
-3. Análise Inferencial
-
-
-\newpage
-
-4.Conclusões
-
-
-5. Bibliografia
-
-- Azevedo, C. L. N. (2017). Notas de aula sobre análise multivariada de dados http://www.ime.unicamp.br/~cnaber/Material_AM_2S_2017.htm
-
-
-- Johnson, R. A. & Wichern, D. W. (2007). Applied Multivariate Statistical Analysis. 6 a edição, Upper Saddle River, NJ: Pearson Prentice Hall.
