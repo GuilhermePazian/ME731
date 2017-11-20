@@ -28,3 +28,131 @@ Canadá                     & 6534                          & 14168
 
 
 Não encontramos nenhuma informação que nos dê direcionamento direto à definição de probabilidades à priori de um salmão ser proveniente de uma ou outra localidade (Alasca ou Canada), uma vez que essa probabilidade está muito relacionada ao local onde o salmão foi pescado. Por não ter informações suficientes iríamos supor probabilidades iguais para cada localidade, porém como foi orientação utilizar probabilidades diferentes para cada localidade, utilizamos os dados sobre toneladas de salmão comercial pescados e o respectivo valor monetário gerado no ano de 2015 (dado mais atual) a partir dessa pesca para as duas localidades, estes valores são apresentados na tabela 01 ("tabela com as quantidades de salmão Alasca/CANADA e $"). Observe que o volume de pesca de salmão para o ano de 2015 é muito maior no Alasca em comparação com o Canadá, isso nos leva a acreditar que a população de salmão do Alasca é maior que a população de salmão do Canadá, o que nos leva a conjecturar que a probabilidade de um salmão ser originário do Alasca é maior do que um salmão ser originário do Canadá. Acreditamos que considerar a probabilidade à priori de um salmão ser originário do Alasca como sendo 0,7 e ser originário do Canadá como sendo 0,3 parece ser razoável diante dos dados da tabela 01 e da relação levantada entre a probabilidade do salmão pertencer a uma determinada localidade e o local da pesca, uma vez que não se têm informações mais precisas quanto às populações de salmão e seus respectivos comportamentos migratórios destes de ambas as localidades.
+
+
+
+
+```{r}
+#Pegando a coluna das espécies (grupos) para fazer o vetor identificador de grupos
+
+
+#v.especies <- cbind(as.numeric(dadosmoscas[,1]))
+v.especies <- dados$Reg
+
+#tirando a primeira e a segunda coluna para fazer a matriz de dados
+m.dados <- dados[,-c(1,2)]
+
+
+#Criando um vetor com as quantidades de observações de cada grupo, constam 50 de cada grupo
+v.n_especies <- rbind(50,50)
+
+#Identificação da quantidade de grupos
+k.G <- 2
+
+#Identificação da quantidade de variáveis
+k.P <- 2
+```
+
+
+
+
+```{r}
+#Teste de igualdade das matrizes de covariância entre os tipos de Salmão
+
+#resuldado da função
+test.igual.matriz <-Box.teste.Igual.MCov(as.matrix(m.dados),as.numeric(v.especies),v.n_especies,k.G)
+
+#matriz sigma P (não lembro o que é exatamente)
+m.sigma.P <- test.igual.matriz$Sigma.P
+
+#estatística do teste
+est.test.igual.m.cov <- test.igual.matriz$est.test
+
+#p-valor do teste
+p.valor.igual.m.cov <- test.igual.matriz$p.valor
+
+```
+
+
+
+
+Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados dos dois tipos de salmão, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov < 0.001,"<0,001",round(p.valor.igual.m.cov,3))`, indicando que `r if(p.valor.igual.m.cov >0.05,"não")` existe diferença estatisticamente significante entre as matrizes de covariâncias dos tipos de salmão, indicando que `r if(p.valor.igual.m.cov <0.05, "não")` parece ser razoável a suposição de igualdade das matrizes de covariâncias entre os tipos de salmão.
+
+########################## teste de igualdade de matrizes de covariância considerando os sexos ############
+
+
+```{r}
+############     Salmão macho    #################
+
+#Pegando a coluna das espécies (grupos) para fazer o vetor identificador de grupos
+
+
+#v.especies <- ifelse(dados$Reg == "Alasca" & dados$Gen == "macho", "AlascaMacho", ifelse(dados$Reg == "Alasca" & dados$Gen == "fêmea","AlascaFemea",ifelse(dados$Reg == "Canadá" & dados$Gen == "macho", "CanadáMacho", ifelse(dados$Reg == "Canadá" & dados$Gen == "fêmea","CanadáFemea","NA"))))
+
+
+v.especies <- dados[,1:2]
+
+#tirando a primeira e a segunda coluna para fazer a matriz de dados
+m.dados <- dados[,-c(1,2)]
+
+
+#Criando um vetor com as quantidades de observações de cada grupo, constam 50 de cada grupo
+v.n_especies <- rbind(25,25)
+
+#Identificação da quantidade de grupos
+k.G <- 2
+
+#Identificação da quantidade de variáveis
+k.P <- 2
+```
+
+
+```{r}
+#Teste de igualdade das matrizes de covariância entre os tipos de salmão macho
+
+#resuldado da função
+test.igual.matriz.macho <-Box.teste.Igual.MCov(as.matrix(m.dados[Gen == "macho",]),as.numeric(v.especies[Gen == "macho",1]),v.n_especies,k.G)
+
+#matriz sigma P (não lembro o que é exatamente)
+m.sigma.P.macho <- test.igual.matriz.macho$Sigma.P
+
+#estatística do teste
+est.test.igual.m.cov.macho <- test.igual.matriz.macho$est.test
+
+#p-valor do teste
+p.valor.igual.m.cov.macho <- test.igual.matriz$p.valor
+
+```
+
+
+
+
+Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados dos dois tipos de salmão macho, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov.macho < 0.001,"<0,001",round(p.valor.igual.m.cov,3))`, indicando que `r if(p.valor.igual.m.cov.macho >0.05,"não")` existe diferença estatisticamente significante entre as matrizes de covariâncias dos tipos de salmão machos, indicando que `r if(p.valor.igual.m.cov.macho <0.05, "não")` parece ser razoável a suposição de igualdade das matrizes de covariâncias entre os tipos de salmão macho.
+
+
+
+
+```{r}
+#Teste de igualdade das matrizes de covariância entre os tipos de salmão fêmea
+
+#resuldado da função
+test.igual.matriz.femea <-Box.teste.Igual.MCov(as.matrix(m.dados[Gen == "fêmea",]),as.numeric(v.especies[Gen == "fêmea",1]),v.n_especies,k.G)
+
+#matriz sigma P (não lembro o que é exatamente)
+m.sigma.P.femea <- test.igual.matriz.femea$Sigma.P
+
+#estatística do teste
+est.test.igual.m.cov.femea <- test.igual.matriz.femea$est.test
+
+#p-valor do teste
+p.valor.igual.m.cov.femea <- test.igual.matriz$p.valor
+
+```
+
+
+
+
+Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados dos dois tipos de salmão fêmea, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov.femea < 0.001,"<0,001",round(p.valor.igual.m.cov,3))`, indicando que `r if(p.valor.igual.m.cov.femea >0.05,"não")` existe diferença estatisticamente significante entre as matrizes de covariâncias dos tipos de salmão femeas, indicando que `r if(p.valor.igual.m.cov.femea <0.05, "não")` parece ser razoável a suposição de igualdade das matrizes de covariâncias entre os tipos de salmão femea.
+
+
+
