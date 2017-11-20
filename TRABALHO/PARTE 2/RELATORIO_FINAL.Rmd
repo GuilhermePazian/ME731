@@ -732,8 +732,8 @@ boxplot_ac
 ```
 
 ```{r , fig.cap=c("Densidade estimada da função discriminante aplicada à amostra teste, por grupo"), fig.height=4.5, fig.width=7}
-
-plot(density(y[grupo=="Alasca"]),lwd=2,xlim=c(min(y[,1])-1,max(y[,1])+3),xlab="função discriminante",ylab="densidade",cex=1.2,cex.lab=1.2,cex.main=1.2,main="",ylim=c(0,0.9))
+grupo <- as.factor(rep(c("Alasca","Canadá"), rep(25,2)))
+plot(density(y[grupo=="Alasca"]),lwd=2,xlim=c(min(y)-1,max(y)+3),xlab="função discriminante",ylab="densidade",cex=1.2,cex.lab=1.2,cex.main=1.2,main="",ylim=c(0,0.9))
 lines(density(y[grupo=="Canadá"]),col=2,lwd=2)
 legend(3.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canadá"),bty="n",cex=1.2)
 ```
