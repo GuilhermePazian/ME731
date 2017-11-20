@@ -330,6 +330,7 @@ Canadá & 1 & 24 \\ \bottomrule
 \end{table}
 
 
+Ao observar a tabela XX (Resultados da classificação da amostra teste), observamos a qualidade da regra de classificação, obtemos uma taxa de erro aparente TEA =  `r round(TEA,2)` $\%$, valor bem próximo ao da taxa ótima de erro TOE = `r round(TOE,2)` $\%$ ao qual leva em consideração a validade das suposições de normalidade multivariada e igualdade das matrizes de covariância relativas aos dois tipos de salmão, ou seja, mesmo com as observações indicativas à fuga das suposições mencionadas anteriormente, a regra de classificação mostrou uma taxa de erro bem próxima à taxa ótima, indicando uma boa performance da regra proposta.
 TEA = `r TEA` $\%$
 
 TOE = `r TOE` $\%$
