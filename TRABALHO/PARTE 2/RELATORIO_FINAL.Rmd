@@ -429,9 +429,9 @@ boxplot_ac <- ggplot(datadados2, aes(grupo2,y2))+stat_boxplot(geom ='errorbar')+
 1. Introdução
 
 Os salmões nascem em água doce mas migram para o mar retornando, posteriormente, para o local onde nasceram, para fins de reprodução, por isso, caso grande parte da população de salmão nascidos em um local específico for pescado, ocorre uma diminuição na quantidade de salmãos que conseguirão se reproduzir neste local, gerando excasses destes peixes. A fronteira do Canadá com o Alasca é uma importante área de pesca de salmão, e o mercado deste peixe tem significante importância na economia (veja tabela 1 "tabela com as quantidades de salmão EUA/CANADA e $") assim como exerce forte influência na excasses ou abundancia deste peixe (num próximo ciclo reprodutivo) no local de reprodução. Existem basicamente dois tipos de Salmão nessa região, uma que nasce no Alasca e outra que nasce no Canadá, pela proximidade, um salmão nascido no Alasca, pode acabar sendo pescado no mar por um pescador do Canada e vice versa. Os dados são desconhecidos, mas os pescadores do Alasca eram conhecidos por interceptar grandes quantidades de salmão Canadense, e os pescadores Canadenses tinham menos oportunidade de interceptar salmão originário do Alaska. Este fato gerou alguns conflitos entre Estados Unidos e Canada, tanto que em 1985 estes países fizeram um tratado para pesca de salmão do Oceano Pacífico (Pacific Salmon Treaty'), ao qual proibe a pesca de salmão do tipo que nasce no Canadá por pescadores Norte Americanos e do tipo que nasce no Alasca por pescadores Canadenses. A fim de seguir o tratado é impressindível conseguir diferenciar os tipos de salmão originário do Alasca e do Canadá. 
-
-Veja mais sobre esse conflito em (THE PACIFIC SALMON TREATY: A BRIEF TRUCE IN THE CANADA/U.S.A. PACIFIC SALMON WAR  (COLOCAR NAS REFERÊNCIAS)).
   
+Veja mais sobre esse conflito em (THE PACIFIC SALMON TREATY: A BRIEF TRUCE IN THE CANADA/U.S.A. PACIFIC SALMON WAR  (COLOCAR NAS REFERÊNCIAS)).
+    
 Com o presente trabalho, pretende-se criar uma regra de classificação, visando poder identificar mais facilmente a origem de salmões pescados, utilizando-se um banco de dados contendo duas variáveis intituladas aqui como DGAD e DGM  (diâmetro da guelra (em mm) na fase de água doce e na fase no mar respectivamente) medidas em 50 salmões provenientes do Alasca e em 50 salmões provenientes do Canadá, assim como o sexo destes peixes. A origem dos salmões (Alasca ou Canadá) é identificada por uma variável aqui utilizada indistintamente como Região, localidade e/ou grupo.
 
 Todas as análises serão realizadas com o suporte dos softwares *R* versão 3.4.2 e *RStudio* versão 1.1.383.
@@ -484,7 +484,7 @@ A tabela 1, apresenta mostra algumas medidas resumo para as vaiáveis DGAD e DGM 
 
 
 A partir da Figura 1, que consta o gráfico de dispersão entre as variaveis separadas por Região (Alasca e Canadá), podemos observar que os indíviduos do Canáda tendem a ter um diâmetro (em mm) da guelra durante a fase de água doce maior que os indivíduos do Alasca e durante a fase no Mar tendem a ter um diametro menor (em mm). Se olharmos separadamente os dois grupos, vemos que existe uma correlação levemente positiva entre os índividuos do Canadá, e levemente negativa para os índividuos do Alasca. Vale ressaltar que se considerarmos ambos os Grupos, parecer haver uma correlação negativa entre as variaveis.
-
+  
 
 ```{r,fig.cap=c("Figura 1: Gráfico de dispersão entre os diâmetros da guelra de salmões em água doce e no mar"), fig.pos = '!h',fig.height=3}
 #LINHA DE REGRESSAO PARA AMBOS OS GRUPOS
@@ -495,15 +495,16 @@ grid.draw(cbind(ggplotGrob(d1),
 \vspace{1cm}
 
 Na Figura 2 notamos que o diâmetro da guelra é menor na água doce para os índividuos de ambos os grupos, constatamos isso também na distribuição de densidade na Figura X, e reforçado nos valores das medidas centrais, como a da média e mediana, na Tabela X. Estes resultados são esperados devido a natureza dos dados, pois as medidas em água doce foram obtidas na fase inícial da vida dos peixes e as medições obtidas no mar aconteceram na maturidade destes salmões. 
-
+  
 Podemos observar também nos box-plot, que o diâmetro das guelras para o salmão do Canadá é consideravelmente maior do que os do Alasca, já durante a fase no mar, o contrário ocorre. Para ambas as variáveis (DGAD, DGM) é possível notar uma sobreposição em boa parte da distribuições apresentadas Figura 3. As distribuições parecem ser levemente assimétricas, mais evidente para o diâmetro da guelra no mar de indivíduos do Canadá, e menos evidente para diâmetro da guelra na água doce de indivíduos do Alasca.
-
+  
 
 ```{r,fig.cap=c("Boxplots por grupo"), fig.pos = '!h', fig.height=3}
 grid.arrange(b1,b2, nrow=1, ncol=2)
 ```
 
-```{r,fig.cap=c("Figura 3: Distribuição estimada por grupo"), fig.pos = '!h', fig.height=3}
+```{r eval=FALSE,fig.cap=c("Figura 3: Distribuição estimada por grupo"), fig.pos = '!h', fig.height=3}
+# eval= FALSE porque não está funcionando e não escrevemos nada sobre (é dispensável essa parte)
 grid.draw(cbind(ggplotGrob(g1),
                 ggplotGrob(g2),size = "first"))+ theme(legend.position = "bottom") 
 ```
@@ -584,7 +585,6 @@ p.valor.igual.m.cov <- test.igual.matriz$p.valor
 
 Foi realizado o teste de Box para igualdade de matrizes de covariâncias dos dados dos dois tipos de salmão (alasca e Canadá), ao qual resultou num p-valor = `r ifelse(p.valor.igual.m.cov < 0.001,"<0,001",round(p.valor.igual.m.cov,3))`, indicando que `r if(p.valor.igual.m.cov >0.05)"não"` existe diferença estatisticamente significante entre as matrizes de covariâncias dos tipos de salmão, indicando que `r if(p.valor.igual.m.cov < 0.05)"não"` parece ser razoável a suposição de igualdade das matrizes de covariâncias entre os tipos de salmão. Este resultado têm grande relevância, uma vez que a técnica de análise discriminante de Fisher supõe homocedásticidade multivariada, ou seja, igualdade das matrizes de covariâncias para os grupos. O teste de box, portanto, indicou que a suposição de homocedásticidade neste caso `r if(p.valor.igual.m.cov < 0.05)"não"` parece ser razoável quando se considera os grupos de salmão originários do Alasca e do Canadá.
 
-########################## teste de igualdade de matrizes de covariância considerando os sexos ############
 
 
 ```{r}
@@ -697,8 +697,10 @@ Canadá & 1 & 24 \\ \bottomrule
 
 
 Ao observar a tabela XX (Resultados da classificação da amostra teste), observamos a qualidade da regra de classificação, obtemos uma taxa de erro aparente TEA =  `r round(TEA,2)` $\%$, valor bem próximo ao da taxa ótima de erro TOE = `r round(TOE,2)` $\%$ ao qual leva em consideração a validade das suposição de igualdade das matrizes de covariância relativas aos dois tipos de salmão, ou seja, mesmo com as observações indicativas à fuga da suposição mencionadas, a regra de classificação mostrou uma taxa de erro bem próxima à taxa ótima, indicando uma boa performance da regra proposta.
+    
+A tabela XX (Medidas resumo para os valores função discriminante aplicada na amostra teste, por grupo:) apresenta medidas resumo para os valores da função discriminante e a figuar XX (Boxplots da função discriminante aplicada à amostra teste, por grupo) apresenta os boxplots para estes mesmos valores. Note que o valor máximo para o grupo Alasca é bem proximo ao valor da mediana para o grupo Canadá, o mesmo acontece para o mínimo do grupo Canadá em comparação com a mediana do grupo Alasca, o desvio padrão dos valores dos dois grupos é bastante similar (diferença de 0,19). Para ambos os grupos os valores da média e mediana se apresentam com valores bastante próximos e os boxplots parecem ser simétricos (ou pouco assimétricos). 
   
-A tabela XX (Medidas resumo para os valores função discriminante aplicada na amostra teste, por grupo:) apresenta medidas resumo para os valores da função discriminante e a figuar XX (Boxplots da função discriminante aplicada à amostra teste, por grupo) apresenta os boxplots para estes mesmos valores. Note que o valor máximo para o grupo Alasca é bem proximo ao valor da mediana para o grupo Canadá, o mesmo acontece para o mínimo do grupo Canadá em comparação com a mediana do grupo Alasca, o desvio padrão dos valores dos dois grupos é bastante similar (diferença de 0,19). Para ambos os grupos os valores da média e mediana se apresentam com valores bastante próximos e os boxplots parecem ser simétricos (ou pouco assimétricos). A figura XX (Densidade estimada da função discriminante aplicada à amostra teste, por grupo)) apresenta as densidades estimadas da função discriminante para os grupos, note que, a luz do comportamento apresentado pelos boxplots temos uma interseção entre estas densidades, o que demonstra que a regra de decisão obtida não consegue isolar totalmente as distribuições e consequentemente diferenciar totalmente os tipos de salmão, porém isso é intrinseco ao banco de dados, já que as variáveis propriamente não tem um comportamento totalmente distinto entre os tipos de salmão. 
+A figura XX (Densidade estimada da função discriminante aplicada à amostra teste, por grupo)) apresenta as densidades estimadas da função discriminante para os grupos, note que, a luz do comportamento apresentado pelos boxplots temos uma interseção entre estas densidades, o que demonstra que a regra de decisão obtida não consegue isolar totalmente as distribuições e consequentemente diferenciar totalmente os tipos de salmão, porém isso é intrinseco ao banco de dados, já que as variáveis propriamente não tem um comportamento totalmente distinto entre os tipos de salmão. 
 
 
 ```{r}
@@ -737,19 +739,8 @@ legend(3.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canadá"),bty="n",cex=1.2
 ```
 
 
-\newpage
-
-4.Conclusões
 
 
-
-5. Bibliografia
-
-- Azevedo, C. L. N. (2017). Notas de aula sobre análise multivariada de dados http://www.ime.unicamp.br/~cnaber/Material_AM_2S_2017.htm
-
-
-- Johnson, R. A. & Wichern, D. W. (2007). Applied Multivariate Statistical Analysis. 6 a edição, Upper Saddle River, NJ: Pearson Prentice Hall.
-##GENERO
 ```{r}
 #SEPARADOS POR GENERO
 data.femea <- dados %>% group_by(Gen,Reg) %>% filter(Gen =="fêmea") %>% as.data.frame() 
@@ -894,7 +885,7 @@ gm.TOE <- pnorm(-sqrt(gm.delta2)/2)
 gf.grupo <- as.factor(rep(c("Alasca","Canadá"), rep(13,2)))
 # Medidas resumo
 gf.datadados<-data.frame(gf.y,gf.grupo)
-colnames(gf.datadados)<-c("y femea","dados femea")
+colnames(gf.datadados)<-c("gf.y","gf.grupo")
 gf.medados<-ddply(gf.datadados,.(gf.grupo),summarise,media=mean(gf.y),dp=sqrt(var(gf.y)),vari=var(gf.y),minimo=min(gf.y),mediana=quantile(gf.y,0.5),maximo=max(gf.y),n=length(gf.y))
 colnames(gf.medados)<-c("Grupo Femea","Média","DP","Var.","Mínimo","Mediana","Máximo","n")
 
@@ -906,7 +897,7 @@ colnames(gf.medados)<-c("Grupo Femea","Média","DP","Var.","Mínimo","Mediana","Má
 gm.grupo <- as.factor(rep(c("Alasca","Canadá"), rep(12,2)))
 # Medidas resumo
 gm.datadados<-data.frame(gm.y,gm.grupo)
-colnames(gm.datadados)<-c("y femea","dados femea")
+colnames(gm.datadados)<-c("gm.y","gm.grupo")
 gm.medados<-ddply(gm.datadados,.(gm.grupo),summarise,media=mean(gm.y),dp=sqrt(var(gm.y)),vari=var(gm.y),minimo=min(gm.y),mediana=quantile(gm.y,0.5),maximo=max(gm.y),n=length(gm.y))
 colnames(gm.medados)<-c("Grupo Macho","Média","DP","Var.","Mínimo","Mediana","Máximo","n")
 
@@ -921,6 +912,11 @@ gf.boxplot_ac=ggplot(gf.datadados, aes(gf.grupo,gf.y))+stat_boxplot(geom ='error
 gm.boxplot_ac=ggplot(gm.datadados, aes(gm.grupo,gm.y))+stat_boxplot(geom ='errorbar')+geom_boxplot()+theme_bw()
 ```
 
+Outras duas regras, baseadas na metodologia de Análise discriminante de Fisher, foram geradas à partir do banco de dados, porém agora os grupos (Alasca e Canadá) foram divididos por gênero fêmea e macho. Aqui também foi suposto a presença de homocedasticidade entre as populações, com custos de classificação errada iguais e com as mesmas prioris definidas anteriormente, ou seja, as probabilidades a priori de um salmão pertencer ao Grupo Alasca foi definida como 0,6 e pertencer ao grupo Canada foi 0,4 para ambos os sexos. 
+  
+Como já foi discutido anteriormente, o teste de Box indicou para ambos os sexos que as matrizes de covariância são diferentes, de modo que a suposição de homocedásticidade não parece ser razoável para ambos os casos. 
+  
+Os resultados referentes as regras de classificação para salmões fêmea a macho são apresentados nas tabelas XX e XX respectivamente.
 
 ```{r, fig.cap=c("Resultados da classificação da amostra teste - FEMININO")}
 
@@ -940,8 +936,11 @@ Canadá & 0 & 13 \\
 \end{tabular}
 \end{table}
 
-TEA(Feminino): `r gf.TEA`
+Ao observar a tabela XX (Resultados da classificação da amostra teste - FEMININO), observamos a qualidade da regra de classificação para os salmões fêmea, obtemos uma taxa de erro aparente TEA =  `r round(gf.TEA,2)` $\%$, valor bem abaixo ao da taxa ótima de erro TOE = `r round(gf.TOE,2)` $\%$ ao qual leva em consideração a validade das suposição de igualdade das matrizes de covariância relativas aos dois tipos de salmão, ou seja, mesmo com as observações indicativas à fuga da suposição mencionadas, a regra de classificação mostrou uma taxa de erro ainda menor que a taxa ótima, indicando uma boa performance da regra proposta para o banco de dados em questão.
 
+
+TEA(Feminino): `r gf.TEA`
+#### Ver se faz sentido TEA ser menor que TOE
 TOE(Feminino): `r gf.TOE`
 
 ```{r, fig.cap=c("Resultados da classificação da amostra teste - MASCULINO")}
@@ -962,13 +961,27 @@ Canadá & 1 & 11 \\
 \end{tabular}
 \end{table}
 
-TEA(Masculino): `r gm.TEA`
 
+Ao observar a tabela XX (Resultados da classificação da amostra teste - MASCULINO), observamos a qualidade da regra de classificação para os salmões macho, obtemos uma taxa de erro aparente TEA =  `r round(gm.TEA,2)` $\%$, valor bem abaixo ao da taxa ótima de erro TOE = `r round(gm.TOE,2)` $\%$ ao qual leva em consideração a validade das suposição de igualdade das matrizes de covariância relativas aos dois tipos de salmão, ou seja, mesmo com as observações indicativas à fuga da suposição mencionadas, a regra de classificação mostrou uma taxa de erro ainda menor que a taxa ótima, indicando uma boa performance da regra proposta para o banco de dados em questão.
+
+TEA(Masculino): `r gm.TEA`
+#### Ver se faz sentido TEA ser menor que TOE
 TOE(Masculino): `r gm.TOE`
+
+
+Observe também que as regras de classificação para os salmões fêmea e macho apresentam valores de TEA bastante similares, já que ambos tiveram apenas um erro de classificação e a quantidade de peixes de cada sexo na amostra onde as regras foram testadas é praticamente a mesma.
+
 
 ```{r}
 #xtable(gf.medados)
 ```
+
+Observamos nas Tabelas XX e XX (Medidas resumo fêmea e macho) as medidas resumos dos grupos divididos por macho e fêmea, onde são apresentadas os valores da função discriminante aplicada na amostra teste. Além disso é possível observar os box-plots para cada genêro na figura XX (boxplot fêmea). 
+  
+Para salmões fêmea, observamos que o valor mínimo referente ao grupo Canadá é menor que o máximo referente ao grupo Alasca, porém, pode-se observar por meio dos box-plots correspondentes que a menos de um valores discrepante, os box-plots parecem ser bastante distintos, uma vez que, pode-se perceber uma separação clara entre valores presentes no grupo Alasca comparando-se com os valores presentes no grupo Canadá, este comportamento também é observado, embora seja menos evidente, na figura XX(funçao discriminante fêmea) ao qual apresenta as densidades estimadas para os valores da função discriminante para os grupos, nesta figura observa-se uma área de interseção pequena entre as densidades, o que favorece à distinção da origem dos Salmões fêmea por meio das variáveis DGAD e DGM.
+  
+O comportamento referênte aos valores da função discriminante para salmões macho é análogo ao apresentado para salmões fêmea, os box-plots correspondentes, a menos de dois pontos, parecem ser bastante distintos, assim como existe pouca área de interseção entre as densidades estimadas para os valores da função discriminante para os grupos Alasca e Canadá (Figura XX ((funçao discriminante macho)), o que favorece à distinção da origem dos salmões macho por meio das variáveis DGAD e DGM.
+  
 
 \begin{table}[ht]
 \centering
@@ -977,8 +990,8 @@ TOE(Masculino): `r gm.TOE`
 \hline
 & Grupo Femea & Média & DP & Var. & Mínimo & Mediana & Máximo & n \\
 \hline
-& Alasca & 0,31 & 1,79 & 3,21 & -2,39 & 0,79 & 3,26 & 26 \\
-& Canadá & 0,31 & 1,79 & 3,21 & -2,39 & 0,79 & 3,26 & 26 \\
+& Alasca & -1,18 & 1,11 & 1,23 & -2,39 & -1,44 & 1,49 & 13 \\
+& Canadá & 1,80 & 0,79 & 0,62 & -0,71 & 1,80 & 3,26 & 13 \\
 \hline
 \end{tabular}
 \end{table}
@@ -994,8 +1007,8 @@ TOE(Masculino): `r gm.TOE`
 \hline
 & Grupo Macho & Média & DP & Var. & Mínimo & Mediana & Máximo & n \\
 \hline
-& Alasca & 0,01 & 1,79 & 3,20 & -3,23 & -0,16 & 2,58 & 24 \\
-& Canadá & 0,01 & 1,79 & 3,20 & -3,23 & -0,16 & 2,58 & 24 \\
+& Alasca & -1,50 & 0,87 & 0,76 & -3,23 & -1,68 & 0,26 & 12 \\
+& Canadá & 1,53 & 0,95 & 0,90 & -0,80 & -1,81 & 2,58 & 12 \\
 \hline
 \end{tabular}
 \end{table}
@@ -1014,3 +1027,21 @@ gm.d2 <- plot(density(gm.y[gm.grupo=="Alasca",1]),lwd=2,xlim=c(min(y[,1])-1,max(
 lines(density(gm.y[gm.grupo=="Canadá",1]),col=2,lwd=2)
 legend(0.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canadá"),bty="n",cex=1.2)
 ```
+
+
+  
+
+\newpage
+
+4.Conclusões
+
+As análises apresentadas aqui indicaram que as regras de classificação de salmões quanto à sua origem (Alasca ou Canadá) obtidas por meio do método de análise discriminante de Fisher foram razoávelmente boas, mesmo sendo a suposição de homocedásticidade irrazuável para todos os conjuntos analisados (Salmões de ambos os sexos, Salmões macho e Salmões fêmea).
+  
+Julgamos que todas as regras de classificação obtidas neste presente estudo poderiam ser sugeridas, embora as regras obtidas separando-se os salmões por sexo tenham sido um pouco mais efetivas, errando a classificação de 2 salmões em contrapartida aos 3 erros de classificação obtidos pela regra que não leva em consideração os sexos dos peixes para a mesma quantidade de peixes analizados, porém deve-se avaliar sempre o contexto onde a regra será aplicada, o custo, a utilidade e a influência que esta regra de classificação pode exercer.
+
+5. Bibliografia
+
+- Azevedo, C. L. N. (2017). Notas de aula sobre análise multivariada de dados http://www.ime.unicamp.br/~cnaber/Material_AM_2S_2017.htm
+
+
+- Johnson, R. A. & Wichern, D. W. (2007). Applied Multivariate Statistical Analysis. 6 a edição, Upper Saddle River, NJ: Pearson Prentice Hall.
