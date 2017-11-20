@@ -388,7 +388,7 @@ TEA <- (tc[1,2]+tc[2,1])/sum(tc)
 
 ```{r}
 
-m.dados<- dados2[treino,]
+m.dados<- dados[treino,]
 
 Dados.1 <- (m.dados[m.dados[,1]=="Alasca",][,3:4])
 Dados.2 <- (m.dados[m.dados[,1]=="Canadá",][,3:4])
@@ -750,3 +750,197 @@ legend(3.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canadá"),bty="n",cex=1.
 
 
 - Johnson, R. A. & Wichern, D. W. (2007). Applied Multivariate Statistical Analysis. 6 a edição, Upper Saddle River, NJ: Pearson Prentice Hall.
+
+
+
+\newpage
+
+
+##GENERO
+```{r}
+#SEPARADOS POR GENERO
+data.femea <- dados %>% group_by(Gen,Reg) %>% filter(Gen =="fêmea") %>% as.data.frame() 
+data.macho <- dados %>% group_by(Gen,Reg) %>% filter(Gen =="macho") %>% as.data.frame() 
+```
+
+
+```{r modelos, message=F}
+################################ PARA FEMEA###########################################
+
+#
+# aqu estão as modelagens
+
+#lda.fit = lda(Reg~DGAD+DGM, dados2)
+
+# Selecionando as amostras. Selecionei 25 observações de cada grupo para montar o treinamento do modelo
+
+gf.treinog1 <- sort(sample(1:26,13,replace=FALSE))
+gf.treinog2 <- sort(sample(26:52,13,replace=FALSE))
+gf.treino <- c(gf.treinog1,gf.treinog2)
+
+# Amostra treino
+#atrein <- iris[treino,]
+
+# Utilizando a função lda
+#m.X <- rbind(irisd[51:100,3:4],irisd[101:150,3:4])
+#Sp = rep(c("VE","VI"), rep(50,2))
+#m.Iris <- data.frame(m.X,Sp)
+#table(m.Iris$Sp[treino])
+#result.ad <- lda(Sp~., m.Iris, prior = c(1,1)/2,subset = treino)
+
+# as prioris tem de ser diferentes. Custo iguais
+
+gf.result.ad <- lda(data.femea$Reg~., data.femea[,c(3,4)], prior = c(0.6,0.4),subset = gf.treino)
+# coeficientes da função discriminante
+# result.ad$scaling
+# predizendo os grupos na amostra teste
+gf.pred<-predict(gf.result.ad, data.femea[-gf.treino, c(3,4)])$class
+# função discriminante
+gf.y <-predict(gf.result.ad, data.femea[-gf.treino, c(3,4)])$x 
+# Pegando a amostra teste
+gf.data.teste <- data.femea[-gf.treino,1]
+# Tabela de classificação
+gf.tc <- table(gf.data.teste,gf.pred)
+#matriz de confusão
+confusionMatrix(gf.tc)
+#xtable(gf.tc)
+```
+
+
+```{r modelos, message=F}
+################################ PARA MACHO###########################################
+
+#
+# aqu estão as modelagens
+
+#lda.fit = lda(Reg~DGAD+DGM, dados2)
+
+# Selecionando as amostras. Selecionei 25 observações de cada grupo para montar o treinamento do modelo
+
+gm.treinog1 <- sort(sample(1:24,12,replace=FALSE))
+gm.treinog2 <- sort(sample(25:48,12,replace=FALSE))
+gm.treino <- c(gm.treinog1,gm.treinog2)
+
+# Amostra treino
+#atrein <- iris[treino,]
+
+# Utilizando a função lda
+#m.X <- rbind(irisd[51:100,3:4],irisd[101:150,3:4])
+#Sp = rep(c("VE","VI"), rep(50,2))
+#m.Iris <- data.frame(m.X,Sp)
+#table(m.Iris$Sp[treino])
+#result.ad <- lda(Sp~., m.Iris, prior = c(1,1)/2,subset = treino)
+
+# as prioris tem de ser diferentes. Custo iguais
+
+gm.result.ad <- lda(data.macho$Reg~., data.macho[,c(3,4)], prior = c(0.6,0.4),subset = gm.treino)
+# coeficientes da função discriminante
+# result.ad$scaling
+# predizendo os grupos na amostra teste
+gm.pred<-predict(gm.result.ad, data.macho[-gm.treino, c(3,4)])$class
+# função discriminante
+gm.y <-predict(gm.result.ad, data.macho[-gm.treino, c(3,4)])$x 
+# Pegando a amostra teste
+gm.data.teste <- data.macho[-gm.treino,1]
+# Tabela de classificação
+gm.tc <- table(gm.data.teste,gm.pred)
+#matriz de confusão
+confusionMatrix(gm.tc)
+#xtable(gf.tc)
+```
+
+
+```{r}
+# TEA PARA FEMEA
+gf.TEA <- (gf.tc[1,2]+gf.tc[2,1])/sum(gf.tc)
+# TEA PARA MACHO
+gm.TEA <- (gm.tc[1,2]+gm.tc[2,1])/sum(gm.tc)
+```
+
+
+```{r}
+##########TOE PARA FEMEA##########
+gf.m.dados<- data.femea[gf.treino,]
+
+gf.Dados.1 <- (gf.m.dados[gf.m.dados[,1]=="Alasca",][,3:4])
+gf.Dados.2 <- (gf.m.dados[gf.m.dados[,1]=="Canadá",][,3:4])
+gf.v.mean1 <- cbind(c(gf.result.ad$means[1,]))
+gf.v.mean2 <- cbind(c(gf.result.ad$means[2,]))
+gf.S21 <- cov(gf.Dados.1[,1:2])
+gf.S22 <- cov(gf.Dados.2[,1:2])
+
+
+gf.Sp <- ((nrow(gf.Dados.1)-1)*gf.S21 +  ((nrow(gf.Dados.2)-1)*gf.S22))/(nrow(gf.Dados.1) + nrow(gf.Dados.2) - 2)
+gf.q.classifi <- 0.5*t(gf.v.mean1-gf.v.mean2)%*%solve(gf.Sp)%*%(gf.v.mean1+gf.v.mean2)
+gf.delta2 <-  t(gf.v.mean1-gf.v.mean2)%*%solve(gf.Sp)%*%(gf.v.mean1 - gf.v.mean2)
+#
+gf.TOE <- pnorm(-sqrt(gf.delta2)/2)
+
+###################### PARA MACHO ###################
+
+gm.m.dados<- data.macho[gm.treino,]
+
+gm.Dados.1 <- (gm.m.dados[gm.m.dados[,1]=="Alasca",][,3:4])
+gm.Dados.2 <- (gm.m.dados[gm.m.dados[,1]=="Canadá",][,3:4])
+gm.v.mean1 <- cbind(c(gm.result.ad$means[1,]))
+gm.v.mean2 <- cbind(c(gm.result.ad$means[2,]))
+gm.S21 <- cov(gm.Dados.1[,1:2])
+gm.S22 <- cov(gm.Dados.2[,1:2])
+
+gm.Sp <- ((nrow(gm.Dados.1)-1)*gm.S21 +  ((nrow(gm.Dados.2)-1)*gm.S22))/(nrow(gm.Dados.1) + nrow(gm.Dados.2) - 2)
+gm.q.classifi <- 0.5*t(gm.v.mean1-gm.v.mean2)%*%solve(gm.Sp)%*%(gm.v.mean1+gm.v.mean2)
+gm.delta2 <-  t(gm.v.mean1-gm.v.mean2)%*%solve(gm.Sp)%*%(gm.v.mean1 - gm.v.mean2)
+#
+gm.TOE <- pnorm(-sqrt(gm.delta2)/2)
+```
+
+```{r}
+#FEMEA
+#
+#
+# Análise da função discriminante para a amostra teste
+gf.grupo <- as.factor(rep(c("Alasca","Canadá"), rep(13,2)))
+# Medidas resumo
+gf.datadados<-data.frame(gf.y,gf.grupo)
+colnames(gf.datadados)<-c("y femea","dados femea")
+gf.medados<-ddply(gf.datadados,.(gf.grupo),summarise,media=mean(gf.y),dp=sqrt(var(gf.y)),vari=var(gf.y),minimo=min(gf.y),mediana=quantile(gf.y,0.5),maximo=max(gf.y),n=length(gf.y))
+colnames(gf.medados)<-c("Grupo Femea","Média","DP","Var.","Mínimo","Mediana","Máximo","n")
+
+
+#MACHO
+#
+#
+# Análise da função discriminante para a amostra teste
+gm.grupo <- as.factor(rep(c("Alasca","Canadá"), rep(12,2)))
+# Medidas resumo
+gm.datadados<-data.frame(gm.y,gm.grupo)
+colnames(gm.datadados)<-c("y femea","dados femea")
+gm.medados<-ddply(gm.datadados,.(gm.grupo),summarise,media=mean(gm.y),dp=sqrt(var(gm.y)),vari=var(gm.y),minimo=min(gm.y),mediana=quantile(gm.y,0.5),maximo=max(gm.y),n=length(gm.y))
+colnames(gm.medados)<-c("Grupo Macho","Média","DP","Var.","Mínimo","Mediana","Máximo","n")
+
+
+```
+
+```{r}
+
+#FEMEA
+gf.boxplot_ac=ggplot(gf.datadados, aes(gf.grupo,gf.y))+stat_boxplot(geom ='errorbar')+geom_boxplot()+theme_bw()
+#MACHO
+gm.boxplot_ac=ggplot(gm.datadados, aes(gm.grupo,gm.y))+stat_boxplot(geom ='errorbar')+geom_boxplot()+theme_bw()
+```
+
+
+```{r eval=FALSE, fig.cap=c("Boxplots da função discriminante aplicada à amostra teste, por grupo"), fig.pos= '!h', fig.height=3.5, fig.width=7}
+grid.arrange(gm.boxplot_ac,gf.boxplot_ac, nrow=1, ncol=2)
+```
+
+```{r eval=FALSE, fig.cap=c("Densidade estimada da função discriminante aplicada à amostra teste, por grupo"), fig.height=4.5, fig.width=7}
+par(mfrow=c(1,2))
+gf.d1 <- plot(density(gf.y[gf.grupo=="Alasca",1]),lwd=2,xlim=c(min(y[,1])-1,max(y[,1])+3),xlab="função discriminante femea",ylab="densidade",cex=1.2,cex.lab=1.2,cex.main=1.2,main="",ylim=c(0,0.9))
+lines(density(gf.y[gf.grupo=="Canadá",1]),col=2,lwd=2)
+legend(0.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canadá"),bty="n",cex=1.2)
+
+gm.d2 <- plot(density(gm.y[gm.grupo=="Alasca",1]),lwd=2,xlim=c(min(y[,1])-1,max(y[,1])+3),xlab="função discriminante femea",ylab="densidade",cex=1.2,cex.lab=1.2,cex.main=1.2,main="",ylim=c(0,0.9))
+lines(density(gm.y[gm.grupo=="Canadá",1]),col=2,lwd=2)
+legend(0.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canadá"),bty="n",cex=1.2)
+```
