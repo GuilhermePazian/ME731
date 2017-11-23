@@ -1049,6 +1049,130 @@ As análises apresentadas aqui indicaram que as regras de classificação de sal
   
 Concluimos que todas as regras de classificação obtidas neste presente estudo poderiam ser sugeridas, embora as regras obtidas separando-se os salmões por sexo tenham sido um pouco mais efetivas, errando a classificação de 2 salmões em contrapartida aos 3 erros de classificação obtidos pela regra que não leva em consideração os sexos dos peixes para a mesma quantidade de peixes analisados. Porém deve-se avaliar sempre o contexto no qual a regra será aplicada, o custo, a utilidade e a influência que esta regra de classificação pode exercer.
 
+
+##DESCRITIVA GENERO##############
+
+```{r}
+#xtable(tab_resumo_genero)
+```
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rlllllllll}
+  \hline
+ & Gênero & n & Media & Variancia & Desvio Padrao & CV(\%) & Minimo & Mediana & Maximo \\ 
+  \hline
+1 & FÊmea & 52 & 118,058 & 777,114 & 27,877 & 23,613 & 53 & 118,5 & 179 \\ 
+  2 & Macho & 48 & 117,771 & 580,734 & 24,098 & 20,462 & 79 & 117 & 170 \\ 
+  3 & FÊmea & 52 & 396,327 & 1808,773 & 42,53 & 10,731 & 301 & 397,5 & 481 \\ 
+  4 & Macho & 48 & 400,104 & 2533,457 & 50,333 & 12,58 & 306 & 388,5 & 511 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+
+```{r}
+
+############################Gráficos de boxplot#################################
+# Boxplot de cada variável com relação a região
+b11 = data.macho %>% ggplot(aes(Reg, DGAD))+stat_boxplot(geom ='errorbar')+geom_boxplot()+theme_bw() + labs(y = "Fase em água doce", title="Macho")
+b12 = data.macho %>% ggplot(aes(Reg, DGM))+stat_boxplot(geom ='errorbar')+geom_boxplot()+theme_bw()+labs(y = "Fase no mar",title="Macho")
+b21 = data.femea %>% ggplot(aes(Reg, DGAD))+stat_boxplot(geom ='errorbar')+geom_boxplot()+theme_bw() + labs(y = "Fase em água doce", title="Fêmea")
+b22 = data.femea %>% ggplot(aes(Reg, DGM))+stat_boxplot(geom ='errorbar')+geom_boxplot()+theme_bw()+labs(y = "Fase no mar",title="Fêmea")
+
+
+############################Gráficos de dispersão#####################################
+library(grid)
+
+d11 <- data.macho %>% ggplot(aes(DGAD,  DGM, col =Reg)) + geom_point() +
+    scale_colour_manual(values = c("Blue", "Red")) + 
+    geom_smooth(method=lm,  
+                se=FALSE) + theme_bw()+guides(col=F) + labs(x="Fase em água doce (em mm)", y = "Fase no
+mar (em mm)")
+
+d12 <- data.macho %>% ggplot(aes(DGAD,  DGM)) + geom_point(aes(color = Reg)) +
+      scale_colour_manual(values = c("Blue", "Red")) + 
+      geom_smooth(method=lm,  
+                se=FALSE) + theme_bw()+ labs(x="Fase em água doce (em mm)", y = "Fase no
+mar (em mm)")
+
+
+
+d21 <- data.femea %>% ggplot(aes(DGAD,  DGM, col =Reg)) + geom_point() +
+    scale_colour_manual(values = c("Blue", "Red")) + 
+    geom_smooth(method=lm,  
+                se=FALSE) + theme_bw()+guides(col=F) + labs(x="Fase em água doce (em mm)", y = "Fase no
+mar (em mm)")
+
+d22 <- data.femea %>% ggplot(aes(DGAD,  DGM)) + geom_point(aes(color = Reg)) +
+      scale_colour_manual(values = c("Blue", "Red")) + 
+      geom_smooth(method=lm,  
+                se=FALSE) + theme_bw()+ labs(x="Fase em água doce (em mm)", y = "Fase no
+mar (em mm)")
+
+#grid.arrange(d11,d12,d21,d22,ncol=2,nrow=2)
+
+####################GRAFICOS DE DENSIDADE########################################
+g11 <- data.femea %>% ggplot(aes(x = DGAD)) +
+        geom_density(aes(fill=factor(Reg)),position="identity", alpha=0.5) + theme(legend.position = "bottom") +
+        theme_bw() + labs(y = "Valores ", x = "Valores doce", fill = "Espécies\n")+  scale_fill_brewer(palette="Accent")+guides(fill=F)+scale_x_continuous(limits = c(-300, 300))+scale_y_continuous(limits = c(0, 0.025))
+
+g12 <- data.femea %>% ggplot(aes(x = DGM)) +
+        geom_density(aes(fill=factor(Reg)),position="identity", alpha=0.5) + theme(legend.position = "bottom") +
+        theme_bw() + labs(y = "Valores", x = "Valores do Mar", fill = "Espécies\n")+  scale_fill_brewer(palette="Accent")+labs(fill = "Grupos")+scale_x_continuous(limits = c(-300, 600))+scale_y_continuous(limits = c(0, 0.025))
+
+g21 <- data.macho %>% ggplot(aes(x = DGAD)) +
+        geom_density(aes(fill=factor(Reg)),position="identity", alpha=0.5) + theme(legend.position = "bottom") +
+        theme_bw() + labs(y = "Valores ", x = "Valores doce", fill = "Espécies\n")+  scale_fill_brewer(palette="Accent")+guides(fill=F)+scale_x_continuous(limits = c(-300, 300))+scale_y_continuous(limits = c(0, 0.025))
+
+g22 <- data.macho %>% ggplot(aes(x = DGM)) +
+        geom_density(aes(fill=factor(Reg)),position="identity", alpha=0.5) + theme(legend.position = "bottom") +
+        theme_bw() + labs(y = "Valores", x = "Valores do Mar", fill = "Espécies\n")+  scale_fill_brewer(palette="Accent")+labs(fill = "Grupos")+scale_x_continuous(limits = c(-300, 600))+scale_y_continuous(limits = c(0, 0.025))
+```
+
+
+A partir da Figura X, que consta o gráfico de dispersão entre as variaveis separadas por Região (Alasca e Canadá). Para o gênero Fêmea, podemos observar que os peixes do Canáda tendem a ter um diâmetro (em mm) da guelra durante a fase de água doce maior que os indivíduos do Alasca e durante a fase no Mar tendem a ter um diametro menor (em mm). Se olharmos separadamente os dois grupos, vemos que existe uma correlação levemente positiva de valor `r round(cor(filter(data.femea,Reg=="Canadá")[,3:4])[1,2],2)` entre os indivíduos do Canadá, e levemente negativa de valor `r round(cor(filter(data.femea,Reg=="Alasca")[,3:4])[1,2],2)` para os índividuos do Alasca. Vale ressaltar que se considerarmos ambos os Grupos, parecer haver uma correlação levemente negativa entre as variaveis. O mesmo é observado para o grupo  dos machos,se olharmos separadamente os dois grupos, vemos que existe uma correlação levemente positiva de valor `r round(cor(filter(data.macho,Reg=="Canadá")[,3:4])[1,2],2)` entre os indivíduos do Canadá, e levemente negativa de valor `r round(cor(filter(data.macho,Reg=="Alasca")[,3:4])[1,2],2)` para os índividuos do Alasca.
+
+
+```{r,fig.cap=c("Figura 1: Gráfico de dispersão entre os diâmetros da guelra de salmões em água doce e no mar - Macho"), fig.pos = '!h',fig.height=3}
+#######################MACHO##########################################
+grid.draw(cbind(ggplotGrob(d11),
+                ggplotGrob(d12),size = "first"))+ theme(legend.position = "bottom") 
+```
+
+```{r,fig.cap=c("Figura 1: Gráfico de dispersão entre os diâmetros da guelra de salmões em água doce e no mar- Fêmea"), fig.pos = '!h',fig.height=3}
+#######################FEMEA##########################################
+grid.draw(cbind(ggplotGrob(d21),
+                ggplotGrob(d22),size = "first"))+ theme(legend.position = "bottom") 
+```
+
+
+A partir dos Box-plot da Figura X, podemos ver para o gênero macho que o diâmetro das guelras do Canadá na fase em agua doce consideravelmente maior que o Grupo Alasca, já para a Fase no mar o contrario ocorre.    
+
+Além disso podemos ver que o diâmetro das guelras para o salmão fêmea do Canadá é consideravelmente maior do que os do Alasca, já durante a fase no mar, o contrario ocorre e  para o Canadá o valor máximo quase atinge a mediana do grupo Alasca.
+
+Portanto é possível notar a partir dos densidades é possível notar que existe uma sobreposição em boa parte da distribuições apresentadas, o que já foi notado nos boxplots anteriormente.
+
+
+```{r, fig.cap=c("Boxplots dos Grupos por Gênero"), fig.pos= '!h', fig.height=3.5, fig.width=7}
+grid.arrange(b11,b12,b21,b22,ncol=2,nrow=2)
+```
+
+
+```{r, fig.cap=c("Densidades dos grupos do gênero -  Fêmea"), fig.pos= '!h', fig.height=3.5, fig.width=7}
+#######################MACHO##########################################
+grid.draw(cbind(ggplotGrob(g11),
+                ggplotGrob(g12),size = "first"))+ theme(legend.position = "bottom") 
+```
+
+```{r, fig.cap=c("Densidades dos grupos do gênero -  Macho"), fig.pos= '!h', fig.height=3.5, fig.width=7}
+#######################FEMEA##########################################
+grid.draw(cbind(ggplotGrob(g21),
+                ggplotGrob(g22),size = "first"))+ theme(legend.position = "bottom")
+```
+
+
+
 5. Bibliografia
 
 - Azevedo, C. L. N. (2017). Notas de aula sobre análise multivariada de dados http://www.ime.unicamp.br/~cnaber/Material_AM_2S_2017.htm
