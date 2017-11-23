@@ -33,8 +33,8 @@ fontsize: 10pt
 \includegraphics[width=40pt,height=45pt]{logoUnicamp.png} 
 \end{minipage}\begin{minipage}[s]{11.25cm}\noindent
 {\begin{center} {\Large Universidade Estadual de Campinas}\\
-{Instituto de Matem·tica, EstatÌstica e ComputaÁ„o CientÌfica}\\
-{\sc Departamento de EstatÌstica}
+{Instituto de Matem√°tica, Estat√≠stica e Computa√ß√£o Cient√≠fica}\\
+{\sc Departamento de Estat√≠stica}
 \end{center}}
 \end{minipage}
 \begin{minipage}[s]{0.5cm}
@@ -50,7 +50,7 @@ fontsize: 10pt
 \vspace*{3.5cm}
 {\rule[0 ex]{16cm}{0.05cm}}
 {\huge \sc Trabalho - Parte 2 \\[8pt]
-RelatÛrio - Quest„o 1}
+Relat√≥rio - Quest√£o 1}
 {\rule[0 ex]{16cm}{0.05cm}}
 \end{center}
 
@@ -68,7 +68,7 @@ RelatÛrio - Quest„o 1}
 
 \vspace{0.2cm}
 
-Disciplina: {\bf ME731 - An·lise Multivariada}\\
+Disciplina: {\bf ME731 - An√°lise Multivariada}\\
 Professor: {\bf Caio Lucidius Naberezny Azevedo}
 \vspace{1cm}
 
@@ -82,18 +82,18 @@ options(OutDec= ",")
 ```
 
 ```{r, echo=FALSE}
-#definindo opÁıes padrıes dos chunks
+#definindo op√ß√µes padr√µes dos chunks
 knitr::opts_chunk$set(fig.align='center', echo=FALSE, warning=FALSE, message=FALSE)
 ```
 
 
 ```{r pacotes,cache = FALSE,echo=FALSE, warning = FALSE,eval=TRUE,message = FALSE, error = FALSE}
 #eval= FALSE faz com que o R ignore este chunk
-#echo = FALSE n„o permite que o chunk apareÁa no pdf
+#echo = FALSE n√£o permite que o chunk apare√ßa no pdf
 
 #pacotes = c("tidyverse","reshape2","knitr","captioner","gdata","gridExtra","Matrix","plotrix","xtable")
 
-packages= c("tidyverse","data.table","reshape2","captioner","gridExtra","caret","e1071","MASS","psych","xtable","corrplot","scales","knitr","kableExtra","formattable","Matrix","plyr")
+packages= c("tidyverse","data.table","reshape2","captioner","gridExtra","caret","e1071","MASS","psych","xtable","corrplot","scales","knitr","kableExtra","formattable","Matrix","plyr","car")
 
 
 #install.packages(packages)
@@ -111,7 +111,7 @@ tbls <- captioner(prefix="Tabela")
 
 ```{r func_aux}
 
-# aqui est„o as funcoes auxliares construÌda por nÛs ou que achamos na internet
+# aqui est√£o as funcoes auxliares constru√≠da por n√≥s ou que achamos na internet
 tabela.descritiva_regiao <- function(vetor){
   
   media=aggregate(vetor, by=list(dados2$Reg), mean)
@@ -157,24 +157,24 @@ tabela.descritiva_genero <- function(vetor){
   cv=100*(desvio_padrao$DP/media$Media)
   
   mediana=aggregate(vetor, by=list(dados2$Gen), median)
-  names(mediana)<-c("GÍnero", "Mediana")
+  names(mediana)<-c("G√™nero", "Mediana")
   
   min=aggregate(vetor, by=list(dados2$Gen), min)
-  names(min)<-c("GÍnero", "Minimo")
+  names(min)<-c("G√™nero", "Minimo")
   
   max=aggregate(vetor, by=list(dados2$Gen), max)
-  names(max)<-c("GÍnero", "Maximo")
+  names(max)<-c("G√™nero", "Maximo")
   
-  Genero<-c("F mea", "Macho")
+  Genero<-c("F√ämea", "Macho")
   
   tabela_descritiva_genero=cbind(Genero,c(52,48),round(media$Media,3),round(variancia$Variancia,3), round(desvio_padrao$DP,3), round(cv,3), round(min$Minimo,3), round(mediana$Mediana,3), round(max$Maximo,3))
-  colnames(tabela_descritiva_genero)<-c("GÍnero","n","Media", "Variancia", "Desvio Padrao", "CV(%)", "Minimo", "Mediana", "Maximo")
+  colnames(tabela_descritiva_genero)<-c("G√™nero","n","Media", "Variancia", "Desvio Padrao", "CV(%)", "Minimo", "Mediana", "Maximo")
   
   return(tabela_descritiva_genero)  
 }
 
 
-###### FunÁıes do Caio Referente ‡ teste de BOX #################
+###### Fun√ß√µes do Caio Referente √† teste de BOX #################
 
 
 
@@ -201,19 +201,19 @@ Box.teste.Igual.MCov<-function(m.X.completa,v.grupos,v.n,G)
   }
   Sigma.P <- Sigma.P/(sum(v.n)-G)
   
-  # EstatÌstica de ajuste
+  # Estat√≠stica de ajuste
   aux.u <- (sum(1/(v.n - 1)) - (1/(sum(v.n - 1))))*(2*p^2 + 3*p - 1)/(6*(p+1)*(G-1))
   Q.B <-  (1 - aux.u)*(sum(v.n-1)*log(det(Sigma.P)) - aux.k.1)
   aux.v <- 0.5*p*(p+1)*(G-1)
   e.nd.QB <- 1 - pchisq(Q.B,aux.v)
-#  cat("EstatÌstica do Teste: ", Q.B, "\n")
-#  cat("nÌvel descritivo: ",e.nd.QB,"\n")
-#  cat("Matrizes de Covari‚ncias por grupo: \n")
+#  cat("Estat√≠stica do Teste: ", Q.B, "\n")
+#  cat("n√≠vel descritivo: ",e.nd.QB,"\n")
+#  cat("Matrizes de Covari√¢ncias por grupo: \n")
 #  print(m.Sigma.completa)
   Sigma.P <-as.matrix(data.frame(Sigma.P))
-  #mudei aqui para conseguir printar o pvalor e o qui-quadrado mais f·cil
+  #mudei aqui para conseguir printar o pvalor e o qui-quadrado mais f√°cil
   return(list(Sigma.P=Sigma.P,p.valor = e.nd.QB, est.test = Q.B))
-} # fim fa funÁ„o
+} # fim fa fun√ß√£o
 
 
 
@@ -224,21 +224,21 @@ path_arq = glue::glue(getwd(),'/dados_salmao.txt')
 
 dados = read.table(path_arq)
 
-# descriÁ„o das colunas  
-# procedÍncia (1 - Alasca, 2 - Canad·), 
-# gÍnero (1 - fÍmea, 2 - macho), 
-# di‚metro das guelras durante a fase em ·gua doce (em mm), di‚metro das guelras durante a fase no mar (em mm)
+# descri√ß√£o das colunas  
+# proced√™ncia (1 - Alasca, 2 - Canad√°), 
+# g√™nero (1 - f√™mea, 2 - macho), 
+# di√¢metro das guelras durante a fase em √°gua doce (em mm), di√¢metro das guelras durante a fase no mar (em mm)
 
 
-# renomeando as colunas (Est· na ordem do banco)
-names(dados) = c("Reg","Gen","DGAD","DGM") #Reg=regi„o, Gen=GÍnero, DGAD=di‚metro das guelras durante a fase em ·gua doce (em mm), DGM= di‚metro das guelras durante a fase no mar (em mm)
+# renomeando as colunas (Est√° na ordem do banco)
+names(dados) = c("Reg","Gen","DGAD","DGM") #Reg=regi√£o, Gen=G√™nero, DGAD=di√¢metro das guelras durante a fase em √°gua doce (em mm), DGM= di√¢metro das guelras durante a fase no mar (em mm)
 
-# fiz este data frame para manipulaÁ„o na funÁ„o dscrmnante
+# fiz este data frame para manipula√ß√£o na fun√ß√£o dscrmnante
 
 dados2 = dados
-# Renomeando as vari·ves
-dados$Reg =  as.factor(ifelse(dados$Reg==1,"Alasca","Canad·"))
-dados$Gen =  as.factor(ifelse(dados$Gen==1,"fÍmea","macho"))
+# Renomeando as vari√°ves
+dados$Reg =  as.factor(ifelse(dados$Reg==1,"Alasca","Canad√°"))
+dados$Gen =  as.factor(ifelse(dados$Gen==1,"f√™mea","macho"))
 ```
 
 ```{r ana_descr}
@@ -257,52 +257,52 @@ resumo_DGM_genero=tabela.descritiva_genero(dados2$DGM)
 tab_resumo_genero=rbind(resumo_DGAD_genero, resumo_DGM_genero)
 
 
-# matriz onde a diaagonal s„o as vari‚ncias de cada vari·vel, abaixo da diagonal est· a covari‚ncia e acima, correlaÁ„o.
+# matriz onde a diaagonal s√£o as vari√¢ncias de cada vari√°vel, abaixo da diagonal est√° a covari√¢ncia e acima, correla√ß√£o.
 
 # al = Alasca
 
-# can = Canad·
+# can = Canad√°
 
 mat_cov_al = round(cov(filter(dados,Reg=="Alasca")[,3:4]),2)
 mat_cov_al[1,2] =round(cor(filter(dados,Reg=="Alasca")[,3:4])[1,2],2)
 
 
-mat_cov_can = round(cov(filter(dados,Reg=="Canad·")[,3:4]),2)
-mat_cov_can[1,2] =round(cor(filter(dados,Reg=="Canad·")[,3:4])[1,2],2)
+mat_cov_can = round(cov(filter(dados,Reg=="Canad√°")[,3:4]),2)
+mat_cov_can[1,2] =round(cor(filter(dados,Reg=="Canad√°")[,3:4])[1,2],2)
 
 ```
 
 ```{r}
-############################Gr·ficos de boxplot#################################
-# Boxplot de cada vari·vel com relaÁ„o a regi„o
+############################Gr√°ficos de boxplot#################################
+# Boxplot de cada vari√°vel com rela√ß√£o a regi√£o
 b1 = dados %>% ggplot(aes(Reg, DGAD))+stat_boxplot(geom ='errorbar')+geom_boxplot()+theme_bw()
 b2 = dados %>% ggplot(aes(Reg, DGM))+stat_boxplot(geom ='errorbar')+geom_boxplot()+theme_bw()
 
 
-############################Gr·ficos de dispers„o#####################################
+############################Gr√°ficos de dispers√£o#####################################
 library(grid)
 
 d1 <- dados %>% ggplot(aes(DGAD,  DGM, col =Reg)) + geom_point() +
     scale_colour_manual(values = c("Blue", "Red")) + 
     geom_smooth(method=lm,  
-                se=FALSE) + theme_bw()+guides(col=F) + labs(x="Fase em ·gua doce (em mm)", y = "Fase no
+                se=FALSE) + theme_bw()+guides(col=F) + labs(x="Fase em √°gua doce (em mm)", y = "Fase no
 mar (em mm)")
 
 d2 <- dados %>% ggplot(aes(DGAD,  DGM)) + geom_point(aes(color = Reg)) +
       scale_colour_manual(values = c("Blue", "Red")) + 
       geom_smooth(method=lm,  
-                se=FALSE) + theme_bw()+ labs(x="Fase em ·gua doce (em mm)", y = "Fase no
+                se=FALSE) + theme_bw()+ labs(x="Fase em √°gua doce (em mm)", y = "Fase no
 mar (em mm)")
 
 
 ####################GRAFICOS DE DENSIDADE########################################
 g1 <- dados %>% ggplot(aes(x = DGAD)) +
         geom_density(aes(fill=factor(Reg)),position="identity", alpha=0.5) + theme(legend.position = "bottom") +
-        theme_bw() + labs(y = "Valores ", x = "Valores doce", fill = "EspÈcies\n")+  scale_fill_brewer(palette="Accent")+guides(fill=F)
+        theme_bw() + labs(y = "Valores ", x = "Valores doce", fill = "Esp√©cies\n")+  scale_fill_brewer(palette="Accent")+guides(fill=F)
 
 g2 <- dados %>% ggplot(aes(x = DGM)) +
         geom_density(aes(fill=factor(Reg)),position="identity", alpha=0.5) + theme(legend.position = "bottom") +
-        theme_bw() + labs(y = "Valores", x = "Valores do Mar", fill = "EspÈcies\n")+  scale_fill_brewer(palette="Accent")+labs(fill = "Grupos")
+        theme_bw() + labs(y = "Valores", x = "Valores do Mar", fill = "Esp√©cies\n")+  scale_fill_brewer(palette="Accent")+labs(fill = "Grupos")
 
 ```
 
@@ -317,7 +317,7 @@ s2 <- cov(mx)
 vvar<-diag(s2)
 nvar<-2
 
-mx2<- dados %>% filter(Reg=="Canad·")
+mx2<- dados %>% filter(Reg=="Canad√°")
 n2 <- nrow(mx2)
 mx2 <- as.matrix(mx2[,3:4])
 vmu2 <-apply(mx2,2,mean)
@@ -337,11 +337,11 @@ vF2<- (n2-nvar2)*vF2/((n2-1)*nvar2)
 ```
 
 ```{r modelos, message=F}
-# aqu est„o as modelagens
+# aqu est√£o as modelagens
 
 #lda.fit = lda(Reg~DGAD+DGM, dados2)
 
-# Selecionando as amostras. Selecionei 25 observaÁıes de cada grupo para montar o treinamento do modelo
+# Selecionando as amostras. Selecionei 25 observa√ß√µes de cada grupo para montar o treinamento do modelo
 set.seed(1)
 treinog1 <- sort(sample(1:50,25,replace=FALSE))
 treinog2 <- sort(sample(51:100,25,replace=FALSE))
@@ -350,7 +350,7 @@ treino <- c(treinog1,treinog2)
 # Amostra treino
 #atrein <- iris[treino,]
 
-# Utilizando a funÁ„o lda
+# Utilizando a fun√ß√£o lda
 #m.X <- rbind(irisd[51:100,3:4],irisd[101:150,3:4])
 #Sp = rep(c("VE","VI"), rep(50,2))
 #m.Iris <- data.frame(m.X,Sp)
@@ -360,19 +360,19 @@ treino <- c(treinog1,treinog2)
 # as prioris tem de ser diferentes. Custo iguais
 
 result.ad <- lda(dados$Reg~., dados[,c(3,4)], prior = c(0.6,0.4),subset = treino)
-# coeficientes da funÁ„o discriminante
+# coeficientes da fun√ß√£o discriminante
 # result.ad$scaling
 # predizendo os grupos na amostra teste
 pred<-predict(result.ad, dados[-treino, c(3,4)])$class
-# funÁ„o discriminante
+# fun√ß√£o discriminante
 y <-predict(result.ad, dados[-treino, c(3,4)])$x 
 # Pegando a amostra teste
 data.teste <- dados[-treino,1]
-# Tabela de classificaÁ„o
+# Tabela de classifica√ß√£o
 tc <- table(data.teste,pred)
-#matriz de confus„o
+#matriz de confus√£o
 #confusionMatrix(tc)
-names(tc)<-c("Alasca", "Canad·")
+names(tc)<-c("Alasca", "Canad√°")
 #xtable(tc)
 
 ```
@@ -391,7 +391,7 @@ TEA <- (tc[1,2]+tc[2,1])/sum(tc)
 m.dados<- dados[treino,]
 
 Dados.1 <- (m.dados[m.dados[,1]=="Alasca",][,3:4])
-Dados.2 <- (m.dados[m.dados[,1]=="Canad·",][,3:4])
+Dados.2 <- (m.dados[m.dados[,1]=="Canad√°",][,3:4])
 v.mean1 <- cbind(c(result.ad$means[1,]))
 v.mean2 <- cbind(c(result.ad$means[2,]))
 S21 <- cov(Dados.1[,1:2])
@@ -406,13 +406,13 @@ TOE <- pnorm(-sqrt(delta2)/2)
 ```
 
 ```{r}
-# An·lise da funÁ„o discriminante para a amostra teste
-grupo <- as.factor(rep(c("Alasca","Canad·"), rep(25,2)))
+# An√°lise da fun√ß√£o discriminante para a amostra teste
+grupo <- as.factor(rep(c("Alasca","Canad√°"), rep(25,2)))
 # Medidas resumo
 datadados<-data.frame(y,grupo)
 colnames(datadados)<-c("y","grupo")
 medados<-ddply(datadados,.(grupo),summarise,media=mean(y),dp=sqrt(var(y)),vari=var(y),minimo=min(y),mediana=quantile(y,0.5),maximo=max(y),n=length(y))
-colnames(medados)<-c("Grupo","MÈdia","DP","Var.","MÌnimo","Mediana","M·ximo","n")
+colnames(medados)<-c("Grupo","M√©dia","DP","Var.","M√≠nimo","Mediana","M√°ximo","n")
 
 ```
 
@@ -426,26 +426,27 @@ boxplot_ac <- ggplot(datadados2, aes(grupo2,y2))+stat_boxplot(geom ='errorbar')+
 \setlength{\parindent}{3em}
 \doublespacing
 
-1. IntroduÁ„o
+1. Introdu√ß√£o
 
-A fronteira do Canad· com o Alasca È uma importante ·rea de pesca de salm„o, e o mercado deste peixe tem significante import‚ncia na economia, como vemos na Tabela 1, assim como exerce forte influÍncia na escassez ou abundancia deste peixe (num prÛximo ciclo reprodutivo) no local de reproduÁ„o. Existem basicamente dois tipos de Salm„o nessa regi„o, uma que nasce no Alasca e outra que nasce no Canad· e pela proximidade, um salm„o nascido no Alasca, pode acabar sendo pescado no mar por um pescador do Canada e vice versa. Os salmıes nascem em ·gua doce mas migram para o mar e retornam, posteriormente, para o local onde nasceram, para fins de reproduÁ„o, por isso, caso grande parte da populaÁ„o de salm„o nascidos em um local especÌfico for pescado, ocorre uma diminuiÁ„o na quantidade de salm„os que conseguir„o se reproduzir neste local, gerando escassez destes peixes. 
+A fronteira do Canad√° com o Alasca √© uma importante √°rea de pesca de salm√£o, peixe cujo mercado tem significante import√¢ncia na economia, como vemos na Tabela 1, exerce forte influ√™ncia na escassez ou abund√¢ncia deste peixe (em um pr√≥ximo ciclo reprodutivo) no local de reprodu√ß√£o. Existem basicamente dois tipos de Salm√£o nessa regi√£o: um que nasce no Alasca e outro que nasce no Canad√°. Pela proximidade, um salm√£o nascido no Alasca, pode acabar sendo pescado no mar por um pescador do Canad√° e vice versa. Os salm√µes nascem em √°gua doce mas migram para o mar e retornam, posteriormente, para o local onde nasceram, para fins de reprodu√ß√£o. Por isso, caso grande parte da popula√ß√£o de salm√£o nascida em um local espec√≠fico for pescado, ocorre uma diminui√ß√£o na quantidade de salm√£os que conseguir√£o se reproduzir neste local, gerando escassez destes peixes. 
 
-Os pescadores do Alasca eram conhecidos por interceptar grandes quantidades de salm„o canadense, e os pescadores canadenses tinham menos oportunidade de interceptar salm„o origin·rio do Alasca. Este fato gerou alguns conflitos entre Estados Unidos e Canada, tanto que em 1985 estes paÌses fizeram um tratado para pesca de salm„o do Oceano PacÌfico (Pacific Salmon Treaty'), proibindo a pesca de salm„o do tipo que nasce no Canad· por pescadores Norte Americanos e do tipo que nasce no Alasca por pescadores Canadenses.Portanto, a fim de seguir o tratado, È imprescindÌvel conseguir diferenciar os tipos de salm„o por sua regi„o de origem. Para maiores informaÁıes sobre esse conflito em (THE PACIFIC SALMON TREATY: A BRIEF TRUCE IN THE CANADA/U.S.A. PACIFIC SALMON WAR  (COLOCAR NAS REFER NCIAS)).
+Os pescadores do Alasca eram conhecidos por interceptar grandes quantidades de salm√£o canadense, deixando os canadenses com menos oportunidade de interceptar salm√£o origin√°rio do Alasca. Este fato gerou alguns conflitos entre Estados Unidos e Canad√°, tanto que em 1985 estes pa√≠ses fizeram um tratado para pesca de salm√£o do Oceano Pac√≠fico (*Pacific Salmon Treaty*), proibindo a pesca de salm√£o do tipo que nasce no Canad√° por pescadores norte americanos e do tipo que nasce no Alasca por pescadores canadenses. Portanto, para facilitar o seguimento do tratado, √© imprescind√≠vel conseguir diferenciar os tipos de salm√£o por sua regi√£o de origem. Para informa√ß√µes sobre esse conflito em (THE PACIFIC SALMON TREATY: A BRIEF TRUCE IN THE CANADA/U.S.A. PACIFIC SALMON WAR  (COLOCAR NAS REFER√äNCIAS)).
     
-Neste relatÛrio, pretende-se criar uma regra de classificaÁ„o, visando facilitar a indetificaÁ„o da origem dos salmıes pescados. O banco de dados contÈm duas vari·veis intituladas como DGAD e DGM  (di‚metro da guelra (em mm) na fase de ·gua doce e na fase no mar respectivamente) medidas em 50 salmıes provenientes do Alasca e em 50 salmıes provenientes do Canad·, assim como o gÍnero destes peixes. A partir deste momento, neste relatÛrio, referir-se-· a origem dos salmıes  indistintamente como Regi„o, localidade e/ou grupo.
+Neste relat√≥rio, pretende-se criar uma regra de classifica√ß√£o, visando descomplicar a  identifica√ß√£o da origem dos salm√µes pescados. O banco de dados cont√©m duas vari√°veis intituladas como DGAD e DGM  (di√¢metro da guelra (em mm) na fase de √°gua doce e na fase no mar respectivamente) medidas em 50 salm√µes provenientes do Alasca e em 50 salm√µes provenientes do Canad√°, assim como o sexo destes peixes. Neste relat√≥rio, nos referiremos a origem dos salm√µes  indistintamente como Regi√£o, localidade e/ou grupo.
 
-Todas as an·lises foram realizadas com o suporte dos softwares *R* vers„o 3.4.2 e *RStudio* vers„o 1.1.383.
-Considerou-se um nÌvel de signific‚ncia de 5% para tomada de decisıes quanto aos resultados dos testes estatÌsticos aqui apresentados.
+Todas as an√°lises foram realizadas com o suporte dos softwares *R* vers√£o 3.4.2 e *RStudio* vers√£o 1.1.383.
+
+Considerou-se um n√≠vel de signific√¢ncia de 5% para tomada de decis√µes quanto aos resultados dos testes estat√≠sticos aqui apresentados.
 
 \begin{table}[!h]
 \centering
-\caption{InformaÁıes sobre pesca de Salm„o no ano de 2015 para Alasca (veja $(link)[http://www.adfg.alaska.gov/index.cfm?adfg=commercialbyfisherysalmon.salmon_combined_historical]$ (((colocar nas referencias)))) e para Canad· ( veja $(link)[http://www.pac.dfo-mpo.gc.ca/stats/comm/summ-somm/annsumm-sommann/2015/ANNUAL15_USER_three_party_groups-eng.htm]$ (((colocar nas referencias))) )}
+\caption{Informa√ß√µes sobre pesca de Salm√£o no ano de 2015 para Alasca (veja $(link)[http://www.adfg.alaska.gov/index.cfm?adfg=commercialbyfisherysalmon.salmon_combined_historical]$ (((colocar nas referencias)))) e para Canad√° ( veja $(link)[http://www.pac.dfo-mpo.gc.ca/stats/comm/summ-somm/annsumm-sommann/2015/ANNUAL15_USER_three_party_groups-eng.htm]$ (((colocar nas referencias))) )}
 \label{my-label}
 \begin{tabular}{ccc}
 \hline
-\multicolumn{1}{l}{Origem} & \multicolumn{1}{l}{Toneladas} & \multicolumn{1}{l}{Mil DÛlares (EUA)} \\ \hline
+\multicolumn{1}{l}{Origem} & \multicolumn{1}{l}{Toneladas} & \multicolumn{1}{l}{Mil D√≥lares (EUA)} \\ \hline
 Alasca                     & 120280                        & 494783                                \\
-Canad·                     & 6534                          & 14168          \\
+Canad√°                     & 6534                          & 14168          \\
 \hline                    
 \end{tabular}
 \end{table}
@@ -455,9 +456,9 @@ Canad·                     & 6534                          & 14168          \\
 \newpage
 
 
-2. An·lise Descritiva
+2. An√°lise Descritiva
 
-A Tabela XX, apresenta algumas medidas resumo para as vai·veis DGAD e DGM separadas por regi„o (Alasca e Canad·).
+A Tabela XX, apresenta algumas medidas resumo para as vari√°veis DGAD e DGM separadas por regi√£o (Alasca e Canad√°).
 
 
 ```{r}
@@ -466,27 +467,27 @@ A Tabela XX, apresenta algumas medidas resumo para as vai·veis DGAD e DGM separa
 
 \begin{table}[ht]
 \centering
-\caption{Medidas Resumo das vari·veis por regi„o}
+\caption{Medidas Resumo das vari√°veis por regi√£o}
 \bgroup
 \def\arraystretch{1.0}
 \begin{tabular}{rlllllllll}
   \hline
- & Regi„o & n & Media & Variancia & Desvio Padrao & CV(\%) & Minimo & Mediana & Maximo \\ 
+ & Regi√£o & n & Media & Variancia & Desvio Padrao & CV(\%) & Minimo & Mediana & Maximo \\ 
   \hline
 \multirow{2}{*}{DGAD} & Alasca & 50 & 98,38 & 260,608 & 16,143 & 16,409 & 53 & 99 & 131 \\ 
-   & Canad· & 50 & 137,46 & 326,09 & 18,058 & 13,137 & 90 & 140 & 179 \\ \midrule
+   & Canad√° & 50 & 137,46 & 326,09 & 18,058 & 13,137 & 90 & 140 & 179 \\ \midrule
 \multirow{2}{*}{DGM} & Alasca & 50 & 429,66 & 1399,086 & 37,404 & 8,706 & 355 & 427,5 & 511 \\ 
-   & Canad· & 50 & 366,62 & 893,261 & 29,887 & 8,152 & 301 & 369,5 & 438 \\ \bottomrule
+   & Canad√° & 50 & 366,62 & 893,261 & 29,887 & 8,152 & 301 & 369,5 & 438 \\ \bottomrule
    \hline
 \end{tabular}
 \egroup
 \end{table}
 
 
-A partir da Figura 1, que consta o gr·fico de dispers„o entre as variaveis separadas por Regi„o (Alasca e Canad·), podemos observar que os indÌviduos do Can·da tendem a ter um di‚metro (em mm) da guelra durante a fase de ·gua doce maior que os indivÌduos do Alasca e durante a fase no Mar tendem a ter um diametro menor (em mm). Se olharmos separadamente os dois grupos, vemos que existe uma correlaÁ„o levemente positiva de valor `r round(cor(filter(dados,Reg=="Canad·")[,3:4])[1,2],2)` entre os indivÌduos do Canad·, e levemente negativa de valor `r round(cor(filter(dados,Reg=="Alasca")[,3:4])[1,2],2)` para os Ìndividuos do Alasca. Vale ressaltar que se considerarmos ambos os Grupos, parecer haver uma correlaÁ„o negativa entre as variaveis.
+A partir da Figura 1, que consta o gr√°fico de dispers√£o entre as vari√°veis separadas por Regi√£o (Alasca e Canad√°), podemos observar que os peixes do Canad√° tendem a ter um di√¢metro (em mm) da guelra durante a fase de √°gua doce maior que os peixes do Alasca e durante a fase no Mar tendem a ter um di√¢metro menor (em mm). Se olharmos separadamente os dois grupos, vemos que existe uma correla√ß√£o levemente positiva de valor `r round(cor(filter(dados,Reg=="Canad√°")[,3:4])[1,2],2)` entre os peixes do Canad√°, e levemente negativa de valor `r round(cor(filter(dados,Reg=="Alasca")[,3:4])[1,2],2)` para os peixes do Alasca. Vale ressaltar que se considerarmos ambos os Grupos, parecer haver uma correla√ß√£o negativa entre as vari√°veis.
   
 
-```{r,fig.cap=c("Figura 1: Gr·fico de dispers„o entre os di‚metros da guelra de salmıes em ·gua doce e no mar"), fig.pos = '!h',fig.height=3}
+```{r,fig.cap=c("Figura 1: Gr√°fico de dispers√£o entre os di√¢metros da guelra de salm√µes em √°gua doce e no mar"), fig.pos = '!h',fig.height=3}
 #LINHA DE REGRESSAO PARA AMBOS OS GRUPOS
 grid.draw(cbind(ggplotGrob(d1),
                 ggplotGrob(d2),size = "first"))
@@ -494,22 +495,22 @@ grid.draw(cbind(ggplotGrob(d1),
 
 \vspace{1cm}
 
-Na Figura 2 notamos que o di‚metro da guelra È menor na ·gua doce para os indivÌduos de ambos os grupos, constatamos isso tambÈm na distribuiÁ„o de densidade na Figura X, e reforÁado nos valores das medidas centrais, como a da mÈdia e mediana, na Tabela X. Estes resultados s„o esperados devido a natureza dos dados, pois as medidas em ·gua doce foram obtidas na fase inÌcial da vida dos peixes e as mediÁıes obtidas no mar aconteceram na maturidade destes salmıes. 
+Na Figura 2 notamos que o di√¢metro da guelra √© menor na √°gua doce para os peixes de ambos os grupos, o que constatamos tamb√©m na distribui√ß√£o de densidade na Figura X e √© refor√ßado nos valores das medidas centrais, como a da m√©dia e mediana, na Tabela X. Estes resultados s√£o esperados devido a natureza dos dados, pois as medidas em √°gua doce foram obtidas na fase inicial da vida dos peixes e as medi√ß√µes obtidas no mar aconteceram na maturidade destes salm√µes. 
   
-Podemos observar tambÈm nos box-plot, que o di‚metro das guelras para o salm„o do Canad· È consideravelmente maior do que os do Alasca, j· durante a fase no mar, o contr·rio ocorre. Para ambas as vari·veis (DGAD, DGM) È possÌvel notar uma sobreposiÁ„o em boa parte da distribuiÁıes apresentadas Figura 3. As distribuiÁıes parecem ser levemente assimÈtricas, mais evidente para o di‚metro da guelra no mar de indivÌduos do Canad·, e menos evidente para di‚metro da guelra na ·gua doce de indivÌduos do Alasca.
+Podemos observar tamb√©m nos box-plot, que o di√¢metro das guelras para o salm√£o do Canad√° √© consideravelmente maior do que os do Alasca. Durante a fase no mar, ocorre o contr√°rio. Para ambas as vari√°veis (DGAD, DGM) √© poss√≠vel notar uma sobreposi√ß√£o em boa parte da distribui√ß√µes apresentadas na Figura 3. As distribui√ß√µes parecem ser levemente assim√©tricas, mais evidente para o di√¢metro da guelra no mar dos peixes do Canad√°, e menos evidente para di√¢metro da guelra na √°gua doce dos salm√µes do Alasca.
   
 
 ```{r,fig.cap=c("Boxplots por grupo"), fig.pos = '!h', fig.height=3}
 grid.arrange(b1,b2, nrow=1, ncol=2)
 ```
 
-```{r eval=FALSE,fig.cap=c("Figura 3: DistribuiÁ„o estimada por grupo"), fig.pos = '!h', fig.height=3}
-# eval= FALSE porque n„o est· funcionando e n„o escrevemos nada sobre (È dispens·vel essa parte)
+```{r eval=FALSE,fig.cap=c("Figura 3: Distribui√ß√£o estimada por grupo"), fig.pos = '!h', fig.height=3}
+# eval= FALSE porque n√£o est√° funcionando e n√£o escrevemos nada sobre (√© dispens√°vel essa parte)
 grid.draw(cbind(ggplotGrob(g1),
                 ggplotGrob(g2),size = "first"))+ theme(legend.position = "bottom") 
 ```
 
-Podemos observar na Figura 4 que para cada vari·vel DGAD e DGM foi realizado um gr·fico de quantil-quantil para cada Grupo (Canad· e Alasca). Vemos que para o di‚metro da guelra na fase em ·gua doce de indÌvÌduos do Alasca, os pontos se comportaram de maneira razoavelmente aleatÛria em torno da linha de referÍncia, n„o apresentando sinais evidentes de tendÍncia. Os outros trÍs gr·ficos, apresentam uma certa sistematizaÁ„o no comportamento dos dados em torno da linha de referÍncia, evidenciando uma certa tendÍncia, embora pareÁa ser menos contundente, configurando um ponto contra a suposiÁ„o de normalidade dos dados, porÈm n„o seria irrazo·vel supor normalidade para as vari·veis neste caso dada a fraca intensidade desta tendÍncia.
+Podemos observar na Figura 4 que para cada vari√°vel DGAD e DGM foi realizado um gr√°fico de quantil-quantil para cada Grupo (Canad√° e Alasca). Vemos que para o di√¢metro da guelra na fase em √°gua doce de peixes do Alasca, os pontos se comportaram de maneira razoavelmente aleat√≥ria em torno da linha de refer√™ncia, n√£o apresentando sinais evidentes de tend√™ncia. Os outros tr√™s gr√°ficos, apresentam uma certa sistematiza√ß√£o no comportamento dos dados em torno da linha de refer√™ncia, evidenciando uma certa tend√™ncia, embora pare√ßa ser menos contundente, e configurando um ponto contra a suposi√ß√£o de normalidade dos dados> Por√©m n√£o seria irrazo√°vel supor normalidade para as vari√°veis neste caso dada a fraca intensidade desta tend√™ncia.
 
 
 ```{r,fig.cap=c("Figura 4: Quantil-quantil para cada Grupo"),fig.width=8, fig.height=5.5,fig.pos = '!h'}
@@ -520,28 +521,28 @@ dgad =dados$DGAD
 dgm = dados$DGM
 
 par(mfrow=c(2,2))
-qqPlot(scale(dgad[grupo=="Alasca"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="Quantil da distriuiÁ„o amostral",cex=1.2,id.cex=1.2,main="Fase em ·gua doce - Alasca")
-qqPlot(scale(dgm[grupo=="Alasca"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="Quantil da distriuiÁ„o amostral",cex=1.2,id.cex=1.2,main="Fase no mar - Alasca")
-qqPlot(scale(dgad[grupo=="Canad·"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="Quantil da distriuiÁ„o amostral",cex=1.2,id.cex=1.2,main="Fase em ·gua doce - Canad·")
-qqPlot(scale(dgm[grupo=="Canad·"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="Quantil da distriuiÁ„o amostral",cex=1.2,id.cex=1.2,main="Fase no mar - Canad·")
+qqPlot(scale(dgad[grupo=="Alasca"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="Quantil da distriui√ß√£o amostral",cex=1.2,id.cex=1.2,main="Fase em √°gua doce - Alasca")
+qqPlot(scale(dgm[grupo=="Alasca"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="Quantil da distriui√ß√£o amostral",cex=1.2,id.cex=1.2,main="Fase no mar - Alasca")
+qqPlot(scale(dgad[grupo=="Canad√°"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="Quantil da distriui√ß√£o amostral",cex=1.2,id.cex=1.2,main="Fase em √°gua doce - Canad√°")
+qqPlot(scale(dgm[grupo=="Canad√°"]),dist="norm",mean=0,sd=1,col.lines="red",grid="FALSE",xlab="quantil da N(0,1)",ylab="Quantil da distriui√ß√£o amostral",cex=1.2,id.cex=1.2,main="Fase no mar - Canad√°")
 ```
 
 
-Na Figura XX, podemos ver que a normalidade bivariada n„o parece ser uma suposiÁ„o razoavel para nenhum dos grupos, porque alÈm da sistematizaÁ„o em torno da linha de referÍncia, existem  muitos pontos fora das bandas de confianÁa. Dadas as observaÁıes, vemos que a suposiÁ„o de normalidade multivariada para ambas as regiıes parece ser irrazo·vel.
-Contudo, a tÈcnica de an·lise discriminante de Fisher foi desenvolvida sem supor normalidade dos dados, portanto, a suposiÁ„o de normalidade avaliadas com base nos gr·ficos 4 e 5 n„o s„o relevantes para a aplicaÁ„o da tÈcnica de an·lise discriminante de Fisher.
+Na Figura XX, podemos ver que a normalidade bivariada n√£o parece ser uma suposi√ß√£o razo√°vel para nenhum dos grupos, porque al√©m da sistematiza√ß√£o em torno da linha de refer√™ncia, existem  muitos pontos fora das bandas de confian√ßa. Dadas as observa√ß√µes, vemos que a suposi√ß√£o de normalidade multivariada para ambas as regi√µes parece ser irrazo√°vel.
+Contudo, a t√©cnica de an√°lise discriminante de Fisher foi desenvolvida sem supor normalidade dos dados. Assim, a suposi√ß√£o de normalidade avaliadas com base nos gr√°ficos 4 e 5 n√£o √© relevante para a aplica√ß√£o da t√©cnica de an√°lise discriminante de Fisher.
 
-```{r, fig.height=4.5,fig.width=9,fig.cap=c(" Gr·fico de quantil-quantil com envelopes para a dist‚ncia de Mahalanobis; A) Alasca, B) Canad·"),fig.pos = '!h'}
+```{r, fig.height=4.5,fig.width=9,fig.cap=c(" Gr√°fico de quantil-quantil com envelopes para a dist√¢ncia de Mahalanobis; A) Alasca, B) Canad√°"),fig.pos = '!h'}
 library(car)
 par(mfrow=c(1,2))
 
-car::qqPlot(vF,dist="f",df1=nvar,df2=n-nvar,col.lines="red",grid="FALSE",xlab="Quantil da distribuiÁ„o F",ylab="Forma quadr·tica",cex=1.2,id.cex=1.2, main=" A) Alasca")
+car::qqPlot(vF,dist="f",df1=nvar,df2=n-nvar,col.lines="red",grid="FALSE",xlab="Quantil da distribui√ß√£o F",ylab="Forma quadr√°tica",cex=1.2,id.cex=1.2, main=" A) Alasca")
 
-car::qqPlot(vF2,dist="f",df1=nvar2,df2=n2-nvar2,col.lines="red",grid="FALSE",xlab="Quantil da distribuiÁ„o F",ylab="Forma quadr·tica",cex=1.2,id.cex=1.2, main="B) Canad·")
+car::qqPlot(vF2,dist="f",df1=nvar2,df2=n2-nvar2,col.lines="red",grid="FALSE",xlab="Quantil da distribui√ß√£o F",ylab="Forma quadr√°tica",cex=1.2,id.cex=1.2, main="B) Canad√°")
 ```
 
 
 ```{r}
-#Pegando a coluna das espÈcies (grupos) para fazer o vetor identificador de grupos
+#Pegando a coluna das esp√©cies (grupos) para fazer o vetor identificador de grupos
 
 
 #v.especies <- cbind(as.numeric(dadosmoscas[,1]))
@@ -551,13 +552,13 @@ v.especies <- dados$Reg
 m.dados <- dados[,-c(1,2)]
 
 
-#Criando um vetor com as quantidades de observaÁıes de cada grupo, constam 50 de cada grupo
+#Criando um vetor com as quantidades de observa√ß√µes de cada grupo, constam 50 de cada grupo
 v.n_especies <- rbind(50,50)
 
-#IdentificaÁ„o da quantidade de grupos
+#Identifica√ß√£o da quantidade de grupos
 k.G <- 2
 
-#IdentificaÁ„o da quantidade de vari·veis
+#Identifica√ß√£o da quantidade de vari√°veis
 k.P <- 2
 ```
 
@@ -565,15 +566,15 @@ k.P <- 2
 
 
 ```{r}
-#Teste de igualdade das matrizes de covari‚ncia entre os tipos de Salm„o
+#Teste de igualdade das matrizes de covari√¢ncia entre os tipos de Salm√£o
 
-#resuldado da funÁ„o
+#resuldado da fun√ß√£o
 test.igual.matriz <-Box.teste.Igual.MCov(as.matrix(m.dados),as.numeric(v.especies),v.n_especies,k.G)
 
-#matriz sigma P (n„o lembro o que È exatamente)
+#matriz sigma P (n√£o lembro o que √© exatamente)
 m.sigma.P <- test.igual.matriz$Sigma.P
 
-#estatÌstica do teste
+#estat√≠stica do teste
 est.test.igual.m.cov <- test.igual.matriz$est.test
 
 #p-valor do teste
@@ -583,16 +584,16 @@ p.valor.igual.m.cov <- test.igual.matriz$p.valor
 
 
 
-Foi realizado o teste de Box para igualdade de matrizes de covari‚ncias dos dados dos tipos de salm„o das duas regiıes (Alasca e Canad·), resultando num p-valor = `r ifelse(p.valor.igual.m.cov < 0.001,"<0,001",round(p.valor.igual.m.cov,3))`, indicando que `r if(p.valor.igual.m.cov >0.05)"n„o"` existe diferenÁa estatisticamente significante entre as matrizes de covari‚ncias dos tipos de salm„o, indicando que `r if(p.valor.igual.m.cov < 0.05)"n„o"` parece ser razo·vel a suposiÁ„o de igualdade das matrizes de covari‚ncias entre os tipos de salm„o. Este resultado tÍm grande relev‚ncia, uma vez que a tÈcnica de an·lise discriminante de Fisher supıe homoced·sticidade multivariada, ou seja, igualdade das matrizes de covari‚ncias para os grupos. O teste de box, portanto, indicou que a suposiÁ„o de homoced·sticidade neste caso `r if(p.valor.igual.m.cov < 0.05)"n„o"` parece ser razo·vel quando se considera os grupos de salm„o origin·rios do Alasca e do Canad·.
+Foi realizado o teste de Box para a igualdade de matrizes de covari√¢ncias dos dados dos tipos de salm√£o das duas regi√µes (Alasca e Canad√°), resultando num p-valor = `r ifelse(p.valor.igual.m.cov < 0.001,"<0,001",round(p.valor.igual.m.cov,3))` e, indicando que `r if(p.valor.igual.m.cov >0.05)"n√£o"` existe diferen√ßa estatisticamente significante entre as matrizes de covari√¢ncias dos tipos de salm√£o e que `r if(p.valor.igual.m.cov < 0.05)"n√£o"` parece ser razo√°vel a suposi√ß√£o de igualdade das matrizes de covari√¢ncias entre os tipos de salm√£o. Este resultado tem grande relev√¢ncia, uma vez que a t√©cnica de an√°lise discriminante de Fisher sup√µe homocedasticidade multivariada, ou seja, igualdade das matrizes de covari√¢ncias para os grupos. O teste de box, portanto, indicou que a suposi√ß√£o de homocedasticidade neste caso `r if(p.valor.igual.m.cov < 0.05)"n√£o"` parece ser razo√°vel quando se considera os grupos de salm√£o origin√°rios do Alasca e do Canad√°.
 
 
 ```{r}
-############     Salm„o macho    #################
+############     Salm√£o macho    #################
 
-#Pegando a coluna das espÈcies (grupos) para fazer o vetor identificador de grupos
+#Pegando a coluna das esp√©cies (grupos) para fazer o vetor identificador de grupos
 
 
-#v.especies <- ifelse(dados$Reg == "Alasca" & dados$Gen == "macho", "AlascaMacho", ifelse(dados$Reg == "Alasca" & dados$Gen == "fÍmea","AlascaFemea",ifelse(dados$Reg == "Canad·" & dados$Gen == "macho", "Canad·Macho", ifelse(dados$Reg == "Canad·" & dados$Gen == "fÍmea","Canad·Femea","NA"))))
+#v.especies <- ifelse(dados$Reg == "Alasca" & dados$Gen == "macho", "AlascaMacho", ifelse(dados$Reg == "Alasca" & dados$Gen == "f√™mea","AlascaFemea",ifelse(dados$Reg == "Canad√°" & dados$Gen == "macho", "Canad√°Macho", ifelse(dados$Reg == "Canad√°" & dados$Gen == "f√™mea","Canad√°Femea","NA"))))
 
 
 v.especies <- dados[,1:2]
@@ -601,27 +602,27 @@ v.especies <- dados[,1:2]
 m.dados <- dados[,-c(1,2)]
 
 
-#Criando um vetor com as quantidades de observaÁıes de cada grupo, constam 50 de cada grupo
+#Criando um vetor com as quantidades de observa√ß√µes de cada grupo, constam 50 de cada grupo
 v.n_especies <- rbind(25,25)
 
-#IdentificaÁ„o da quantidade de grupos
+#Identifica√ß√£o da quantidade de grupos
 k.G <- 2
 
-#IdentificaÁ„o da quantidade de vari·veis
+#Identifica√ß√£o da quantidade de vari√°veis
 k.P <- 2
 ```
 
 
 ```{r}
-#Teste de igualdade das matrizes de covari‚ncia entre os tipos de salm„o macho
+#Teste de igualdade das matrizes de covari√¢ncia entre os tipos de salm√£o macho
 
-#resuldado da funÁ„o
+#resuldado da fun√ß√£o
 test.igual.matriz.macho <-Box.teste.Igual.MCov(as.matrix(m.dados[v.especies$Gen == "macho",]),as.numeric(v.especies[v.especies$Gen == "macho",1]),v.n_especies,k.G)
 
-#matriz sigma P (n„o lembro o que È exatamente)
+#matriz sigma P (n√£o lembro o que √© exatamente)
 m.sigma.P.macho <- test.igual.matriz.macho$Sigma.P
 
-#estatÌstica do teste
+#estat√≠stica do teste
 est.test.igual.m.cov.macho <- test.igual.matriz.macho$est.test
 
 #p-valor do teste
@@ -632,21 +633,21 @@ p.valor.igual.m.cov.macho <- test.igual.matriz$p.valor
 
 
 
-Foi realizado o teste de Box para igualdade de matrizes de covari‚ncias dos dados dos dois tipos de salm„o macho, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov.macho < 0.001,"<0,001",round(p.valor.igual.m.cov.macho,3))`, indicando que `r if(p.valor.igual.m.cov.macho >0.05)"n„o"` existe diferenÁa estatisticamente significante entre as matrizes de covari‚ncias dos tipos de salm„o machos, indicando que `r if(p.valor.igual.m.cov.macho <0.05) "n„o"` parece ser razo·vel a suposiÁ„o de igualdade das matrizes de covari‚ncias entre os tipos de salm„o macho. O teste de Box, portanto, indicou que a suposiÁ„o de homoced·sticidade neste caso `r if(p.valor.igual.m.cov.macho < 0.05)"n„o"` parece ser razo·vel quando se considera os grupos de salm„o do sexo masculino origin·rios do Alasca e do Canad·.
+Foi realizado o teste de Box para igualdade de matrizes de covari√¢ncias dos dados dos dois tipos de salm√£o macho, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov.macho < 0.001,"<0,001",round(p.valor.igual.m.cov.macho,3))`, indicando que `r if(p.valor.igual.m.cov.macho >0.05)"n√£o"` existe diferen√ßa estatisticamente significante entre as matrizes de covari√¢ncias dos tipos de salm√£o machos e que `r if(p.valor.igual.m.cov.macho <0.05) "n√£o"` parece ser razo√°vel a suposi√ß√£o de igualdade das matrizes de covari√¢ncias entre os tipos de salm√£o macho. O teste de Box, portanto, indicou que a suposi√ß√£o de homocedasticidade neste caso `r if(p.valor.igual.m.cov.macho < 0.05)"n√£o"` parece ser razo√°vel quando se considera os grupos de salm√£o do sexo masculino origin√°rios do Alasca e do Canad√°.
 
 
 
 
 ```{r}
-#Teste de igualdade das matrizes de covari‚ncia entre os tipos de salm„o fÍmea
+#Teste de igualdade das matrizes de covari√¢ncia entre os tipos de salm√£o f√™mea
 
-#resuldado da funÁ„o
-test.igual.matriz.femea <-Box.teste.Igual.MCov(as.matrix(m.dados[v.especies$Gen == "fÍmea",]),as.numeric(v.especies[v.especies$Gen == "fÍmea",1]),v.n_especies,k.G)
+#resuldado da fun√ß√£o
+test.igual.matriz.femea <-Box.teste.Igual.MCov(as.matrix(m.dados[v.especies$Gen == "f√™mea",]),as.numeric(v.especies[v.especies$Gen == "f√™mea",1]),v.n_especies,k.G)
 
-#matriz sigma P (n„o lembro o que È exatamente)
+#matriz sigma P (n√£o lembro o que √© exatamente)
 m.sigma.P.femea <- test.igual.matriz.femea$Sigma.P
 
-#estatÌstica do teste
+#estat√≠stica do teste
 est.test.igual.m.cov.femea <- test.igual.matriz.femea$est.test
 
 #p-valor do teste
@@ -655,15 +656,15 @@ p.valor.igual.m.cov.femea <- test.igual.matriz$p.valor
 ```
 
 
-Foi realizado o teste de Box para igualdade de matrizes de covari‚ncias dos dados dos dois tipos de salm„o fÍmea, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov.femea < 0.001,"<0,001",round(p.valor.igual.m.cov.femea,3))`, indicando que `r if(p.valor.igual.m.cov.femea >0.05)"n„o"` existe diferenÁa estatisticamente significante entre as matrizes de covari‚ncias dos tipos de salm„o femeas, indicando que `r if(p.valor.igual.m.cov.femea <0.05) "n„o"` parece ser razo·vel a suposiÁ„o de igualdade das matrizes de covari‚ncias entre os tipos de salm„o femea. O teste de box, portanto, indicou que a suposiÁ„o de homoced·sticidade neste caso `r if(p.valor.igual.m.cov.femea < 0.05)"n„o"` parece ser razo·vel quando se considera os grupos de salm„o do sexo feminino origin·rios do Alasca e do Canad·.
+Tamb√©m foi realizado um teste de Box para igualdade de matrizes de covari√¢ncias dos dados dos dois tipos de salm√£o f√™mea, ao qual resultou num p-valor `r ifelse(p.valor.igual.m.cov.femea < 0.001,"<0,001",round(p.valor.igual.m.cov.femea,3))`, indicando que `r if(p.valor.igual.m.cov.femea >0.05)"n√£o"` existe diferen√ßa estatisticamente significante entre as matrizes de covari√¢ncias dos tipos de salm√£o f√™meas, indicando que `r if(p.valor.igual.m.cov.femea <0.05) "n√£o"` parece ser razo√°vel a suposi√ß√£o de igualdade das matrizes de covari√¢ncias entre os tipos de salm√£o femea. O teste de box, portanto, indicou que a suposi√ß√£o de homocedasticidade neste caso `r if(p.valor.igual.m.cov.femea < 0.05)"n√£o"` parece ser razo√°vel quando se considera os grupos de salm√£o do sexo feminino origin√°rios do Alasca e do Canad√°.
   
 \newpage
 
-3. An·lise Inferencial
+3. An√°lise Inferencial
 
-N„o encontramos nenhuma informaÁ„o que nos dÍ direcionamento direto ‡ definiÁ„o de probabilidades ‡ priori de um salm„o ser proveniente de uma ou outra localidade (Alasca ou Canada), uma vez que essa probabilidade est· muito relacionada ao local onde o salm„o foi pescado. Por n„o ter informaÁıes suficientes irÌamos supor probabilidades iguais para cada localidade, porÈm como foi orientado utilizar probabilidades diferentes para cada localidade, utilizamos os dados sobre toneladas de salm„o comercial pescados e o respectivo valor monet·rio gerado no ano de 2015 (dado mais atual) a partir dessa pesca para as duas localidades, estes valores s„o apresentados na Tabela 01 ("tabela com as quantidades de salm„o Alasca/CANADA e $"). Observe que o volume de pesca de salm„o para o ano de 2015 È muito maior no Alasca em comparaÁ„o com o Canad·, isso nos leva a acreditar que a populaÁ„o de salm„o do Alasca È maior que a populaÁ„o de salm„o do Canad·, o que nos leva a conjecturar que a probabilidade de um salm„o ser origin·rio do Alasca È maior do que um salm„o ser origin·rio do Canad·. Acreditamos que considerar a probabilidade ‡ priori de um salm„o ser origin·rio do Alasca como sendo 0,6 e ser origin·rio do Canad· como sendo 0,4 parece ser razo·vel diante dos dados da tabela 01 e da relaÁ„o levantada entre a probabilidade do salm„o pertencer a uma determinada localidade e o local da pesca, uma vez que n„o se tÍm informaÁıes mais precisas quanto ‡s populaÁıes de salm„o e seus respectivos comportamentos migratÛrios destes de ambas as localidades.
+N√£o encontramos nenhuma informa√ß√£o que nos d√™ direcionamento direto √† defini√ß√£o de probabilidades a priori de um salm√£o ser proveniente de uma ou outra localidade (Alasca ou Canad√°), uma vez que essa probabilidade est√° muito relacionada ao local onde o salm√£o foi pescado. Por n√£o ter informa√ß√µes suficientes ir√≠amos supor probabilidades iguais para cada localidade. Por√©m como foi orientado utilizar probabilidades diferentes para cada localidade, utilizamos os dados sobre toneladas de salm√£o comercial pescados e seus respectivos valores monet√°rios gerados no ano de 2015 (dado mais atual) a partir dessa pesca para as duas localidades Estes valores s√£o apresentados na Tabela 01 ("tabela com as quantidades de salm√£o Alasca/CANADA e $"). Observamos que o volume de pesca de salm√£o para o ano de 2015 √© muito maior no Alasca em compara√ß√£o com o Canad√°. Isso nos leva a acreditar que a popula√ß√£o de salm√£o do Alasca √© maior que a popula√ß√£o de salm√£o do Canad√° e que nos leva a conjecturar que a probabilidade de um salm√£o ser origin√°rio do Alasca √© maior do que um salm√£o ser origin√°rio do Canad√°. Acreditamos que considerar a probabilidade a priori de um salm√£o ser origin√°rio do Alasca como sendo 0,6 e ser origin√°rio do Canad√° como sendo 0,4 parece ser razo√°vel diante dos dados da Tabela 1 e da rela√ß√£o levantada entre a probabilidade do salm√£o pertencer a uma determinada localidade e o local da pesca, uma vez que n√£o se tem informa√ß√µes mais precisas quanto √†s popula√ß√µes de salm√£o e seus respectivos comportamentos migrat√≥rios destes de ambas as localidades.
 
-Com base na metodologia de An·lise discriminante de Fisher, considerando custos iguais de classificaÁ„o errada e probabilidades ‡ priori destacadas acima, obtivemos uma regra de classificaÁ„o ‡ qual est„o apresentados os seguintes resultados.
+Com base na metodologia de An√°lise discriminante de Fisher, considerando custos iguais de classifica√ß√£o errada e probabilidades a priori destacadas acima, obtivemos uma regra de classifica√ß√£o a qual est√£o apresentados os seguintes resultados.
 
 ```{r}
 #xtable(tc)
@@ -680,61 +681,61 @@ TOE=100*TOE
 
 \begin{table}[ht]
 \centering
-\caption{Resultados da classificaÁ„o da amostra teste}
+\caption{Resultados da classifica√ß√£o da amostra teste}
 \bgroup
 \def\arraystretch{1.0}
 \begin{tabular}{rrr}
 \toprule
-& Alasca & Canad· \\ \midrule
+& Alasca & Canad√° \\ \midrule
 \hline
 Alasca & 23 & 2 \\
-Canad· & 1 & 24 \\ \bottomrule
+Canad√° & 1 & 24 \\ \bottomrule
 \hline
 \end{tabular}
 \egroup
 \end{table}
 
 
-Ao observar a Tabela XX (Resultados da classificaÁ„o da amostra teste), observamos a qualidade da regra de classificaÁ„o, obtemos uma taxa de erro aparente TEA =  `r round(TEA,2)` $\%$, valor bem prÛximo ao da taxa Ûtima de erro TOE = `r round(TOE,2)` $\%$ ao qual leva em consideraÁ„o a validade das suposiÁ„o de igualdade das matrizes de covari‚ncia relativas aos dois tipos de salm„o, ou seja, mesmo com as observaÁıes indicativas ‡ fuga da suposiÁ„o mencionadas, a regra de classificaÁ„o mostrou uma taxa de erro bem prÛxima ‡ taxa Ûtima, indicando uma boa performance da regra proposta.
+Ao observar a Tabela XX (Resultados da classifica√ß√£o da amostra teste), observamos a qualidade da regra de classifica√ß√£o e obtemos uma taxa de erro aparente TEA =  `r round(TEA,2)` $\%$, valor bem pr√≥ximo ao da taxa √≥tima de erro TOE = `r round(TOE,2)` $\%$ ao qual leva em considera√ß√£o a validade da suposi√ß√£o de igualdade das matrizes de covari√¢ncia relativas aos dois tipos de salm√£o, ou seja, mesmo com as observa√ß√µes indicativas √† fuga da suposi√ß√£o mencionadas, a regra de classifica√ß√£o mostrou uma taxa de erro bem pr√≥xima √† taxa √≥tima, indicando uma boa performance da regra proposta.
     
-A Tabela XX (Medidas resumo para os valores funÁ„o discriminante aplicada na amostra teste, por grupo:) apresenta medidas resumo para os valores da funÁ„o discriminante e a Figura XX (Boxplots da funÁ„o discriminante aplicada ‡ amostra teste, por grupo) apresenta os boxplots para estes mesmos valores. Note que o valor m·ximo para o grupo Alasca È bem proximo ao valor da mediana para o grupo Canad·, o mesmo acontece para o mÌnimo do grupo Canad· em comparaÁ„o com a mediana do grupo Alasca, o desvio padr„o dos valores dos dois grupos È bastante similar (diferenÁa de 0,19). Para ambos os grupos os valores da mÈdia e mediana se apresentam com valores bastante prÛximos e os boxplots parecem ser simÈtricos (ou pouco assimÈtricos). 
+A Tabela XX (Medidas resumo para os valores fun√ß√£o discriminante aplicada na amostra teste, por grupo:) apresenta medidas resumo para os valores da fun√ß√£o discriminante e a Figura XX (Boxplots da fun√ß√£o discriminante aplicada √† amostra teste, por grupo) apresenta os boxplots para estes mesmos valores. Notamos que o valor m√°ximo para o grupo Alasca √© bem pr√≥ximo ao valor da mediana para o grupo Canad√°. O mesmo acontece para o m√≠nimo do grupo Canad√° em compara√ß√£o com a mediana do grupo Alasca, o desvio padr√£o dos valores dos dois grupos √© bastante similar (diferen√ßa de 0,19). Para ambos os grupos, os valores da m√©dia e mediana se apresentam com valores bastante pr√≥ximos e os boxplots parecem ser sim√©tricos (ou pouco assim√©tricos). 
   
-A Figura XX (Densidade estimada da funÁ„o discriminante aplicada ‡ amostra teste, por grupo)) apresenta as densidades estimadas da funÁ„o discriminante para os grupos, note que, ‡ luz do comportamento apresentado pelos boxplots temos uma interseÁ„o entre estas densidades, o que demonstra que a regra de decis„o obtida n„o consegue isolar totalmente as distribuiÁıes e consequentemente, diferenciar totalmente os tipos de salm„o, porÈm isso È intrinseco ao banco de dados, j· que as vari·veis propriamente n„o tem um comportamento totalmente distinto entre os tipos de salm„o. 
+A Figura XX (Densidade estimada da fun√ß√£o discriminante aplicada √† amostra teste, por grupo)) apresenta as densidades estimadas da fun√ß√£o discriminante para os grupos. √Ä luz do comportamento apresentado pelos boxplots temos uma interse√ß√£o entre estas densidades, o que demonstra que a regra de decis√£o obtida n√£o consegue isolar totalmente as distribui√ß√µes e consequentemente, diferenciar totalmente os tipos de salm√£o. Por√©m isso √© intr√≠nseco ao banco de dados, j√° que as vari√°veis propriamente n√£o tem um comportamento totalmente distinto entre os tipos de salm√£o. 
 
 
 ```{r}
 
-#legenda: Medidas resumo para os valores da funÁ„o discriminante aplicada na amostra teste, por grupo
+#legenda: Medidas resumo para os valores da fun√ß√£o discriminante aplicada na amostra teste, por grupo
 #xtable(medados) #medidas resumo 
 ```
  
 \begin{table}[ht]
 \centering
-\caption{Medidas resumo para os valores funÁ„o discriminante aplicada na amostra teste, por grupo:}
+\caption{Medidas resumo para os valores fun√ß√£o discriminante aplicada na amostra teste, por grupo:}
 \bgroup
 \def\arraystretch{1.0}
 \begin{tabular}{rlrrrrrrr}
 \toprule
-& Grupo & MÈdia & DP & Var. & MÌnimo & Mediana & M·ximo & n \\ \midrule
+& Grupo & M√©dia & DP & Var. & M√≠nimo & Mediana & M√°ximo & n \\ \midrule
 \hline
 1 & Alasca & -0,63 & 1,15 & 1,33 & -3,16 & -0,62 & 1,94 & 25 \\
-2 & Canad· & 1,97 & 0,96 & 0,93 & -0,64 & 1,97 & 3,77 & 25 \\ \bottomrule
+2 & Canad√° & 1,97 & 0,96 & 0,93 & -0,64 & 1,97 & 3,77 & 25 \\ \bottomrule
 \hline
 \end{tabular}
 \egroup
 \end{table}
 
 
-```{r , fig.cap=c("Boxplots da funÁ„o discriminante aplicada ‡ amostra teste, por grupo"), fig.pos= '!h', fig.height=3.5, fig.width=7}
+```{r , fig.cap=c("Boxplots da fun√ß√£o discriminante aplicada √† amostra teste, por grupo"), fig.pos= '!h', fig.height=3.5, fig.width=7}
 
 boxplot_ac
 ```
 
-```{r , fig.cap=c("Densidade estimada da funÁ„o discriminante aplicada ‡ amostra teste, por grupo"), fig.height=4.5, fig.width=7}
-grupo <- as.factor(rep(c("Alasca","Canad·"), rep(25,2)))
-plot(density(y[grupo=="Alasca"]),lwd=2,xlim=c(min(y)-1,max(y)+3),xlab="funÁ„o discriminante",ylab="densidade",cex=1.2,cex.lab=1.2,cex.main=1.2,main="",ylim=c(0,0.9))
-lines(density(y[grupo=="Canad·"]),col=2,lwd=2)
-legend(3.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canad·"),bty="n",cex=1.2)
+```{r , fig.cap=c("Densidade estimada da fun√ß√£o discriminante aplicada √† amostra teste, por grupo"), fig.height=4.5, fig.width=7}
+grupo <- as.factor(rep(c("Alasca","Canad√°"), rep(25,2)))
+plot(density(y[grupo=="Alasca"]),lwd=2,xlim=c(min(y)-1,max(y)+3),xlab="fun√ß√£o discriminante",ylab="densidade",cex=1.2,cex.lab=1.2,cex.main=1.2,main="",ylim=c(0,0.9))
+lines(density(y[grupo=="Canad√°"]),col=2,lwd=2)
+legend(3.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canad√°"),bty="n",cex=1.2)
 ```
 
 
@@ -742,7 +743,7 @@ legend(3.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canad·"),bty="n",cex=1.2
 
 ```{r}
 #SEPARADOS POR GENERO
-data.femea <- dados %>% group_by(Gen,Reg) %>% filter(Gen =="fÍmea") %>% as.data.frame() 
+data.femea <- dados %>% group_by(Gen,Reg) %>% filter(Gen =="f√™mea") %>% as.data.frame() 
 data.macho <- dados %>% group_by(Gen,Reg) %>% filter(Gen =="macho") %>% as.data.frame() 
 ```
 
@@ -751,12 +752,12 @@ data.macho <- dados %>% group_by(Gen,Reg) %>% filter(Gen =="macho") %>% as.data.
 ################################ PARA FEMEA###########################################
 
 #
-# aqu est„o as modelagens
+# aqu est√£o as modelagens
 
 #lda.fit = lda(Reg~DGAD+DGM, dados2)
 
-# Selecionando as amostras. Selecionei 25 observaÁıes de cada grupo para montar o treinamento do modelo
-
+# Selecionando as amostras. Selecionei 25 observa√ß√µes de cada grupo para montar o treinamento do modelo
+set.seed(20)
 gf.treinog1 <- sort(sample(1:26,13,replace=FALSE))
 gf.treinog2 <- sort(sample(26:52,13,replace=FALSE))
 gf.treino <- c(gf.treinog1,gf.treinog2)
@@ -764,7 +765,7 @@ gf.treino <- c(gf.treinog1,gf.treinog2)
 # Amostra treino
 #atrein <- iris[treino,]
 
-# Utilizando a funÁ„o lda
+# Utilizando a fun√ß√£o lda
 #m.X <- rbind(irisd[51:100,3:4],irisd[101:150,3:4])
 #Sp = rep(c("VE","VI"), rep(50,2))
 #m.Iris <- data.frame(m.X,Sp)
@@ -774,17 +775,17 @@ gf.treino <- c(gf.treinog1,gf.treinog2)
 # as prioris tem de ser diferentes. Custo iguais
 
 gf.result.ad <- lda(data.femea$Reg~., data.femea[,c(3,4)], prior = c(0.6,0.4),subset = gf.treino)
-# coeficientes da funÁ„o discriminante
+# coeficientes da fun√ß√£o discriminante
 # result.ad$scaling
 # predizendo os grupos na amostra teste
 gf.pred<-predict(gf.result.ad, data.femea[-gf.treino, c(3,4)])$class
-# funÁ„o discriminante
+# fun√ß√£o discriminante
 gf.y <-predict(gf.result.ad, data.femea[-gf.treino, c(3,4)])$x 
 # Pegando a amostra teste
 gf.data.teste <- data.femea[-gf.treino,1]
-# Tabela de classificaÁ„o
+# Tabela de classifica√ß√£o
 gf.tc <- table(gf.data.teste,gf.pred)
-#matriz de confus„o
+#matriz de confus√£o
 #confusionMatrix(gf.tc)
 #xtable(gf.tc)
 ```
@@ -794,12 +795,12 @@ gf.tc <- table(gf.data.teste,gf.pred)
 ################################ PARA MACHO###########################################
 
 #
-# aqu est„o as modelagens
+# aqu est√£o as modelagens
 
 #lda.fit = lda(Reg~DGAD+DGM, dados2)
 
-# Selecionando as amostras. Selecionei 25 observaÁıes de cada grupo para montar o treinamento do modelo
-
+# Selecionando as amostras. Selecionei 25 observa√ß√µes de cada grupo para montar o treinamento do modelo
+set.seed(20)
 gm.treinog1 <- sort(sample(1:24,12,replace=FALSE))
 gm.treinog2 <- sort(sample(25:48,12,replace=FALSE))
 gm.treino <- c(gm.treinog1,gm.treinog2)
@@ -807,7 +808,7 @@ gm.treino <- c(gm.treinog1,gm.treinog2)
 # Amostra treino
 #atrein <- iris[treino,]
 
-# Utilizando a funÁ„o lda
+# Utilizando a fun√ß√£o lda
 #m.X <- rbind(irisd[51:100,3:4],irisd[101:150,3:4])
 #Sp = rep(c("VE","VI"), rep(50,2))
 #m.Iris <- data.frame(m.X,Sp)
@@ -817,24 +818,24 @@ gm.treino <- c(gm.treinog1,gm.treinog2)
 # as prioris tem de ser diferentes. Custo iguais
 
 gm.result.ad <- lda(data.macho$Reg~., data.macho[,c(3,4)], prior = c(0.6,0.4),subset = gm.treino)
-# coeficientes da funÁ„o discriminante
+# coeficientes da fun√ß√£o discriminante
 # result.ad$scaling
 # predizendo os grupos na amostra teste
 gm.pred<-predict(gm.result.ad, data.macho[-gm.treino, c(3,4)])$class
-# funÁ„o discriminante
+# fun√ß√£o discriminante
 gm.y <-predict(gm.result.ad, data.macho[-gm.treino, c(3,4)])$x 
 # Pegando a amostra teste
 gm.data.teste <- data.macho[-gm.treino,1]
-# Tabela de classificaÁ„o
+# Tabela de classifica√ß√£o
 gm.tc <- table(gm.data.teste,gm.pred)
-#matriz de confus„o
+#matriz de confus√£o
 #confusionMatrix(gm.tc)
 #xtable(gf.tc)
 ```
 
 ```{r}
 
-set.seed(20)
+
 # TEA PARA FEMEA
 gf.TEA <- (gf.tc[1,2]+gf.tc[2,1])/sum(gf.tc)
 # TEA PARA MACHO
@@ -844,12 +845,12 @@ gm.TEA <- (gm.tc[1,2]+gm.tc[2,1])/sum(gm.tc)
 
 ```{r}
 
-set.seed(20)
-##########TOE PARA FEMEA##########
-gf.m.dados<- data.femea[gf.treino,]
 
-gf.Dados.1 <- (gf.m.dados[gf.m.dados[,1]=="Alasca",][,3:4])
-gf.Dados.2 <- (gf.m.dados[gf.m.dados[,1]=="Canad·",][,3:4])
+##########TOE PARA FEMEA##########
+gf.f.dados<- data.femea[gf.treino,]
+
+gf.Dados.1 <- (gf.f.dados[gf.f.dados[,1]=="Alasca",][,3:4])
+gf.Dados.2 <- (gf.f.dados[gf.f.dados[,1]=="Canad√°",][,3:4])
 gf.v.mean1 <- cbind(c(gf.result.ad$means[1,]))
 gf.v.mean2 <- cbind(c(gf.result.ad$means[2,]))
 gf.S21 <- cov(gf.Dados.1[,1:2])
@@ -857,9 +858,12 @@ gf.S22 <- cov(gf.Dados.2[,1:2])
 
 
 gf.Sp <- ((nrow(gf.Dados.1)-1)*gf.S21 +  ((nrow(gf.Dados.2)-1)*gf.S22))/(nrow(gf.Dados.1) + nrow(gf.Dados.2) - 2)
+
 gf.q.classifi <- 0.5*t(gf.v.mean1-gf.v.mean2)%*%solve(gf.Sp)%*%(gf.v.mean1+gf.v.mean2)
+
 gf.delta2 <-  t(gf.v.mean1-gf.v.mean2)%*%solve(gf.Sp)%*%(gf.v.mean1 - gf.v.mean2)
 #
+
 gf.TOE <- pnorm(-sqrt(gf.delta2)/2)
 
 
@@ -868,7 +872,7 @@ gf.TOE <- pnorm(-sqrt(gf.delta2)/2)
 gm.m.dados<- data.macho[gm.treino,]
 
 gm.Dados.1 <- (gm.m.dados[gm.m.dados[,1]=="Alasca",][,3:4])
-gm.Dados.2 <- (gm.m.dados[gm.m.dados[,1]=="Canad·",][,3:4])
+gm.Dados.2 <- (gm.m.dados[gm.m.dados[,1]=="Canad√°",][,3:4])
 gm.v.mean1 <- cbind(c(gm.result.ad$means[1,]))
 gm.v.mean2 <- cbind(c(gm.result.ad$means[2,]))
 gm.S21 <- cov(gm.Dados.1[,1:2])
@@ -885,25 +889,25 @@ gm.TOE <- pnorm(-sqrt(gm.delta2)/2)
 #FEMEA
 #
 #
-# An·lise da funÁ„o discriminante para a amostra teste
-gf.grupo <- as.factor(rep(c("Alasca","Canad·"), rep(13,2)))
+# An√°lise da fun√ß√£o discriminante para a amostra teste
+gf.grupo <- as.factor(rep(c("Alasca","Canad√°"), rep(13,2)))
 # Medidas resumo
 gf.datadados<-data.frame(gf.y,gf.grupo)
 colnames(gf.datadados)<-c("gf.y","gf.grupo")
 gf.medados<-ddply(gf.datadados,.(gf.grupo),summarise,media=mean(gf.y),dp=sqrt(var(gf.y)),vari=var(gf.y),minimo=min(gf.y),mediana=quantile(gf.y,0.5),maximo=max(gf.y),n=length(gf.y))
-colnames(gf.medados)<-c("Grupo Femea","MÈdia","DP","Var.","MÌnimo","Mediana","M·ximo","n")
+colnames(gf.medados)<-c("Grupo Femea","M√©dia","DP","Var.","M√≠nimo","Mediana","M√°ximo","n")
 
 
 #MACHO
 #
 #
-# An·lise da funÁ„o discriminante para a amostra teste
-gm.grupo <- as.factor(rep(c("Alasca","Canad·"), rep(12,2)))
+# An√°lise da fun√ß√£o discriminante para a amostra teste
+gm.grupo <- as.factor(rep(c("Alasca","Canad√°"), rep(12,2)))
 # Medidas resumo
 gm.datadados<-data.frame(gm.y,gm.grupo)
 colnames(gm.datadados)<-c("gm.y","gm.grupo")
 gm.medados<-ddply(gm.datadados,.(gm.grupo),summarise,media=mean(gm.y),dp=sqrt(var(gm.y)),vari=var(gm.y),minimo=min(gm.y),mediana=quantile(gm.y,0.5),maximo=max(gm.y),n=length(gm.y))
-colnames(gm.medados)<-c("Grupo Macho","MÈdia","DP","Var.","MÌnimo","Mediana","M·ximo","n")
+colnames(gm.medados)<-c("Grupo Macho","M√©dia","DP","Var.","M√≠nimo","Mediana","M√°ximo","n")
 
 
 ```
@@ -916,86 +920,88 @@ gf.boxplot_ac=ggplot(gf.datadados, aes(gf.grupo,gf.y))+stat_boxplot(geom ='error
 gm.boxplot_ac=ggplot(gm.datadados, aes(gm.grupo,gm.y))+stat_boxplot(geom ='errorbar')+geom_boxplot()+theme_bw()
 ```
 
-Outras duas regras, baseadas na metodologia de An·lise discriminante de Fisher, foram geradas ‡ partir do banco de dados, porÈm agora os grupos (Alasca e Canad·) foram divididos por gÍnero fÍmea e macho. Aqui tambÈm foi suposto a presenÁa de homocedasticidade entre as populaÁıes, com custos de classificaÁ„o errada iguais e com as mesmas prioris definidas anteriormente, ou seja, as probabilidades a priori de um salm„o pertencer ao Grupo Alasca foi definida como 0,6 e pertencer ao grupo Canada foi 0,4 para ambos os sexos. 
-  
-Como j· foi discutido anteriormente, o teste de Box indicou para ambos os sexos que as matrizes de covari‚ncia s„o diferentes, de modo que a suposiÁ„o de homoced·sticidade n„o parece ser razo·vel para ambos os casos. 
-  
-Os resultados referentes as regras de classificaÁ„o para salmıes fÍmea a macho s„o apresentados nas tabelas XX e XX respectivamente.
+# An√°lise realizada considerando o sexo do salm√£o
 
-```{r, fig.cap=c("Resultados da classificaÁ„o da amostra teste - FEMININO")}
+Outras duas regras, baseadas na metodologia de An√°lise discriminante de Fisher, foram geradas a partir do banco de dados. Por√©m agora os grupos (Alasca e Canad√°) foram divididos por sexo f√™mea e macho. Aqui tamb√©m foi suposto a presen√ßa de homocedasticidade entre as popula√ß√µes, com custos de classifica√ß√£o errada iguais e com as mesmas prioris definidas anteriormente, ou seja, as probabilidades a priori de um salm√£o pertencer ao Grupo Alasca foi definida como 0,6 e pertencer ao grupo Canad√° foi 0,4 para ambos os sexos. 
+  
+Como j√° foi discutido anteriormente, o teste de Box indicou para ambos os sexos que as matrizes de covari√¢ncia s√£o diferentes, de modo que a suposi√ß√£o de homocedasticidade n√£o parece ser razo√°vel para ambos os casos. 
+  
+Os resultados referentes √†s regras de classifica√ß√£o para salm√µes f√™mea e macho s√£o apresentados nas tabelas XX e XX respectivamente.
+
+```{r, fig.cap=c("Resultados da classifica√ß√£o da amostra teste - FEMININO")}
 
 #xtable(gf.tc)
 ```
 
  \begin{table}[ht]
 \centering
-\caption{Resultados da classificaÁ„o da amostra teste - FEMININO}
+\caption{Resultados da classifica√ß√£o da amostra teste - FEMININO}
 \begin{tabular}{rrr}
 \hline
-& Alasca & Canad· \\
+& Alasca & Canad√° \\
 \hline
 Alasca & 12 & 1 \\
-Canad· & 0 & 13 \\
+Canad√° & 0 & 13 \\
 \hline
 \end{tabular}
 \end{table}
 
-Ao observar a tabela XX (Resultados da classificaÁ„o da amostra teste - FEMININO), observamos a qualidade da regra de classificaÁ„o para os salmıes fÍmea, obtemos uma taxa de erro aparente TEA =  `r round(gf.TEA,2)` $\%$, valor bem abaixo ao da taxa Ûtima de erro TOE = `r round(gf.TOE,2)` $\%$ ao qual leva em consideraÁ„o a validade das suposiÁ„o de igualdade das matrizes de covari‚ncia relativas aos dois tipos de salm„o, ou seja, mesmo com as observaÁıes indicativas ‡ fuga da suposiÁ„o mencionadas, a regra de classificaÁ„o mostrou uma taxa de erro ainda menor que a taxa Ûtima, indicando uma boa performance da regra proposta para o banco de dados em quest„o.
+Ao observar a Tabela XX (Resultados da classifica√ß√£o da amostra teste - FEMININO), observamos a qualidade da regra de classifica√ß√£o para os salm√µes f√™mea. Obtivemos uma taxa de erro aparente TEA =  `r round(gf.TEA,2)` $\%$, valor bem abaixo ao da taxa √≥tima de erro TOE = `r round(gf.TOE,2)` $\%$ ao qual leva em considera√ß√£o a validade das suposi√ß√µes de igualdade das matrizes de covari√¢ncia relativas aos dois tipos de salm√£o, ou seja, mesmo com as observa√ß√µes indicativas √† fuga da suposi√ß√£o mencionadas, a regra de classifica√ß√£o mostrou uma taxa de erro ainda menor que a taxa √≥tima, indicando uma boa performance da regra proposta para o banco de dados em quest√£o.
 
 
 TEA(Feminino): `r gf.TEA`
 #### Ver se faz sentido TEA ser menor que TOE
 TOE(Feminino): `r gf.TOE`
 
-```{r, fig.cap=c("Resultados da classificaÁ„o da amostra teste - MASCULINO")}
+```{r, fig.cap=c("Resultados da classifica√ß√£o da amostra teste - MASCULINO")}
 
 #xtable(gm.tc)
 ```
 
 \begin{table}[ht]
 \centering
-\caption{Resultados da classificaÁ„o da amostra teste - MASCULINO}
+\caption{Resultados da classifica√ß√£o da amostra teste - MASCULINO}
 \begin{tabular}{rrr}
 \hline
-& Alasca & Canad· \\
+& Alasca & Canad√° \\
 \hline
 Alasca & 12 & 0 \\
-Canad· & 1 & 11 \\
+Canad√° & 1 & 11 \\
 \hline
 \end{tabular}
 \end{table}
 
 
-Ao observar a tabela XX (Resultados da classificaÁ„o da amostra teste - MASCULINO), observamos a qualidade da regra de classificaÁ„o para os salmıes macho, obtemos uma taxa de erro aparente TEA =  `r round(gm.TEA,2)` $\%$, valor bem abaixo ao da taxa Ûtima de erro TOE = `r round(gm.TOE,2)` $\%$ ao qual leva em consideraÁ„o a validade das suposiÁ„o de igualdade das matrizes de covari‚ncia relativas aos dois tipos de salm„o, ou seja, mesmo com as observaÁıes indicativas ‡ fuga da suposiÁ„o mencionadas, a regra de classificaÁ„o mostrou uma taxa de erro ainda menor que a taxa Ûtima, indicando uma boa performance da regra proposta para o banco de dados em quest„o.
+Ao observar a tabela XX (Resultados da classifica√ß√£o da amostra teste - MASCULINO), observamos a qualidade da regra de classifica√ß√£o para os salm√µes macho. OBtivemos uma taxa de erro aparente TEA =  `r round(gm.TEA,2)` $\%$, valor bem abaixo ao da taxa √≥tima de erro TOE = `r round(gm.TOE,2)` $\%$ ao qual leva em considera√ß√£o a validade das suposi√ß√£o de igualdade das matrizes de covari√¢ncia relativas aos dois tipos de salm√£o, ou seja, mesmo com as observa√ß√µes indicativas a fuga da suposi√ß√£o mencionadas, a regra de classifica√ß√£o mostrou uma taxa de erro ainda menor que a taxa √≥tima, indicando uma boa performance da regra proposta para o banco de dados em quest√£o.
 
 TEA(Masculino): `r gm.TEA`
 #### Ver se faz sentido TEA ser menor que TOE
 TOE(Masculino): `r gm.TOE`
 
 
-Observe tambÈm que as regras de classificaÁ„o para os salmıes fÍmea e macho apresentam valores de TEA bastante similares, j· que ambos tiveram apenas um erro de classificaÁ„o e a quantidade de peixes de cada sexo na amostra onde as regras foram testadas È praticamente a mesma.
+Observamos tamb√©m que as regras de classifica√ß√£o para os salm√µes f√™mea e macho apresentam valores de TEA bastante similares, j√° que ambos tiveram apenas um erro de classifica√ß√£o e a quantidade de peixes de cada sexo na amostra onde as regras foram testadas √© praticamente a mesma.
 
 
 ```{r}
 #xtable(gf.medados)
 ```
 
-Observamos nas Tabelas XX e XX (Medidas resumo fÍmea e macho) as medidas resumos dos grupos divididos por macho e fÍmea, onde s„o apresentadas os valores da funÁ„o discriminante aplicada na amostra teste. AlÈm disso È possÌvel observar os box-plots para cada genÍro na figura XX (boxplot fÍmea). 
+Nas Tabelas XX e XX (Medidas resumo f√™mea e macho) podemos verificar as medidas resumos dos grupos divididos por macho e f√™mea, onde s√£o apresentadas os valores da fun√ß√£o discriminante aplicada na amostra teste. Al√©m disso √© poss√≠vel observar os box-plots para cada sexo na figura XX (boxplot f√™mea). 
   
-Para salmıes fÍmea, observamos que o valor mÌnimo referente ao grupo Canad· È menor que o m·ximo referente ao grupo Alasca, porÈm, pode-se observar por meio dos box-plots correspondentes que a menos de um valores discrepante, os box-plots parecem ser bastante distintos, uma vez que, pode-se perceber uma separaÁ„o clara entre valores presentes no grupo Alasca comparando-se com os valores presentes no grupo Canad·, este comportamento tambÈm È observado, embora seja menos evidente, na figura XX(funÁao discriminante fÍmea) ao qual apresenta as densidades estimadas para os valores da funÁ„o discriminante para os grupos, nesta figura observa-se uma ·rea de interseÁ„o pequena entre as densidades, o que favorece ‡ distinÁ„o da origem dos Salmıes fÍmea por meio das vari·veis DGAD e DGM.
+Para salm√µes f√™mea, observamos que o valor m√≠nimo referente ao grupo Canad√° √© menor que o m√°ximo referente ao grupo Alasca, por√©m, pode-se observar por meio dos box-plots correspondentes que a menos de alguns valores discrepante, os box-plots parecem ser bastante distintos, uma vez que, pode-se perceber uma separa√ß√£o clara entre valores presentes no grupo Alasca, se comparados com os valores presentes no grupo Canad√°. Este comportamento tamb√©m √© observado, embora seja menos evidente, na figura XX (fun√ß√£o discriminante f√™mea) ao qual apresenta as densidades estimadas para os valores da fun√ß√£o discriminante para os grupos. Nesta figura observa-se uma √°rea de interse√ß√£o pequena entre as densidades, o que favorece a distin√ß√£o da origem dos alm√µes f√™mea por meio das vari√°veis DGAD e DGM.
   
-O comportamento referÍnte aos valores da funÁ„o discriminante para salmıes macho È an·logo ao apresentado para salmıes fÍmea, os box-plots correspondentes, a menos de dois pontos, parecem ser bastante distintos, assim como existe pouca ·rea de interseÁ„o entre as densidades estimadas para os valores da funÁ„o discriminante para os grupos Alasca e Canad· (Figura XX ((funÁao discriminante macho)), o que favorece ‡ distinÁ„o da origem dos salmıes macho por meio das vari·veis DGAD e DGM.
+O comportamento referente aos valores da fun√ß√£o discriminante para salm√µes macho √© an√°logo ao apresentado para salm√µes f√™mea. Os box-plots correspondentes, a menos de dois pontos, parecem ser bastante distintos, assim como existe pouca √°rea de interse√ß√£o entre as densidades estimadas para os valores da fun√ß√£o discriminante para os grupos Alasca e Canad√° (Figura XX ((fun√ßao discriminante macho)), o que favorece a distin√ß√£o da origem dos salm√µes macho por meio das vari√°veis DGAD e DGM.
   
 
 \begin{table}[ht]
 \centering
-\caption{Medidas resumo para os valores funÁ„o discriminante aplicada na amostra teste, por grupo (Feminino)}
+\caption{Medidas resumo para os valores fun√ß√£o discriminante aplicada na amostra teste, por grupo (Feminino)}
 \begin{tabular}{rlrrrrrrr}
 \hline
-& Grupo Femea & MÈdia & DP & Var. & MÌnimo & Mediana & M·ximo & n \\
+& Grupo Femea & M√©dia & DP & Var. & M√≠nimo & Mediana & M√°ximo & n \\
 \hline
 & Alasca & -1,18 & 1,11 & 1,23 & -2,39 & -1,44 & 1,49 & 13 \\
-& Canad· & 1,80 & 0,79 & 0,62 & -0,71 & 1,80 & 3,26 & 13 \\
+& Canad√° & 1,80 & 0,79 & 0,62 & -0,71 & 1,80 & 3,26 & 13 \\
 \hline
 \end{tabular}
 \end{table}
@@ -1006,30 +1012,30 @@ O comportamento referÍnte aos valores da funÁ„o discriminante para salmıes macho
 
 \begin{table}[ht]
 \centering
-\caption{Medidas resumo para os valores funÁ„o discriminante aplicada na amostra teste, por grupo (Masculino)}
+\caption{Medidas resumo para os valores fun√ß√£o discriminante aplicada na amostra teste, por grupo (Masculino)}
 \begin{tabular}{rlrrrrrrr}
 \hline
-& Grupo Macho & MÈdia & DP & Var. & MÌnimo & Mediana & M·ximo & n \\
+& Grupo Macho & M√©dia & DP & Var. & M√≠nimo & Mediana & M√°ximo & n \\
 \hline
 & Alasca & -1,50 & 0,87 & 0,76 & -3,23 & -1,68 & 0,26 & 12 \\
-& Canad· & 1,53 & 0,95 & 0,90 & -0,80 & -1,81 & 2,58 & 12 \\
+& Canad√° & 1,53 & 0,95 & 0,90 & -0,80 & -1,81 & 2,58 & 12 \\
 \hline
 \end{tabular}
 \end{table}
 
-```{r, fig.cap=c("Boxplots da funÁ„o discriminante aplicada ‡ amostra teste, por grupo"), fig.pos= '!h', fig.height=3.5, fig.width=7}
+```{r, fig.cap=c("Boxplots da fun√ß√£o discriminante aplicada √† amostra teste, por grupo"), fig.pos= '!h', fig.height=3.5, fig.width=7}
 grid.arrange(gm.boxplot_ac,gf.boxplot_ac, nrow=1, ncol=2)
 ```
 
-```{r, fig.cap=c("Densidade estimada da funÁ„o discriminante aplicada ‡ amostra teste, por grupo"), fig.height=10, fig.width=12}
+```{r, fig.cap=c("Densidade estimada da fun√ß√£o discriminante aplicada √† amostra teste, por grupo"), fig.height=10, fig.width=12}
 par(mfrow=c(2,1))
-gf.d1 <- plot(density(gf.y[gf.grupo=="Alasca",1]),lwd=2,xlim=c(min(y[,1])-1,max(y[,1])+3),xlab="funÁ„o discriminante femea",ylab="densidade",cex=1.2,cex.lab=1.2,cex.main=1.2,main="",ylim=c(0,0.9))
-lines(density(gf.y[gf.grupo=="Canad·",1]),col=2,lwd=2)
-legend(0.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canad·"),bty="n",cex=1.2)
+gf.d1 <- plot(density(gf.y[gf.grupo=="Alasca",1]),lwd=2,xlim=c(min(y[,1])-1,max(y[,1])+3),xlab="fun√ß√£o discriminante femea",ylab="densidade",cex=1.2,cex.lab=1.2,cex.main=1.2,main="",ylim=c(0,0.9))
+lines(density(gf.y[gf.grupo=="Canad√°",1]),col=2,lwd=2)
+legend(0.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canad√°"),bty="n",cex=1.2)
 
-gm.d2 <- plot(density(gm.y[gm.grupo=="Alasca",1]),lwd=2,xlim=c(min(y[,1])-1,max(y[,1])+3),xlab="funÁ„o discriminante femea",ylab="densidade",cex=1.2,cex.lab=1.2,cex.main=1.2,main="",ylim=c(0,0.9))
-lines(density(gm.y[gm.grupo=="Canad·",1]),col=2,lwd=2)
-legend(0.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canad·"),bty="n",cex=1.2)
+gm.d2 <- plot(density(gm.y[gm.grupo=="Alasca",1]),lwd=2,xlim=c(min(y[,1])-1,max(y[,1])+3),xlab="fun√ß√£o discriminante femea",ylab="densidade",cex=1.2,cex.lab=1.2,cex.main=1.2,main="",ylim=c(0,0.9))
+lines(density(gm.y[gm.grupo=="Canad√°",1]),col=2,lwd=2)
+legend(0.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canad√°"),bty="n",cex=1.2)
 ```
 
 
@@ -1037,15 +1043,15 @@ legend(0.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canad·"),bty="n",cex=1.2
 
 \newpage
 
-4.Conclusıes
+4.Conclus√µes
 
-As an·lises apresentadas aqui indicaram que as regras de classificaÁ„o de salmıes quanto ‡ sua origem (Alasca ou Canad·) obtidas por meio do mÈtodo de an·lise discriminante de Fisher foram razo·velmente boas, mesmo sendo a suposiÁ„o de homoced·sticidade irrazu·vel para todos os conjuntos analisados (Salmıes de ambos os sexos, Salmıes macho e Salmıes fÍmea).
+As an√°lises apresentadas aqui indicaram que as regras de classifica√ß√£o de salm√µes quanto √† sua origem (Alasca ou Canad√°) obtidas por meio do m√©todo de an√°lise discriminante de Fisher foram razoavelmente boas, mesmo sendo a suposi√ß√£o de homocedasticidade irrazo√°vel para todos os conjuntos analisados (Salm√µes de ambos os sexos, Salm√µes macho e Salm√µes f√™mea).
   
-Julgamos que todas as regras de classificaÁ„o obtidas neste presente estudo poderiam ser sugeridas, embora as regras obtidas separando-se os salmıes por sexo tenham sido um pouco mais efetivas, errando a classificaÁ„o de 2 salmıes em contrapartida aos 3 erros de classificaÁ„o obtidos pela regra que n„o leva em consideraÁ„o os sexos dos peixes para a mesma quantidade de peixes analizados, porÈm deve-se avaliar sempre o contexto onde a regra ser· aplicada, o custo, a utilidade e a influÍncia que esta regra de classificaÁ„o pode exercer.
+Concluimos que todas as regras de classifica√ß√£o obtidas neste presente estudo poderiam ser sugeridas, embora as regras obtidas separando-se os salm√µes por sexo tenham sido um pouco mais efetivas, errando a classifica√ß√£o de 2 salm√µes em contrapartida aos 3 erros de classifica√ß√£o obtidos pela regra que n√£o leva em considera√ß√£o os sexos dos peixes para a mesma quantidade de peixes analisados. Por√©m deve-se avaliar sempre o contexto no qual a regra ser√° aplicada, o custo, a utilidade e a influ√™ncia que esta regra de classifica√ß√£o pode exercer.
 
 5. Bibliografia
 
-- Azevedo, C. L. N. (2017). Notas de aula sobre an·lise multivariada de dados http://www.ime.unicamp.br/~cnaber/Material_AM_2S_2017.htm
+- Azevedo, C. L. N. (2017). Notas de aula sobre an√°lise multivariada de dados http://www.ime.unicamp.br/~cnaber/Material_AM_2S_2017.htm
 
 
-- Johnson, R. A. & Wichern, D. W. (2007). Applied Multivariate Statistical Analysis. 6 a ediÁ„o, Upper Saddle River, NJ: Pearson Prentice Hall.
+- Johnson, R. A. & Wichern, D. W. (2007). Applied Multivariate Statistical Analysis. 6 a edi√ß√£o, Upper Saddle River, NJ: Pearson Prentice Hall.
