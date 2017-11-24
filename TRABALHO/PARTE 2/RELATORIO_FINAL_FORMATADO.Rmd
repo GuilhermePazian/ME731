@@ -729,7 +729,7 @@ Canadá & 1 & 24 \\ \bottomrule
 
 \vspace{0.5cm}
 
-Ao observar a Tabela 3 (Resultados da classificação da amostra teste), observamos a qualidade da regra de classificação e obtemos uma taxa de erro aparente TEA =  `r round(TEA,2)` $\%$, valor bem próximo ao da taxa ótima de erro TOE = `r round(TOE,2)` $\%$ ao qual leva em consideração a validade da suposição de igualdade das matrizes de covariância relativas aos dois tipos de salmão, ou seja, mesmo com as observações indicativas à fuga da suposição mencionadas, a regra de classificação mostrou uma taxa de erro bem próxima à taxa ótima, indicando uma boa performance da regra proposta.
+Ao observar a Tabela 3 (Resultados da classificação da amostra teste), observamos a qualidade da regra de classificação e obtemos uma taxa de erro aparente TEA =  `r round(TEA,3)` $\%$, valor bem próximo ao da taxa ótima de erro TOE = `r round(TOE,3)` $\%$ ao qual leva em consideração a validade da suposição de igualdade das matrizes de covariância relativas aos dois tipos de salmão, ou seja, mesmo com as observações indicativas à fuga da suposição mencionadas, a regra de classificação mostrou uma taxa de erro bem próxima à taxa ótima, indicando uma boa performance da regra proposta.
     
 A Tabela 4 (Medidas resumo para os valores função discriminante aplicada na amostra teste, por grupo:) apresenta medidas resumo para os valores da função discriminante e a Figura 6 (Boxplots da função discriminante aplicada à amostra teste, por grupo) apresenta os boxplots para estes mesmos valores. Notamos que o valor máximo para o grupo Alasca é bem próximo ao valor da mediana para o grupo Canadá. O mesmo acontece para o mínimo do grupo Canadá em comparação com a mediana do grupo Alasca, o desvio padrão dos valores dos dois grupos é bastante similar (diferença de 0,19). Para ambos os grupos, os valores da média e mediana se apresentam com valores bastante próximos e os boxplots parecem ser simétricos (ou pouco assimétricos). 
   
@@ -790,7 +790,7 @@ data.macho <- dados %>% group_by(Gen,Reg) %>% filter(Gen =="macho") %>% as.data.
 #lda.fit = lda(Reg~DGAD+DGM, dados2)
 
 # Selecionando as amostras. Selecionei 25 observações de cada grupo para montar o treinamento do modelo
-set.seed(20)
+#set.seed(20)
 gf.treinog1 <- sort(sample(1:26,13,replace=FALSE))
 gf.treinog2 <- sort(sample(26:52,13,replace=FALSE))
 gf.treino <- c(gf.treinog1,gf.treinog2)
@@ -833,7 +833,7 @@ gf.tc <- table(gf.data.teste,gf.pred)
 #lda.fit = lda(Reg~DGAD+DGM, dados2)
 
 # Selecionando as amostras. Selecionei 25 observações de cada grupo para montar o treinamento do modelo
-set.seed(20)
+#set.seed(20)
 gm.treinog1 <- sort(sample(1:24,12,replace=FALSE))
 gm.treinog2 <- sort(sample(25:48,12,replace=FALSE))
 gm.treino <- c(gm.treinog1,gm.treinog2)
@@ -1125,12 +1125,27 @@ Os resultados referentes às regras de classificação para salmões fêmea e ma
 \egroup
 \end{table}
 
-Ao observar a Tabela 6, observamos a qualidade da regra de classificação para os salmões fêmea. Obtivemos uma taxa de erro aparente TEA =  `r round(gf.TEA,2)` $\%$, valor bem abaixo ao da taxa ótima de erro TOE = `r round(gf.TOE,2)` $\%$ ao qual leva em consideração a validade das suposições de igualdade das matrizes de covariância relativas aos dois tipos de salmão, ou seja, mesmo com as observações indicativas à fuga da suposição mencionadas, a regra de classificação mostrou uma taxa de erro ainda menor que a taxa ótima, indicando uma boa performance da regra proposta para o banco de dados em questão.
+\vspace{0.5cm}
+
+\begin{table}[!h]
+\centering
+\caption{TOE e TEA para cada gênero}
+\bgroup
+\def\arraystretch{1.5}
+\begin{tabular}{lll} \toprule
+    & \multicolumn{2}{c}{Gênero} \\
+    \cline{2-3}
+    & Feminino    & Masculino    \\\midrule
+TEA & `r round(gf.TEA,3)` $\%$      & `r round(gm.TEA,3)` $\%$  \\
+TOE & `r round(gf.TOE,3)` $\%$ & `r round(gm.TOE,3)` $\%$ \\ \bottomrule
+\hline
+\end{tabular}
+\egroup
+\end{table}
+
+Ao observar a Tabela 6, observamos a qualidade da regra de classificação para os salmões fêmea. De acordo com a tabela 7, obtivemos uma taxa de erro aparente TEA =  `r round(gf.TEA,3)` $\%$, valor bem abaixo ao da taxa ótima de erro TOE = `r round(gf.TOE,3)` $\%$ ao qual leva em consideração a validade das suposições de igualdade das matrizes de covariância relativas aos dois tipos de salmão, ou seja, mesmo com as observações indicativas à fuga da suposição mencionadas, a regra de classificação mostrou uma taxa de erro ainda menor que a taxa ótima, indicando uma boa performance da regra proposta para o banco de dados em questão.
 
 
-TEA(Feminino): `r gf.TEA`
-
-TOE(Feminino): `r gf.TOE`
 
 ```{r, fig.cap=c("Resultados da classificação da amostra teste - MASCULINO")}
 
@@ -1138,12 +1153,7 @@ TOE(Feminino): `r gf.TOE`
 ```
 
 
-Para os machos, observamos a qualidade da regra de classificação para os salmões macho. OBtivemos uma taxa de erro aparente TEA =  `r round(gm.TEA,2)` $\%$, valor bem abaixo ao da taxa ótima de erro TOE = `r round(gm.TOE,2)` $\%$ ao qual leva em consideração a validade das suposição de igualdade das matrizes de covariância relativas aos dois tipos de salmão, ou seja, mesmo com as observações indicativas a fuga da suposição mencionadas, a regra de classificação mostrou uma taxa de erro ainda menor que a taxa ótima, indicando uma boa performance da regra proposta para o banco de dados em questão.
-
-TEA(Masculino): `r gm.TEA`
-
-TOE(Masculino): `r gm.TOE`
-
+Para os machos, observamos a qualidade da regra de classificação para os salmões macho. Obtivemos uma taxa de erro aparente TEA =  `r round(gm.TEA,3)` $\%$, valor bem abaixo ao da taxa ótima de erro TOE = `r round(gm.TOE,3)` $\%$ ao qual leva em consideração a validade das suposição de igualdade das matrizes de covariância relativas aos dois tipos de salmão, ou seja, mesmo com as observações indicativas a fuga da suposição mencionadas, a regra de classificação mostrou uma taxa de erro ainda menor que a taxa ótima, indicando uma boa performance da regra proposta para o banco de dados em questão.
 
 Observamos também que as regras de classificação para os salmões fêmea e macho apresentam valores de TEA bastante similares, já que ambos tiveram apenas um erro de classificação e a quantidade de peixes de cada sexo na amostra onde as regras foram testadas é praticamente a mesma.
 
@@ -1152,7 +1162,7 @@ Observamos também que as regras de classificação para os salmões fêmea e ma
 #xtable(gf.medados)
 ```
 
-Na tabela 7 podemos verificar as medidas resumos dos grupos divididos por macho e fêmea, onde são apresentadas os valores da função discriminante aplicada na amostra teste. Além disso é possível observar os box-plots para cada sexo na figura 13 (boxplot fêmea). 
+Na tabela 8 podemos verificar as medidas resumos dos grupos divididos por macho e fêmea, onde são apresentadas os valores da função discriminante aplicada na amostra teste. Além disso é possível observar os box-plots para cada sexo na figura 13 (boxplot fêmea). 
   
 Para salmões fêmea, observamos que o valor mínimo referente ao grupo Canadá é menor que o máximo referente ao grupo Alasca, porém, pode-se observar por meio dos box-plots correspondentes que a menos de alguns valores discrepante, os box-plots parecem ser bastante distintos, uma vez que, pode-se perceber uma separação clara entre valores presentes no grupo Alasca, se comparados com os valores presentes no grupo Canadá. Este comportamento também é observado, embora seja menos evidente, na figura 14 (função discriminante fêmea) ao qual apresenta as densidades estimadas para os valores da função discriminante para os grupos. Nesta figura observa-se uma área de interseção pequena entre as densidades, o que favorece a distinção da origem dos almões fêmea por meio das variáveis DGAD e DGM.
   
@@ -1216,9 +1226,9 @@ Concluimos que todas as regras de classificação obtidas neste presente estudo 
 \begin{enumerate}
   \item THE PACIFIC SALMON TREATY: A BRIEF TRUCE IN THE CANADA/U.S.A. PACIFIC SALMON WAR.
 
-  \item note="\url{http://www.adfg.alaska.gov/index.cfm?adfg=commercialbyfisherysalmon.salmon_combined_historical}"
+  \item site:"\url{http://www.adfg.alaska.gov/index.cfm?adfg=commercialbyfisherysalmon.salmon_combined_historical}"
 
-  \item note="\url{http://www.pac.dfo-mpo.gc.ca/stats/comm/summ-somm/annsumm-sommann/2015/ANNUAL15_USER_three_party_groups-eng.htm}"
+  \item site:"\url{http://www.pac.dfo-mpo.gc.ca/stats/comm/summ-somm/annsumm-sommann/2015/ANNUAL15_USER_three_party_groups-eng.htm}"
 
   \item Azevedo, C. L. N. (2017). Notas de aula sobre análise multivariada de dados note= "\url{http://www.ime.unicamp.br/~cnaber/Material_AM_2S_2017.htm}" 
 
