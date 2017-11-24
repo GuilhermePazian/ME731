@@ -298,11 +298,11 @@ mar (em mm)")
 ####################GRAFICOS DE DENSIDADE########################################
 g1 <- dados %>% ggplot(aes(x = DGAD)) +
         geom_density(aes(fill=factor(Reg)),position="identity", alpha=0.5) + theme(legend.position = "bottom") +
-        theme_bw() + labs(y = "Valores ", x = "Valores doce", fill = "Espécies\n")+  scale_fill_brewer(palette="Accent")+guides(fill=F)
+        theme_bw() + labs(y = "Valores ", x = "Valores doce", fill = "Espécies\n")+  scale_fill_brewer(palette="Accent")+guides(fill=F)+scale_x_continuous(limits = c(-300, 300))+scale_y_continuous(limits = c(0, 0.022))
 
 g2 <- dados %>% ggplot(aes(x = DGM)) +
         geom_density(aes(fill=factor(Reg)),position="identity", alpha=0.5) + theme(legend.position = "bottom") +
-        theme_bw() + labs(y = "Valores", x = "Valores do Mar", fill = "Espécies\n")+  scale_fill_brewer(palette="Accent")+labs(fill = "Grupos")
+        theme_bw() + labs(y = "Valores", x = "Valores do Mar", fill = "Espécies\n")+  scale_fill_brewer(palette="Accent")+labs(fill = "Grupos")+scale_x_continuous(limits = c(-300, 600))+scale_y_continuous(limits = c(0, 0.022))
 
 ```
 
@@ -967,6 +967,8 @@ gm.boxplot_ac=ggplot(gm.datadados, aes(gm.grupo,gm.y))+stat_boxplot(geom ='error
 #xtable(tab_resumo_genero)
 ```
 
+Na Tabela 5, podemos observar as medidas resumo de cada uma das variaveis separadas por gênero.
+
 \begin{table}[!h]
 \centering
 \caption{Medidas Resumo das variáveis por região, considerando a variável gênero}
@@ -1046,7 +1048,7 @@ g22 <- data.macho %>% ggplot(aes(x = DGM)) +
 ```
 
 
-A partir da Figura 9, que consta o gráfico de dispersão entre as variaveis separadas por Região (Alasca e Canadá). Para o gênero Fêmea, podemos observar que os peixes do Canáda tendem a ter um diâmetro (em mm) da guelra durante a fase de água doce maior que os indivíduos do Alasca e durante a fase no Mar tendem a ter um diametro menor (em mm). Se olharmos separadamente os dois grupos, vemos que existe uma correlação levemente positiva de valor `r round(cor(filter(data.femea,Reg=="Canadá")[,3:4])[1,2],2)` entre os indivíduos do Canadá, e levemente negativa de valor `r round(cor(filter(data.femea,Reg=="Alasca")[,3:4])[1,2],2)` para os índividuos do Alasca. Vale ressaltar que se considerarmos ambos os Grupos, parecer haver uma correlação levemente negativa entre as variaveis. O mesmo é observado para o grupo  dos machos,se olharmos separadamente os dois grupos, vemos que existe uma correlação levemente positiva de valor `r round(cor(filter(data.macho,Reg=="Canadá")[,3:4])[1,2],2)` entre os indivíduos do Canadá, e levemente negativa de valor `r round(cor(filter(data.macho,Reg=="Alasca")[,3:4])[1,2],2)` para os índividuos do Alasca.
+A partir da Figura 8 e 9, consta o gráfico de dispersão entre as variaveis separadas por Região (Alasca e Canadá). Para o gênero Fêmea, podemos observar que os peixes do Canáda tendem a ter um diâmetro (em mm) da guelra durante a fase de água doce maior que os indivíduos do Alasca e durante a fase no Mar tendem a ter um diametro menor (em mm). Se olharmos separadamente os dois grupos, vemos que existe uma correlação levemente positiva de valor `r round(cor(filter(data.femea,Reg=="Canadá")[,3:4])[1,2],2)` entre os indivíduos do Canadá, e levemente negativa de valor `r round(cor(filter(data.femea,Reg=="Alasca")[,3:4])[1,2],2)` para os índividuos do Alasca. Vale ressaltar que se considerarmos ambos os Grupos, parecer haver uma correlação levemente negativa entre as variaveis. O mesmo é observado para o grupo  dos machos,se olharmos separadamente os dois grupos, vemos que existe uma correlação levemente positiva de valor `r round(cor(filter(data.macho,Reg=="Canadá")[,3:4])[1,2],2)` entre os indivíduos do Canadá, e levemente negativa de valor `r round(cor(filter(data.macho,Reg=="Alasca")[,3:4])[1,2],2)` para os índividuos do Alasca.
 
 
 ```{r,fig.cap=c(" Gráfico de dispersão entre os diâmetros da guelra de salmões em água doce e no mar - Macho"), fig.pos = '!h',fig.height=3}
@@ -1067,7 +1069,7 @@ A partir dos Box-plot da Figura 10, podemos ver para o gênero macho que o diâm
 
 Além disso podemos ver que o diâmetro das guelras para o salmão fêmea do Canadá é consideravelmente maior do que os do Alasca, já durante a fase no mar, o contrario ocorre e  para o Canadá o valor máximo quase atinge a mediana do grupo Alasca.
 
-Portanto é possível notar a partir dos densidades é possível notar que existe uma sobreposição em boa parte da distribuições apresentadas, o que já foi notado nos boxplots anteriormente.
+Portanto é possível notar a partir nas densidades da Figura 11 e 12, que existe uma sobreposição em boa parte da distribuições apresentadas, o que já foi notado nos boxplots anteriormente.
 
 
 ```{r, fig.cap=c("Boxplots dos Grupos por Gênero"), fig.pos= '!h', fig.height=4.5, fig.width=7}
@@ -1097,7 +1099,7 @@ Outras duas regras, baseadas na metodologia de Análise discriminante de Fisher,
   
 Como já foi discutido anteriormente, o teste de Box indicou para ambos os sexos que as matrizes de covariância são diferentes, de modo que a suposição de homocedasticidade não parece ser razoável para ambos os casos. 
   
-Os resultados referentes às regras de classificação para salmões fêmea e macho são apresentados na tabela 5.
+Os resultados referentes às regras de classificação para salmões fêmea e macho são apresentados na tabela 6.
 
 ```{r, fig.cap=c("Resultados da classificação da amostra teste - FEMININO")}
 
@@ -1123,7 +1125,7 @@ Os resultados referentes às regras de classificação para salmões fêmea e ma
 \egroup
 \end{table}
 
-Ao observar a Tabela 5, observamos a qualidade da regra de classificação para os salmões fêmea. Obtivemos uma taxa de erro aparente TEA =  `r round(gf.TEA,2)` $\%$, valor bem abaixo ao da taxa ótima de erro TOE = `r round(gf.TOE,2)` $\%$ ao qual leva em consideração a validade das suposições de igualdade das matrizes de covariância relativas aos dois tipos de salmão, ou seja, mesmo com as observações indicativas à fuga da suposição mencionadas, a regra de classificação mostrou uma taxa de erro ainda menor que a taxa ótima, indicando uma boa performance da regra proposta para o banco de dados em questão.
+Ao observar a Tabela 6, observamos a qualidade da regra de classificação para os salmões fêmea. Obtivemos uma taxa de erro aparente TEA =  `r round(gf.TEA,2)` $\%$, valor bem abaixo ao da taxa ótima de erro TOE = `r round(gf.TOE,2)` $\%$ ao qual leva em consideração a validade das suposições de igualdade das matrizes de covariância relativas aos dois tipos de salmão, ou seja, mesmo com as observações indicativas à fuga da suposição mencionadas, a regra de classificação mostrou uma taxa de erro ainda menor que a taxa ótima, indicando uma boa performance da regra proposta para o banco de dados em questão.
 
 
 TEA(Feminino): `r gf.TEA`
@@ -1152,9 +1154,9 @@ Observamos também que as regras de classificação para os salmões fêmea e ma
 
 Na tabela 7 podemos verificar as medidas resumos dos grupos divididos por macho e fêmea, onde são apresentadas os valores da função discriminante aplicada na amostra teste. Além disso é possível observar os box-plots para cada sexo na figura 13 (boxplot fêmea). 
   
-Para salmões fêmea, observamos que o valor mínimo referente ao grupo Canadá é menor que o máximo referente ao grupo Alasca, porém, pode-se observar por meio dos box-plots correspondentes que a menos de alguns valores discrepante, os box-plots parecem ser bastante distintos, uma vez que, pode-se perceber uma separação clara entre valores presentes no grupo Alasca, se comparados com os valores presentes no grupo Canadá. Este comportamento também é observado, embora seja menos evidente, na figura XX (função discriminante fêmea) ao qual apresenta as densidades estimadas para os valores da função discriminante para os grupos. Nesta figura observa-se uma área de interseção pequena entre as densidades, o que favorece a distinção da origem dos almões fêmea por meio das variáveis DGAD e DGM.
+Para salmões fêmea, observamos que o valor mínimo referente ao grupo Canadá é menor que o máximo referente ao grupo Alasca, porém, pode-se observar por meio dos box-plots correspondentes que a menos de alguns valores discrepante, os box-plots parecem ser bastante distintos, uma vez que, pode-se perceber uma separação clara entre valores presentes no grupo Alasca, se comparados com os valores presentes no grupo Canadá. Este comportamento também é observado, embora seja menos evidente, na figura 14 (função discriminante fêmea) ao qual apresenta as densidades estimadas para os valores da função discriminante para os grupos. Nesta figura observa-se uma área de interseção pequena entre as densidades, o que favorece a distinção da origem dos almões fêmea por meio das variáveis DGAD e DGM.
   
-O comportamento referente aos valores da função discriminante para salmões macho é análogo ao apresentado para salmões fêmea. Os box-plots correspondentes, a menos de dois pontos, parecem ser bastante distintos, assim como existe pouca área de interseção entre as densidades estimadas para os valores da função discriminante para os grupos Alasca e Canadá (Figura XX ((funçao discriminante macho)), o que favorece a distinção da origem dos salmões macho por meio das variáveis DGAD e DGM.
+O comportamento referente aos valores da função discriminante para salmões macho é análogo ao apresentado para salmões fêmea. Os box-plots correspondentes, a menos de dois pontos, parecem ser bastante distintos, assim como existe pouca área de interseção entre as densidades estimadas para os valores da função discriminante para os grupos Alasca e Canadá (Figura 14 ((funçao discriminante macho)), o que favorece a distinção da origem dos salmões macho por meio das variáveis DGAD e DGM.
   
 
 ```{r}
@@ -1188,15 +1190,13 @@ grid.arrange(gm.boxplot_ac,gf.boxplot_ac, nrow=1, ncol=2)
 par(mfrow=c(2,1))
 gf.d1 <- plot(density(gf.y[gf.grupo=="Alasca",1]),lwd=2,xlim=c(min(y[,1])-1,max(y[,1])+3),xlab="função discriminante femea",ylab="densidade",cex=1.2,cex.lab=1.2,cex.main=1.2,main="",ylim=c(0,0.9))
 lines(density(gf.y[gf.grupo=="Canadá",1]),col=2,lwd=2)
-legend(0.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canadá"),bty="n",cex=1.2)
+legend(3,0.8,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canadá"),bty="n",cex=1.2)
 
 gm.d2 <- plot(density(gm.y[gm.grupo=="Alasca",1]),lwd=2,xlim=c(min(y[,1])-1,max(y[,1])+3),xlab="função discriminante femea",ylab="densidade",cex=1.2,cex.lab=1.2,cex.main=1.2,main="",ylim=c(0,0.9))
 lines(density(gm.y[gm.grupo=="Canadá",1]),col=2,lwd=2)
-legend(0.8,0.6,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canadá"),bty="n",cex=1.2)
+legend(3,0.8,lwd=c(2,2),col=c(1,2),legend=c("Alasca","Canadá"),bty="n",cex=1.2)
 ```
 
-
-  
 
 \newpage
 
