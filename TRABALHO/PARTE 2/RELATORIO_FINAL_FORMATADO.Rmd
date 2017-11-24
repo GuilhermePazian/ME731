@@ -427,8 +427,11 @@ boxplot_ac <- ggplot(datadados2, aes(grupo2,y2))+stat_boxplot(geom ='errorbar')+
 \doublespacing
 
 1. Introdução
+
 \vspace{0.5cm}
 \doublespacing
+
+
 O Salmão é um peixe cujo mercado tem uma importância significante para economia, como podemos ver na Tabela 1. A fronteira do Canadá com o Alasca é uma importante área de pesca de salmão, exerce forte influência na escassez ou abundância deste peixe (em um próximo ciclo reprodutivo) no local de reprodução. Existem basicamente dois tipos de Salmão nessa região: um que nasce no Alasca e outro que nasce no Canadá. Devido a proximidade, um salmão nascido no Alasca, pode acabar sendo pescado no mar por um pescador do Canadá e vice versa. Os salmões nascem em água doce mas migram para o mar e retornam, posteriormente, para o local onde nasceram, para fins de reprodução. Por isso, caso grande parte da população de salmão nascida em um local específico for pescado, ocorre uma diminuição na quantidade de salmãos que conseguirão se reproduzir neste local, gerando escassez destes peixes. 
 
 Os pescadores do Alasca eram conhecidos por interceptar grandes quantidades de salmão canadense, deixando os canadenses com menos oportunidade de interceptar salmão originário do Alasca. Este fato gerou alguns conflitos entre Estados Unidos e Canadá, tanto que em 1985 estes países fizeram um tratado para pesca de salmão do Oceano Pacífico (*Pacific Salmon Treaty*), proibindo a pesca de salmão do tipo que nasce no Canadá por pescadores norte americanos e do tipo que nasce no Alasca por pescadores canadenses. Portanto, para facilitar o seguimento do tratado, é imprescindível conseguir diferenciar os tipos de salmão por sua região de origem. Mais informações sobre esse conflito na referência 1 da bibliografia. 
